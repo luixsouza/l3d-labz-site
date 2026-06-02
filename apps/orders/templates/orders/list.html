@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Meus pedidos · {{ SITE.name }}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:820px">
+    <div class="reveal">
+      <span class="eyebrow">Minha conta</span>
+      <h1>Meus pedidos</h1>
+    </div>
+
+    {% if orders %}
+      <div class="mt-3">
+        {% for order in orders %}
+          <a href="{% url 'orders:detail' order.number %}" class="order-card reveal" style="--i:{{ forloop.counter0 }}">
+            <div>
+              <div class="onum">{{ order.number }}</div>
+              <div class="ometa">{{ order.created_at|date:"d/m/Y H:i" }} · {{ order.item_count }} item{{ order.item_count|pluralize:",s" }} · {{ order.payment_label }}</div>
+            </div>
+            <div class="oright">
+              <span class="status-badge {{ order.status_tone }}">{{ order.status_label }}</span>
+              <strong>{{ order.total_display }}</strong>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="ph"><svg class="icon"><use href="#i-package"></use></svg></div>
+        <h3>Você ainda não fez pedidos</h3>
+        <p class="text-muted">Quando comprar, seus pedidos aparecem aqui.</p>
+        <a href="{% url 'catalog:product_list' %}" class="btn btn-primary mt-2">Explorar catálogo <svg class="icon icon-arrow"><use href="#i-arrow-right"></use></svg></a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

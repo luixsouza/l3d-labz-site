@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Pedido {{ order.number }} · {{ SITE.name }}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:760px">
+    <div class="success-hero reveal">
+      <div class="success-mark"><svg class="icon"><use href="#i-check"></use></svg></div>
+      <span class="eyebrow">Pedido confirmado</span>
+      <h1>Obrigado pela compra!</h1>
+      <p class="text-muted">Seu pedido <strong class="text-accent">{{ order.number }}</strong> foi registrado.
+      <span class="status-badge {{ order.status_tone }}" style="margin-left:.4rem">{{ order.status_label }}</span></p>
+    </div>
+
+    <!-- pagamento -->
+    <div class="card reveal mt-3" style="--i:1">
+      <h3>Pagamento — {{ order.payment_label }}</h3>
+      {% if order.payment_method == "pix" %}
+        <div class="pay-box" style="text-align:center">
+          <div class="qr-fake"></div>
+          <div class="code">{{ order.pix_payload }}</div>
+          <button class="btn btn-primary copy-btn" data-copy="{{ order.pix_payload }}"><svg class="icon"><use href="#i-copy"></use></svg> Copiar código PIX</button>
+          <p class="text-dim mt-2" style="font-size:.8rem">Pague pelo app do seu banco. A aprovação é automática.</p>
+        </div>
+      {% elif order.payment_method == "boleto" %}
+        <div class="pay-box">
+          <div class="info-line"><span>Linha digitável</span><span class="status-badge warn">Aguardando</span></div>
+          <div class="code">{{ order.boleto_line }}</div>
+          <button class="btn btn-primary copy-btn" data-copy="{{ order.boleto_line }}"><svg class="icon"><use href="#i-copy"></use></svg> Copiar linha digitável</button>
+          <p class="text-dim mt-2" style="font-size:.8rem">Vence em 3 dias úteis. O pedido entra em produção após a compensação.</p>
+        </div>
+      {% else %}
+        <div class="pay-box" style="display:flex;align-items:center;gap:.7rem">
+          <span class="ti" style="width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:var(--success);background:rgba(52,211,153,.14)"><svg class="icon"><use href="#i-check"></use></svg></span>
+          <div>Pagamento aprovado{% if order.card_last4 %} — cartão final <strong>{{ order.card_last4 }}</strong>{% endif %}. Seu pedido já está em produção!</div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- itens + resumo -->
+    <div class="card reveal mt-3" style="--i:2">
+      <h3>Resumo</h3>
+      <div class="mt-1">
+        {% for item in order.items %}
+          <div class="info-line"><span>{{ item.quantity }}× {{ item.name }}</span><strong>{{ item.line_total_display }}</strong></div>
+        {% endfor %}
+      </div>
+      <hr style="border:none;border-top:1px solid var(--border);margin:1rem 0">
+      <div class="summary-row"><span>Subtotal</span><span>{{ order.subtotal_display }}</span></div>
+      {% if order.has_discount %}<div class="summary-row" style="color:var(--success)"><span>Desconto</span><span>- {{ order.discount_display }}</span></div>{% endif %}
+      <div class="summary-row"><span>Frete</span><span>{{ order.shipping_display }}</span></div>
+      <div class="summary-row total"><span>Total</span><span>{{ order.total_display }}</span></div>
+    </div>
+
+    <!-- entrega -->
+    <div class="card reveal mt-3" style="--i:3">
+      <h3>Entrega</h3>
+      <p class="text-muted mt-1">{{ order.shipping.recipient }}{% if order.shipping.phone %} · {{ order.shipping.phone }}{% endif %}<br>
+      {{ order.shipping.line }} — {{ order.shipping.district }}<br>
+      {{ order.shipping.city }}/{{ order.shipping.state }} · {{ order.shipping.zip_code }}</p>
+    </div>
+
+    <div class="tag-row mt-3" style="justify-content:center">
+      <a href="{% url 'orders:detail' order.number %}" class="btn btn-ghost">Ver pedido</a>
+      <a href="{% url 'catalog:product_list' %}" class="btn btn-primary">Continuar comprando <svg class="icon icon-arrow"><use href="#i-arrow-right"></use></svg></a>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,36 @@
+# ----- Python -----
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# ----- Ambiente virtual -----
+.venv/
+venv/
+env/
+
+# ----- Segredos / ambiente -----
+.env
+.env.*
+!.env.example
+
+# ----- Banco de dados -----
+*.sqlite3
+*.sqlite3-journal
+db.sqlite3
+
+# ----- Django -----
+/media/
+/staticfiles/
+*.log
+local_settings.py
+
+# ----- Editores / SO -----
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp

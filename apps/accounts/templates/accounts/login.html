@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Entrar · {{ SITE.name }}{% endblock %}
+{% block content %}
+<section class="auth-split">
+  <aside class="auth-aside">
+    <a href="{% url 'core:home' %}" class="brand">
+      <svg class="brand-logo" viewBox="0 0 64 64" aria-hidden="true"><use href="#i-koala"></use></svg>
+      <span class="brand-word">nex<b>ora</b></span>
+    </a>
+    <div>
+      <span class="eyebrow">Que bom te ver de novo</span>
+      <h2>Entre e continue montando sua coleção</h2>
+      <p class="text-muted" style="max-width:40ch">Acesse sua conta para acompanhar pedidos, salvar endereços e aproveitar ofertas exclusivas da comunidade maker.</p>
+    </div>
+    <div class="auth-perks">
+      <div class="auth-perk"><span class="pk"><svg class="icon"><use href="#i-package"></use></svg></span> Acompanhe seus pedidos em tempo real</div>
+      <div class="auth-perk"><span class="pk"><svg class="icon"><use href="#i-truck"></use></svg></span> Frete grátis acima de R$ 199</div>
+      <div class="auth-perk"><span class="pk"><svg class="icon"><use href="#i-tag"></use></svg></span> Cupons e lançamentos antecipados</div>
+    </div>
+  </aside>
+
+  <div class="auth-form-side">
+    <div class="card form-card reveal">
+      <h1 style="font-size:1.7rem">Entrar</h1>
+      <p class="text-muted" style="margin-top:-.2rem">Use o e-mail e a senha da sua conta.</p>
+
+      <form method="post" class="mt-3">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+        {% include "core/partials/field.html" with field=form.username %}
+        {% include "core/partials/field.html" with field=form.password %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <button type="submit" class="btn btn-primary btn-block mt-1">Entrar <svg class="icon icon-arrow"><use href="#i-arrow-right"></use></svg></button>
+      </form>
+
+      <p class="form-aside">Ainda não tem conta? <a href="{% url 'accounts:register' %}">Criar agora</a></p>
+    </div>
+  </div>
+</section>
+{% endblock %}

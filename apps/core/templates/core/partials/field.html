@@ -1,0 +1,13 @@
+{# Renderiza um campo de formulário com o estilo Nexora. Uso: {% include "core/partials/field.html" with field=form.email %} #}
+<div class="field">
+  {% if field.field.widget.input_type != "checkbox" %}
+    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+  {% else %}
+    <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
+      {{ field }} <span>{{ field.label }}</span>
+    </label>
+  {% endif %}
+  {% if field.help_text %}<div class="help">{{ field.help_text|safe }}</div>{% endif %}
+  {% for error in field.errors %}<div class="errors">{{ error }}</div>{% endfor %}
+</div>
