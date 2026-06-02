@@ -1,0 +1,44 @@
+{% load static %}
+<header class="site-header">
+  <div class="container">
+    <a href="{% url 'core:home' %}" class="brand" aria-label="Nexora — início">
+      <svg class="brand-logo" viewBox="0 0 64 64" aria-hidden="true"><use href="#i-koala"></use></svg>
+      <span class="brand-word">nex<b>ora</b></span>
+    </a>
+
+    <nav class="main-nav" id="mainNav">
+      <a href="{% url 'catalog:product_list' %}">Catálogo</a>
+      <a href="{% url 'catalog:product_list' %}?sort=new">Lançamentos</a>
+      <a href="{% url 'promotions:list' %}">Promoções</a>
+      <a href="{% url 'core:about' %}">Sobre</a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="icon-btn theme-toggle" id="themeToggle" type="button" aria-label="Alternar tema" title="Alternar tema claro/escuro">
+        <svg class="icon i-sun"><use href="#i-sun"></use></svg>
+        <svg class="icon i-moon"><use href="#i-moon"></use></svg>
+      </button>
+      {% if user.is_authenticated %}
+        <a href="{% url 'accounts:profile' %}" class="icon-btn" title="Minha conta" aria-label="Minha conta">
+          <svg class="icon"><use href="#i-user"></use></svg>
+        </a>
+        <form action="{% url 'accounts:logout' %}" method="post" style="display:inline">
+          {% csrf_token %}
+          <button class="btn btn-ghost btn-sm" type="submit">Sair</button>
+        </form>
+      {% else %}
+        <a href="{% url 'accounts:login' %}" class="btn btn-ghost btn-sm">Entrar</a>
+        <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-sm">Criar conta</a>
+      {% endif %}
+
+      <a href="{% url 'cart:detail' %}" class="icon-btn" title="Carrinho" aria-label="Carrinho">
+        <svg class="icon"><use href="#i-cart"></use></svg>
+        {% if cart_count %}<span class="cart-badge" data-cart-count>{{ cart_count }}</span>{% endif %}
+      </a>
+
+      <button class="icon-btn nav-toggle" id="navToggle" aria-label="Menu">
+        <svg class="icon"><use href="#i-menu"></use></svg>
+      </button>
+    </div>
+  </div>
+</header>

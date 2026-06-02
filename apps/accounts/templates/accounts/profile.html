@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Minha conta · {{ SITE.name }}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="reveal" style="margin-bottom:1.6rem">
+      <span class="eyebrow">Minha conta</span>
+      <h1 style="margin-bottom:.1rem">Olá, {{ profile.display_name }}</h1>
+      <p class="text-muted" style="margin:0">Membro desde {{ profile.member_since|date:"F \d\e Y" }}</p>
+    </div>
+
+    <div class="account-layout">
+      <!-- navegação da conta -->
+      <nav class="account-nav reveal">
+        <a href="{% url 'accounts:profile' %}" class="active"><svg class="icon"><use href="#i-user"></use></svg> Meus dados</a>
+        <a href="{% url 'orders:list' %}"><svg class="icon"><use href="#i-package"></use></svg> Meus pedidos</a>
+        <a href="{% url 'cart:detail' %}"><svg class="icon"><use href="#i-cart"></use></svg> Carrinho</a>
+        <form action="{% url 'accounts:logout' %}" method="post" style="margin-top:.3rem">
+          {% csrf_token %}
+          <button type="submit" style="all:unset;cursor:pointer;display:flex;align-items:center;gap:.65rem;padding:.7rem .9rem;border-radius:11px;color:var(--text-muted);font-weight:600;font-size:.92rem;width:100%;box-sizing:border-box"><svg class="icon"><use href="#i-arrow-right"></use></svg> Sair</button>
+        </form>
+      </nav>
+
+      <!-- conteúdo -->
+      <div>
+        <div class="card reveal">
+          <h3>Dados pessoais</h3>
+          <p class="text-muted" style="margin-top:-.3rem;font-size:.9rem">Mantenha suas informações atualizadas.</p>
+          <form method="post" class="mt-2">
+            {% csrf_token %}
+            <div class="form-grid">
+              {% include "core/partials/field.html" with field=form.first_name %}
+              {% include "core/partials/field.html" with field=form.last_name %}
+              {% include "core/partials/field.html" with field=form.phone %}
+              <div style="display:flex;align-items:end;padding-bottom:1.1rem">{% include "core/partials/field.html" with field=form.newsletter_opt_in %}</div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-1">Salvar alterações</button>
+          </form>
+        </div>
+
+        <div class="card reveal mt-3">
+          <div class="section-head" style="margin-bottom:1rem"><h3 style="margin:0">Endereços</h3></div>
+          {% for addr in addresses %}
+            <div style="padding:.9rem 0;border-bottom:1px solid var(--border-soft)">
+              <strong>{{ addr.label }}</strong>
+              {% if addr.is_default %}<span class="chip" style="margin-left:.4rem">padrão</span>{% endif %}
+              <div class="text-muted">{{ addr.recipient }}</div>
+              <div class="text-muted">{{ addr.line }} — {{ addr.district }}</div>
+              <div class="text-muted">{{ addr.city }}/{{ addr.state }} · {{ addr.zip_code }}</div>
+            </div>
+          {% empty %}
+            <div class="empty-state" style="padding:2rem 0">
+              <div class="ph"><svg class="icon"><use href="#i-box"></use></svg></div>
+              <p>Nenhum endereço cadastrado ainda.</p>
+              <p class="text-muted">Você poderá adicionar um endereço no checkout.</p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

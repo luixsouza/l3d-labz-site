@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Sobre · {{ SITE.name }}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+
+    <!-- hero -->
+    <div class="story-hero reveal">
+      <div class="bg"><img src="https://loremflickr.com/1400/640/3d,printer,workshop?lock=21" alt=""
+           onerror="this.onerror=null;this.src='https://picsum.photos/seed/aboutnexora/1400/640'"></div>
+      <div class="inner">
+        <span class="eyebrow">Nossa história</span>
+        <h1>Impressão 3D feita por nerds, para nerds.</h1>
+        <p class="lead">A {{ SITE.name }} nasceu numa garagem barulhenta, cheia de impressoras 3D e cultura pop. Hoje levamos esse capricho de maker para estantes do Brasil inteiro.</p>
+        <div class="mt-3"><a href="{% url 'catalog:product_list' %}" class="btn btn-primary">Conhecer o catálogo <svg class="icon icon-arrow"><use href="#i-arrow-right"></use></svg></a></div>
+      </div>
+    </div>
+
+    <!-- números -->
+    <div class="stat-row reveal" style="margin-top:2.4rem">
+      <div class="stat"><div class="n">1.200+</div><div class="l">modelos no catálogo</div></div>
+      <div class="stat"><div class="n">25k+</div><div class="l">peças impressas</div></div>
+      <div class="stat"><div class="n">4,9/5</div><div class="l">avaliação dos clientes</div></div>
+      <div class="stat"><div class="n">48h</div><div class="l">produção média</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- valores -->
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="section-head center reveal">
+      <span class="eyebrow">No que acreditamos</span>
+      <h2 class="section-title">Qualidade de maker em cada camada</h2>
+    </div>
+    <div class="feature-grid">
+      <div class="feature reveal" style="--i:0"><div class="fi"><svg class="icon icon-lg"><use href="#i-box"></use></svg></div><h3>Sob demanda</h3><p class="text-muted">Imprimimos só o que você pede — menos desperdício, mais exclusividade.</p></div>
+      <div class="feature reveal" style="--i:1"><div class="fi"><svg class="icon icon-lg"><use href="#i-bolt"></use></svg></div><h3>Ágil</h3><p class="text-muted">Produção média de 48h e envio para todo o Brasil.</p></div>
+      <div class="feature reveal" style="--i:2"><div class="fi"><svg class="icon icon-lg"><use href="#i-spark"></use></svg></div><h3>Personalizável</h3><p class="text-muted">Cores e tamanhos sob medida em vários modelos.</p></div>
+      <div class="feature reveal" style="--i:3"><div class="fi"><svg class="icon icon-lg"><use href="#i-leaf"></use></svg></div><h3>Consciente</h3><p class="text-muted">Filamentos PLA de fontes renováveis sempre que possível.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- processo -->
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="section-head center reveal">
+      <span class="eyebrow">Como funciona</span>
+      <h2 class="section-title">Da escolha à sua estante</h2>
+    </div>
+    <div class="benefits reveal">
+      <div class="benefit"><span class="bi"><svg class="icon icon-lg"><use href="#i-search"></use></svg></span><div><div class="bt">1 · Escolha</div><div class="bs">Navegue o catálogo e personalize</div></div></div>
+      <div class="benefit"><span class="bi"><svg class="icon icon-lg"><use href="#i-layers"></use></svg></span><div><div class="bt">2 · Impressão</div><div class="bs">Sua peça nasce camada por camada</div></div></div>
+      <div class="benefit"><span class="bi"><svg class="icon icon-lg"><use href="#i-spark"></use></svg></span><div><div class="bt">3 · Acabamento</div><div class="bs">Revisão e finish artesanal</div></div></div>
+      <div class="benefit"><span class="bi"><svg class="icon icon-lg"><use href="#i-truck"></use></svg></span><div><div class="bt">4 · Entrega</div><div class="bs">Embalada com carinho até você</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section">
+  <div class="container">
+    <div class="newsletter reveal">
+      <span class="eyebrow">Bora começar?</span>
+      <h2>Tem um modelo na cabeça? A gente imprime.</h2>
+      <p class="text-muted" style="max-width:48ch;margin-inline:auto">Explore o catálogo ou fale com a gente para um projeto sob medida.</p>
+      <div class="tag-row mt-3" style="justify-content:center">
+        <a href="{% url 'catalog:product_list' %}" class="btn btn-primary">Ver catálogo</a>
+        <a href="{% url 'promotions:list' %}" class="btn btn-ghost">Ver ofertas</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Pedido {{ order.number }} · {{ SITE.name }}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:820px">
+    <nav class="breadcrumb reveal">
+      <a href="{% url 'orders:list' %}">Meus pedidos</a>
+      <svg class="icon"><use href="#i-chevron-right"></use></svg>
+      <span>{{ order.number }}</span>
+    </nav>
+
+    <div class="reveal mt-2" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+      <h1 style="margin:0">{{ order.number }}</h1>
+      <span class="status-badge {{ order.status_tone }}">{{ order.status_label }}</span>
+    </div>
+    <p class="text-dim reveal">Feito em {{ order.created_at|date:"d/m/Y H:i" }} · Pagamento: {{ order.payment_label }}
+      ({{ order.payment_status_label }})</p>
+
+    <div class="card reveal mt-2">
+      <h3>Itens</h3>
+      <div class="mt-1">
+        {% for item in order.items %}
+          <div class="info-line">
+            <span>{% if item.url %}<a href="{{ item.url }}">{{ item.quantity }}× {{ item.name }}</a>{% else %}{{ item.quantity }}× {{ item.name }}{% endif %}</span>
+            <strong>{{ item.line_total_display }}</strong>
+          </div>
+        {% endfor %}
+      </div>
+      <hr style="border:none;border-top:1px solid var(--border);margin:1rem 0">
+      <div class="summary-row"><span>Subtotal</span><span>{{ order.subtotal_display }}</span></div>
+      {% if order.has_discount %}<div class="summary-row" style="color:var(--success)"><span>Desconto{% if order.coupon_code %} ({{ order.coupon_code }}){% endif %}</span><span>- {{ order.discount_display }}</span></div>{% endif %}
+      <div class="summary-row"><span>Frete</span><span>{{ order.shipping_display }}</span></div>
+      <div class="summary-row total"><span>Total</span><span>{{ order.total_display }}</span></div>
+    </div>
+
+    <div class="grid-2 mt-3">
+      <div class="card reveal">
+        <h3>Entrega</h3>
+        <p class="text-muted mt-1">{{ order.shipping.recipient }}{% if order.shipping.phone %} · {{ order.shipping.phone }}{% endif %}<br>
+        {{ order.shipping.line }} — {{ order.shipping.district }}<br>
+        {{ order.shipping.city }}/{{ order.shipping.state }} · {{ order.shipping.zip_code }}</p>
+      </div>
+      <div class="card reveal" style="--i:1">
+        <h3>Pagamento</h3>
+        <p class="text-muted mt-1">{{ order.payment_label }}
+        {% if order.card_last4 %}— final {{ order.card_last4 }}{% endif %}<br>
+        Status: <strong>{{ order.payment_status_label }}</strong>
+        {% if order.paid_at %}<br>Pago em {{ order.paid_at|date:"d/m/Y H:i" }}{% endif %}</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

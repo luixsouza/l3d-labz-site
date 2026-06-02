@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} · {{ SITE.name }}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <nav class="breadcrumb reveal">
+      <a href="{% url 'catalog:product_list' %}">Catálogo</a>
+      <svg class="icon"><use href="#i-chevron-right"></use></svg>
+      <a href="?categoria={{ product.category_slug }}">{{ product.category_name }}</a>
+    </nav>
+
+    <div class="product-detail mt-2">
+      <div class="detail-media reveal">
+        <span class="thumb-mono" style="--acc:{{ product.accent }}">{{ product.monogram }}</span>
+        {% if product.image_url %}
+          <img src="{{ product.image_url }}" alt="{{ product.name }}"
+               onerror="this.onerror=null;this.src='https://picsum.photos/seed/{{ product.slug }}/800/800'">
+        {% endif %}
+      </div>
+
+      <div class="reveal" style="--i:1">
+        <span class="product-cat">{{ product.category_name }}</span>
+        <h1 style="margin-top:.4rem">{{ product.name }}</h1>
+        <div class="product-rating" style="font-size:1rem">
+          <svg class="icon"><use href="#i-star"></use></svg> {{ product.rating }} · {{ product.sales_count }} vendidos
+        </div>
+
+        <div class="detail-price">
+          <span class="price">{{ product.price_display }}</span>
+          {% if product.has_discount %}
+            <span class="price-old">{{ product.old_price_display }}</span>
+            <span class="badge badge-discount" style="position:static">-{{ product.discount_pct }}%</span>
+          {% endif %}
+        </div>
+
+        <p class="text-muted">{{ product.description|default:"Sem descrição ainda." }}</p>
+
+        <div class="tag-row mt-2">
+          <span class="chip"><svg class="icon"><use href="#i-layers"></use></svg> {{ product.material }}</span>
+          {% if product.dimensions %}<span class="chip"><svg class="icon"><use href="#i-ruler"></use></svg> {{ product.dimensions }}</span>{% endif %}
+          <span class="chip"><svg class="icon"><use href="#i-clock"></use></svg> {{ product.print_time_hours }}h de impressão</span>
+          {% if product.in_stock %}<span class="chip"><svg class="icon"><use href="#i-check"></use></svg> {{ product.stock }} em estoque</span>
+          {% else %}<span class="chip">Esgotado</span>{% endif %}
+        </div>
+
+        <div class="mt-3">
+          {% if product.in_stock %}
+            <form action="{% url 'cart:add' product.id %}" method="post" data-cart-form>
+              {% csrf_token %}
+              <div class="tag-row" style="align-items:center">
+                <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" style="width:90px">
+                <button type="submit" class="btn btn-primary">
+                  <svg class="icon"><use href="#i-cart"></use></svg> Adicionar ao carrinho
+                </button>
+              </div>
+            </form>
+          {% else %}
+            <button class="btn btn-ghost" disabled>Produto indisponível</button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {% if related %}
+    <div class="section" style="padding-bottom:0">
+      <div class="section-head reveal"><h2 class="section-title">Você também pode gostar</h2></div>
+      <div class="product-grid">
+        {% for product in related %}
+          <div class="reveal" style="--i:{{ forloop.counter0 }}">
+            {% include "catalog/partials/product_card.html" with product=product %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

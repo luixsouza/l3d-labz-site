@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Catálogo · {{ SITE.name }}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+
+    <!-- carrossel de promoções -->
+    {% if promotions %}
+    <div class="carousel reveal" style="margin-bottom:2.4rem">
+      <div class="carousel-track">
+        {% for promo in promotions %}
+          <div class="slide">
+            <div class="bg"><img src="{{ promo.image_url }}" alt=""
+                 onerror="this.onerror=null;this.src='https://picsum.photos/seed/cat{{ forloop.counter }}/1200/440'"></div>
+            <div class="content">
+              <span class="eyebrow">{{ promo.badge }}</span>
+              <h2 class="section-title">{{ promo.title }}</h2>
+              <p class="text-muted">{{ promo.subtitle }}</p>
+              <div class="mt-2"><a href="{{ promo.cta_url }}" class="btn btn-primary">{{ promo.cta_label }} <svg class="icon icon-arrow"><use href="#i-arrow-right"></use></svg></a></div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      {% if promotions|length > 1 %}
+        <button class="carousel-arrow prev" data-carousel-prev aria-label="Anterior"><svg class="icon"><use href="#i-chevron-left"></use></svg></button>
+        <button class="carousel-arrow next" data-carousel-next aria-label="Próximo"><svg class="icon"><use href="#i-chevron-right"></use></svg></button>
+        <div class="carousel-dots" data-carousel-dots></div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- busca central -->
+    <div class="search-hero reveal">
+      <span class="eyebrow eyebrow-center">{% if active_category %}{{ active_category.name }}{% else %}Catálogo completo{% endif %}</span>
+      <h1 style="max-width:18ch;margin-inline:auto">{% if query %}Resultados para “{{ query }}”{% elif active_category %}{{ active_category.name }}{% else %}Tudo o que dá pra imprimir{% endif %}</h1>
+      <form method="get" action="{% url 'catalog:product_list' %}">
+        {% if active_category %}<input type="hidden" name="categoria" value="{{ active_category.slug }}">{% endif %}
+        <input type="hidden" name="sort" value="{{ current_sort }}">
+        <div class="search-bar">
+          <svg class="icon"><use href="#i-search"></use></svg>
+          <input type="search" name="q" value="{{ query }}" placeholder="Buscar action figures, gadgets, réplicas…">
+          <button class="btn btn-primary" type="submit">Buscar</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- filtros -->
+    <div class="filter-bar reveal">
+      <div class="cat-pills">
+        <a class="pill {% if not active_category %}active{% endif %}" href="?sort={{ current_sort }}{% if query %}&q={{ query }}{% endif %}">Todas</a>
+        {% for cat in categories %}
+          <a class="pill {% if active_category.slug == cat.slug %}active{% endif %}" href="?categoria={{ cat.slug }}&sort={{ current_sort }}{% if query %}&q={{ query }}{% endif %}">
+            <svg class="icon" style="color:{{ cat.accent }}"><use href="#i-{{ cat.icon }}"></use></svg> {{ cat.name }}
+          </a>
+        {% endfor %}
+      </div>
+      <form method="get" class="tools">
+        {% if active_category %}<input type="hidden" name="categoria" value="{{ active_category.slug }}">{% endif %}
+        {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+        <input type="number" name="min" placeholder="mín R$" value="{{ request.GET.min }}" step="0.01">
+        <input type="number" name="max" placeholder="máx R$" value="{{ request.GET.max }}" step="0.01">
+        <select name="sort" onchange="this.form.submit()">
+          <option value="relevance" {% if current_sort == "relevance" %}selected{% endif %}>Relevância</option>
+          <option value="new" {% if current_sort == "new" %}selected{% endif %}>Mais novos</option>
+          <option value="popular" {% if current_sort == "popular" %}selected{% endif %}>Mais vendidos</option>
+          <option value="price_asc" {% if current_sort == "price_asc" %}selected{% endif %}>Menor preço</option>
+          <option value="price_desc" {% if current_sort == "price_desc" %}selected{% endif %}>Maior preço</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" type="submit">Aplicar</button>
+      </form>
+    </div>
+
+    <p class="text-dim reveal" style="margin:1.3rem 0 .2rem;font-size:.9rem">{{ total }} produto{{ total|pluralize }} encontrado{{ total|pluralize }}</p>
+
+    {% if products %}
+      <div class="product-grid mt-2">
+        {% for product in products %}
+          <div class="reveal" style="--i:{{ forloop.counter0 }}">{% include "catalog/partials/product_card.html" with product=product %}</div>
+        {% endfor %}
+      </div>
+
+      {% if page_obj.has_other_pages %}
+        <nav class="pagination">
+          {% if page_obj.has_previous %}
+            <a href="?{% if active_category %}categoria={{ active_category.slug }}&{% endif %}sort={{ current_sort }}&page={{ page_obj.previous_page_number }}"><svg class="icon"><use href="#i-chevron-left"></use></svg></a>
+          {% endif %}
+          {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}<span class="current">{{ num }}</span>
+            {% else %}<a href="?{% if active_category %}categoria={{ active_category.slug }}&{% endif %}sort={{ current_sort }}&page={{ num }}">{{ num }}</a>{% endif %}
+          {% endfor %}
+          {% if page_obj.has_next %}
+            <a href="?{% if active_category %}categoria={{ active_category.slug }}&{% endif %}sort={{ current_sort }}&page={{ page_obj.next_page_number }}"><svg class="icon"><use href="#i-chevron-right"></use></svg></a>
+          {% endif %}
+        </nav>
+      {% endif %}
+    {% else %}
+      <div class="empty-state">
+        <div class="ph"><svg class="icon"><use href="#i-search"></use></svg></div>
+        <h3>Nada encontrado</h3>
+        <p class="text-muted">Tente outro termo ou remova os filtros.</p>
+        <a href="{% url 'catalog:product_list' %}" class="btn btn-ghost mt-2">Limpar filtros</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
