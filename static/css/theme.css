@@ -321,6 +321,19 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; margin: 0 0 .4e
 .detail-media { position: relative; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border); aspect-ratio: 1/1; background: radial-gradient(120% 120% at 70% 20%, rgba(47,168,79,.25), transparent 55%), linear-gradient(160deg, var(--bg-elevated), var(--bg-soft)); display: grid; place-items: center; }
 .detail-media img { width: 100%; height: 100%; object-fit: cover; }
 .detail-media .ph { width: 40%; color: var(--accent-2); animation: float 6s ease-in-out infinite; }
+/* --- viewer 3D (detalhe) --- */
+.detail-media model-viewer {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-lg);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  --poster-color: var(--bg-soft);
+  --progress-bar-color: var(--accent);
+  --progress-mask: transparent;
+}
 .detail-price { display: flex; align-items: baseline; gap: .8rem; margin: 1rem 0 1.5rem; }
 .detail-price .price { font-size: 2.3rem; }
 .breadcrumb { display: flex; gap: .4rem; align-items: center; font-size: .85rem; color: var(--text-dim); }
