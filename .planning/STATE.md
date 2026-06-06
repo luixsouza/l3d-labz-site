@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-06-06T02:15:28.689Z"
+stopped_at: Completed 01-02-PLAN.md (code) — aguardando checkpoint human-verify
+last_updated: "2026-06-06T02:19:30.534Z"
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -47,6 +47,7 @@ Plan: 2 of 2
 
 *Updated after each plan completion*
 | Phase 01 P01 | 2 | 2 tasks | 13 files |
+| Phase 01 P02 | 2 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -61,6 +62,7 @@ Recent decisions affecting current work:
 - [Roadmap]: Estética light/clean minimalista como base.
 - [Phase 01]: Default de tema mudou para light (data-theme=light) refletindo a estética minimalista; boot script ainda sobrescreve com a preferência salva.
 - [Phase 01]: Símbolo #i-koala mantido em icons.html (não referenciado) para não quebrar referências esquecidas.
+- [Phase 01]: .grad-text minimalista usa verde solido var(--accent) (sem gradiente/animacao); 5 azuis literais rgba(59,130,246) convertidos para verde.
 
 ### Pending Todos
 
@@ -79,6 +81,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-06T02:15:21.001Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-06-06T02:19:23.134Z
+Stopped at: Completed 01-02-PLAN.md (code) — aguardando checkpoint human-verify
 Resume file: None

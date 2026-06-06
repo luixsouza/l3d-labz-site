@@ -30,7 +30,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. A home e as páginas-chave (catálogo e detalhe) têm tratamento minimalista (mais espaço em branco, menos ornamento) mantendo as seções essenciais.
 **Plans**: 2 plans
 - [x] 01-01-PLAN.md — Marca L3D Labz: paleta Luigi (dark+light), emblema "L", wordmark, migração da chave de tema, strings
-- [ ] 01-02-PLAN.md — UI minimalista: home, catálogo e detalhe (respiro + verde, sem reescrever o CSS)
+- [x] 01-02-PLAN.md — UI minimalista: home, catálogo e detalhe (respiro + verde, sem reescrever o CSS)
 
 ### Phase 2: Fundação de Dados 3D
 **Goal**: O modelo `Product` armazena um arquivo de exibição 3D (GLB) e um arquivo imprimível (STL) por produto, e o administrador consegue subir ambos pelo Django admin.

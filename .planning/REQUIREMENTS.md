@@ -21,8 +21,8 @@ Requisitos para esta milestone (rebrand + visualizador 3D). Cada um mapeia para 
 
 ### Interface Minimalista (UI)
 
-- [ ] **UI-01**: A home é redesenhada num estilo minimalista (mais espaço em branco, menos ornamentos/gradientes), mantendo as seções essenciais
-- [ ] **UI-02**: O tratamento minimalista é consistente nas páginas-chave (catálogo e detalhe de produto)
+- [x] **UI-01**: A home é redesenhada num estilo minimalista (mais espaço em branco, menos ornamentos/gradientes), mantendo as seções essenciais
+- [x] **UI-02**: O tratamento minimalista é consistente nas páginas-chave (catálogo e detalhe de produto)
 
 ### Dados do Modelo 3D (Model)
 
@@ -68,8 +68,8 @@ Excluídos explicitamente para evitar scope creep.
 | THEME-01 | Phase 1 | Complete |
 | THEME-02 | Phase 1 | Complete |
 | THEME-03 | Phase 1 | Complete |
-| UI-01 | Phase 1 | Pending |
-| UI-02 | Phase 1 | Pending |
+| UI-01 | Phase 1 | Complete |
+| UI-02 | Phase 1 | Complete |
 | MODEL-01 | Phase 2 | Pending |
 | MODEL-02 | Phase 2 | Pending |
 | MODEL-03 | Phase 2 | Pending |
