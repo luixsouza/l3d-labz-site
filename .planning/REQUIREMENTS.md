@@ -60,31 +60,29 @@ Excluídos explicitamente para evitar scope creep.
 
 ## Traceability
 
-Preenchido durante a criação do roadmap.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BRAND-01 | TBD | Pending |
-| BRAND-02 | TBD | Pending |
-| BRAND-03 | TBD | Pending |
-| THEME-01 | TBD | Pending |
-| THEME-02 | TBD | Pending |
-| THEME-03 | TBD | Pending |
-| UI-01 | TBD | Pending |
-| UI-02 | TBD | Pending |
-| MODEL-01 | TBD | Pending |
-| MODEL-02 | TBD | Pending |
-| MODEL-03 | TBD | Pending |
-| VIEW-01 | TBD | Pending |
-| VIEW-02 | TBD | Pending |
-| VIEW-03 | TBD | Pending |
-| VIEW-04 | TBD | Pending |
+| BRAND-01 | Phase 1 | Pending |
+| BRAND-02 | Phase 1 | Pending |
+| BRAND-03 | Phase 1 | Pending |
+| THEME-01 | Phase 1 | Pending |
+| THEME-02 | Phase 1 | Pending |
+| THEME-03 | Phase 1 | Pending |
+| UI-01 | Phase 1 | Pending |
+| UI-02 | Phase 1 | Pending |
+| MODEL-01 | Phase 2 | Pending |
+| MODEL-02 | Phase 2 | Pending |
+| MODEL-03 | Phase 2 | Pending |
+| VIEW-01 | Phase 3 | Pending |
+| VIEW-02 | Phase 3 | Pending |
+| VIEW-03 | Phase 3 | Pending |
+| VIEW-04 | Phase 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 15 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 15 ⚠️
+- Mapped to phases: 15 ✓
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-05*
-*Last updated: 2026-06-05 after initial definition*
+*Last updated: 2026-06-05 after roadmap creation*
