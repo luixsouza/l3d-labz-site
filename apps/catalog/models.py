@@ -4,6 +4,7 @@ from __future__ import annotations
 from datetime import timedelta
 from decimal import Decimal
 
+from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -68,6 +69,17 @@ class Product(TimeStampedModel):
         help_text="Usada quando não há upload. Útil para demo/seed.",
     )
 
+    model_3d = models.FileField(
+        "modelo 3D (GLB/glTF)", upload_to="products/models/", blank=True,
+        validators=[FileExtensionValidator(allowed_extensions=["glb", "gltf"])],
+        help_text="Arquivo .glb ou .gltf exibido no visualizador 3D.",
+    )
+    model_stl = models.FileField(
+        "arquivo STL (impressão)", upload_to="products/stl/", blank=True,
+        validators=[FileExtensionValidator(allowed_extensions=["stl"])],
+        help_text="Arquivo .stl imprimível, disponibilizado para download.",
+    )
+
     stock = models.PositiveIntegerField("estoque", default=10)
     rating = models.DecimalField("avaliação", max_digits=3, decimal_places=2, default=Decimal("5.0"))
     sales_count = models.PositiveIntegerField("vendas", default=0)
@@ -117,3 +129,11 @@ class Product(TimeStampedModel):
     @property
     def is_new(self) -> bool:
         return self.created_at >= timezone.now() - timedelta(days=NEW_PRODUCT_WINDOW_DAYS)
+
+    @property
+    def has_3d_model(self) -> bool:
+        return bool(self.model_3d)
+
+    @property
+    def has_stl(self) -> bool:
+        return bool(self.model_stl)
