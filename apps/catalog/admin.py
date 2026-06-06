@@ -23,6 +23,7 @@ class ProductAdmin(admin.ModelAdmin):
         (None, {"fields": ("category", "name", "slug", "description")}),
         ("Preço", {"fields": ("price", "compare_at_price")}),
         ("Visual", {"fields": ("image",)}),
+        ("Modelos 3D", {"fields": ("model_3d", "model_stl")}),
         ("Estoque & métricas", {"fields": ("stock", "rating", "sales_count")}),
         ("Impressão 3D", {"fields": ("material", "dimensions", "print_time_hours")}),
         ("Flags", {"fields": ("is_featured", "is_active")}),
