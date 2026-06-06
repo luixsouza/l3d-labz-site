@@ -31,6 +31,11 @@ class CatalogService(BaseService):
     def list_on_sale(limit: int = 8) -> list[dict]:
         return ProductMapper.to_list(ProductQuery.on_sale(limit))
 
+    # ---- galeria de modelos 3D ----
+    @staticmethod
+    def gallery() -> dict[str, Any]:
+        return {"products": ProductMapper.to_list(ProductQuery.with_3d())}
+
     # ---- catálogo (listagem com filtros + paginação) ----
     @staticmethod
     def browse(params, page: int = 1) -> dict[str, Any]:

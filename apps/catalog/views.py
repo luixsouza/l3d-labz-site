@@ -18,3 +18,7 @@ def product_detail(request, slug):
     if context is None:
         raise Http404("Produto não encontrado.")
     return render(request, "catalog/product_detail.html", context)
+
+
+def models_3d(request):
+    return render(request, "catalog/models_3d.html", CatalogService.gallery())
