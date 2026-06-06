@@ -52,7 +52,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Num produto sem GLB, a área de mídia faz fallback gracioso para a imagem atual, sem quebra de layout.
   3. Quando o produto tem STL, o cliente consegue baixar o arquivo STL a partir da página do produto.
   4. Existe uma aba/galeria "Modelos 3D" acessível pela navegação que lista apenas os produtos que têm modelo 3D para visualizar.
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 03-01-PLAN.md — Viewer no detalhe: `<model-viewer>` (VIEW-01) + fallback de imagem (VIEW-02) + botão Baixar STL (VIEW-03) + script CDN gated + CSS do container
+- [ ] 03-02-PLAN.md — Galeria "Modelos 3D" (VIEW-04): `with_3d` query, `gallery` service, view, rota `modelos-3d/`, template e link na navbar
 
 ## Progress
 
@@ -63,4 +65,4 @@ Phases execute in numeric order: 1 → 2 → 3 (Fase 1 e Fase 2 são independent
 |-------|----------------|--------|-----------|
 | 1. Rebrand & UI Minimalista | 0/2 | Planned | - |
 | 2. Fundação de Dados 3D | 0/1 | Planned | - |
-| 3. Visualizador 3D & Galeria | 0/TBD | Not started | - |
+| 3. Visualizador 3D & Galeria | 0/2 | Planned | - |
