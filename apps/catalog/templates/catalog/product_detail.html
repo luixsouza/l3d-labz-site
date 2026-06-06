@@ -65,6 +65,11 @@
           {% else %}
             <button class="btn btn-ghost" disabled>Produto indisponível</button>
           {% endif %}
+          {% if product.has_stl %}
+            <a href="{{ product.stl_url }}" download class="btn btn-ghost" style="margin-top:.8rem">
+              <svg class="icon"><use href="#i-box"></use></svg> Baixar STL
+            </a>
+          {% endif %}
         </div>
       </div>
     </div>
