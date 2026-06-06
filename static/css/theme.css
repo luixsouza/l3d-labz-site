@@ -77,12 +77,11 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; margin: 0 0 .4e
 .text-muted  { color: var(--text-muted); }
 .text-dim    { color: var(--text-dim); }
 
-/* gradiente animado em palavra de destaque */
+/* palavra de destaque — verde sólido da marca, sem animação (minimalista) */
 .grad-text {
-  background: linear-gradient(100deg, var(--accent-2), #a78bfa, var(--accent-2));
-  background-size: 200% auto;
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-  animation: grad-shift 6s linear infinite;
+  color: var(--accent);
+  -webkit-background-clip: initial; background-clip: initial;
+  background: none;
 }
 
 /* ----------------------------------------------------------- botões */
@@ -180,7 +179,7 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; margin: 0 0 .4e
 .hero-visual .dot { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 16px 2px var(--accent-glow); top: 18%; left: 22%; animation: float 5s ease-in-out infinite; }
 
 /* ----------------------------------------------------------- seções */
-.section { padding: clamp(2.5rem, 4vw, 4rem) 0; }
+.section { padding: clamp(3rem, 5vw, 5.5rem) 0; }
 .section-head { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.9rem; flex-wrap: wrap; }
 .section-head .link { display: inline-flex; align-items: center; gap: .35rem; color: var(--accent-2); font-weight: 700; font-size: .9rem; }
 .section-head .link:hover .icon-arrow { transform: translateX(3px); }
@@ -504,7 +503,7 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; margin: 0 0 .4e
 .hero-banner { position: relative; border-radius: var(--radius-lg); overflow: hidden; min-height: 480px; display: grid; align-items: center; border: 1px solid var(--border); box-shadow: var(--shadow); }
 .hero-banner .bg, .slide .bg { position: absolute; inset: 0; }
 .hero-banner .bg img, .slide .bg img { width: 100%; height: 100%; object-fit: cover; }
-.hero-banner .bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, rgba(10,13,21,.97) 0%, rgba(10,13,21,.86) 40%, rgba(10,13,21,.42) 78%, rgba(10,13,21,.25) 100%); }
+.hero-banner .bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, rgba(10,13,21,.85) 0%, rgba(10,13,21,.6) 40%, rgba(10,13,21,.32) 78%, rgba(10,13,21,.18) 100%); }
 .hero-banner .inner { position: relative; padding: clamp(2rem, 5vw, 4rem); max-width: 640px; }
 .hero-banner h1 { font-size: clamp(2.2rem, 1rem + 4.4vw, 3.9rem); line-height: 1.04; }
 .hero-banner .lead { font-size: 1.12rem; color: var(--text-muted); max-width: 44ch; margin-top: .9rem; }
