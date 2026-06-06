@@ -26,9 +26,9 @@ Requisitos para esta milestone (rebrand + visualizador 3D). Cada um mapeia para 
 
 ### Dados do Modelo 3D (Model)
 
-- [ ] **MODEL-01**: O modelo `Product` ganha um campo para o arquivo de exibição 3D (GLB/glTF)
-- [ ] **MODEL-02**: O modelo `Product` ganha um campo para o arquivo imprimível (STL)
-- [ ] **MODEL-03**: O administrador consegue subir GLB e STL por produto pelo Django admin
+- [x] **MODEL-01**: O modelo `Product` ganha um campo para o arquivo de exibição 3D (GLB/glTF)
+- [x] **MODEL-02**: O modelo `Product` ganha um campo para o arquivo imprimível (STL)
+- [x] **MODEL-03**: O administrador consegue subir GLB e STL por produto pelo Django admin
 
 ### Visualizador 3D (Viewer)
 
@@ -70,9 +70,9 @@ Excluídos explicitamente para evitar scope creep.
 | THEME-03 | Phase 1 | Complete |
 | UI-01 | Phase 1 | Complete |
 | UI-02 | Phase 1 | Complete |
-| MODEL-01 | Phase 2 | Pending |
-| MODEL-02 | Phase 2 | Pending |
-| MODEL-03 | Phase 2 | Pending |
+| MODEL-01 | Phase 2 | Complete |
+| MODEL-02 | Phase 2 | Complete |
+| MODEL-03 | Phase 2 | Complete |
 | VIEW-01 | Phase 3 | Pending |
 | VIEW-02 | Phase 3 | Pending |
 | VIEW-03 | Phase 3 | Pending |
