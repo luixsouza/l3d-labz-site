@@ -81,6 +81,15 @@ class ProductQuery:
         )
 
     @staticmethod
+    def with_3d(limit: int | None = None) -> list[Product]:
+        qs = (
+            Product.objects.active().with_relations()
+            .exclude(model_3d="")
+            .order_by("-sales_count")
+        )
+        return list(qs[:limit]) if limit else list(qs)
+
+    @staticmethod
     def detail_by_slug(slug: str) -> Product | None:
         def producer():
             return Product.objects.active().with_relations().filter(slug=slug).first()
