@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 01-02-PLAN.md (code) — aguardando checkpoint human-verify
-last_updated: "2026-06-06T02:19:30.534Z"
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-06-06T12:59:46.977Z"
 progress:
   total_phases: 3
-  completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  completed_phases: 2
+  total_plans: 3
+  completed_plans: 3
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-05)
 
 **Core value:** O cliente consegue visualizar o modelo 3D do produto de forma intuitiva num site bonito e minimalista com a marca L3D Labz.
-**Current focus:** Phase 01 — rebrand-ui-minimalista
+**Current focus:** Phase 02 — funda-o-de-dados-3d
 
 ## Current Position
 
-Phase: 01 (rebrand-ui-minimalista) — EXECUTING
-Plan: 2 of 2
+Phase: 02 (funda-o-de-dados-3d) — EXECUTING
+Plan: 1 of 1
 
 ## Performance Metrics
 
@@ -48,6 +48,7 @@ Plan: 2 of 2
 *Updated after each plan completion*
 | Phase 01 P01 | 2 | 2 tasks | 13 files |
 | Phase 01 P02 | 2 | 2 tasks | 2 files |
+| Phase 02 P01 | 1 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -63,6 +64,8 @@ Recent decisions affecting current work:
 - [Phase 01]: Default de tema mudou para light (data-theme=light) refletindo a estética minimalista; boot script ainda sobrescreve com a preferência salva.
 - [Phase 01]: Símbolo #i-koala mantido em icons.html (não referenciado) para não quebrar referências esquecidas.
 - [Phase 01]: .grad-text minimalista usa verde solido var(--accent) (sem gradiente/animacao); 5 azuis literais rgba(59,130,246) convertidos para verde.
+- [Phase 02]: Validação de upload 3D por extensão (FileExtensionValidator: glb/gltf e stl); MIME/tamanho ficou deferido.
+- [Phase 02]: Campos 3D expostos só em ProductMapper.to_detail; to_dict (card/listagem) inalterado.
 
 ### Pending Todos
 
@@ -81,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-06T02:19:23.134Z
-Stopped at: Completed 01-02-PLAN.md (code) — aguardando checkpoint human-verify
+Last session: 2026-06-06T12:59:36.174Z
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None
