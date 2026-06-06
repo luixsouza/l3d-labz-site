@@ -28,7 +28,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A paleta verde/branco/azul está aplicada via tokens CSS e a identidade fica legível e coerente tanto no tema escuro quanto no claro.
   4. O cliente alterna entre tema claro e escuro pelo toggle existente e a escolha persiste entre páginas e recargas (chave localStorage migrada sem quebrar persistência).
   5. A home e as páginas-chave (catálogo e detalhe) têm tratamento minimalista (mais espaço em branco, menos ornamento) mantendo as seções essenciais.
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 01-01-PLAN.md — Marca L3D Labz: paleta Luigi (dark+light), emblema "L", wordmark, migração da chave de tema, strings
+- [ ] 01-02-PLAN.md — UI minimalista: home, catálogo e detalhe (respiro + verde, sem reescrever o CSS)
 
 ### Phase 2: Fundação de Dados 3D
 **Goal**: O modelo `Product` armazena um arquivo de exibição 3D (GLB) e um arquivo imprimível (STL) por produto, e o administrador consegue subir ambos pelo Django admin.
@@ -58,6 +60,6 @@ Phases execute in numeric order: 1 → 2 → 3 (Fase 1 e Fase 2 são independent
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Rebrand & UI Minimalista | 0/TBD | Not started | - |
+| 1. Rebrand & UI Minimalista | 0/2 | Planned | - |
 | 2. Fundação de Dados 3D | 0/TBD | Not started | - |
 | 3. Visualizador 3D & Galeria | 0/TBD | Not started | - |
