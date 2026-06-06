@@ -169,7 +169,7 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; margin: 0 0 .4e
 .hero-visual {
   position: relative; border-radius: var(--radius-lg); aspect-ratio: 4 / 3; overflow: hidden;
   border: 1px solid var(--border);
-  background: radial-gradient(120% 120% at 70% 18%, rgba(59,130,246,.32), transparent 55%), linear-gradient(160deg, var(--bg-elevated), var(--bg-soft));
+  background: radial-gradient(120% 120% at 70% 18%, rgba(47,168,79,.32), transparent 55%), linear-gradient(160deg, var(--bg-elevated), var(--bg-soft));
   box-shadow: var(--shadow-glow); display: grid; place-items: center;
 }
 .hero-visual .art { width: 58%; color: var(--accent-2); animation: float 6s ease-in-out infinite; filter: drop-shadow(0 24px 40px var(--accent-glow)); }
@@ -269,7 +269,7 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; margin: 0 0 .4e
 .alert { padding: .85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: .9rem; animation: fade-up .4s var(--ease); }
 .alert-success { border-color: var(--success); background: rgba(52,211,153,.1); }
 .alert-error   { border-color: var(--danger);  background: rgba(248,113,113,.1); }
-.alert-info    { border-color: var(--accent);  background: rgba(59,130,246,.1); }
+.alert-info    { border-color: var(--accent);  background: rgba(47,168,79,.1); }
 
 /* ----------------------------------------------------------- catálogo */
 .catalog-layout { display: grid; grid-template-columns: 264px 1fr; gap: 2.2rem; align-items: start; }
@@ -318,7 +318,7 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; margin: 0 0 .4e
 
 /* ----------------------------------------------------------- detalhe */
 .product-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
-.detail-media { position: relative; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border); aspect-ratio: 1/1; background: radial-gradient(120% 120% at 70% 20%, rgba(59,130,246,.25), transparent 55%), linear-gradient(160deg, var(--bg-elevated), var(--bg-soft)); display: grid; place-items: center; }
+.detail-media { position: relative; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border); aspect-ratio: 1/1; background: radial-gradient(120% 120% at 70% 20%, rgba(47,168,79,.25), transparent 55%), linear-gradient(160deg, var(--bg-elevated), var(--bg-soft)); display: grid; place-items: center; }
 .detail-media img { width: 100%; height: 100%; object-fit: cover; }
 .detail-media .ph { width: 40%; color: var(--accent-2); animation: float 6s ease-in-out infinite; }
 .detail-price { display: flex; align-items: baseline; gap: .8rem; margin: 1rem 0 1.5rem; }
@@ -420,7 +420,7 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; margin: 0 0 .4e
 /* status badge */
 .status-badge { display: inline-flex; align-items: center; gap: .4rem; padding: .32rem .7rem; border-radius: 999px; font-size: .76rem; font-weight: 800; letter-spacing: .01em; border: 1px solid transparent; }
 .status-badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-.status-badge.info    { color: var(--accent-2); background: rgba(59,130,246,.12); border-color: rgba(59,130,246,.3); }
+.status-badge.info    { color: var(--accent-2); background: rgba(47,168,79,.12); border-color: rgba(47,168,79,.3); }
 .status-badge.success { color: var(--success);  background: rgba(52,211,153,.12); border-color: rgba(52,211,153,.3); }
 .status-badge.warn    { color: var(--warning);  background: rgba(251,191,36,.12); border-color: rgba(251,191,36,.3); }
 .status-badge.danger  { color: var(--danger);   background: rgba(248,113,113,.12); border-color: rgba(248,113,113,.3); }
@@ -456,7 +456,7 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; margin: 0 0 .4e
 .toast .ti { width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center; flex: none; }
 .toast.success .ti { color: var(--success); background: rgba(52,211,153,.14); }
 .toast.error   .ti { color: var(--danger);  background: rgba(248,113,113,.14); }
-.toast.info    .ti { color: var(--accent-2); background: rgba(59,130,246,.14); }
+.toast.info    .ti { color: var(--accent-2); background: rgba(47,168,79,.14); }
 .toast .tx { flex: 1; line-height: 1.4; }
 .toast .tc { background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 0; line-height: 1; }
 .toast .tc:hover { color: var(--text); }
