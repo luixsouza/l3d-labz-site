@@ -43,6 +43,55 @@
   </div>
 </section>
 
+<!-- ===================== PROVA SOCIAL ===================== -->
+<section class="section" style="padding-top:1rem;padding-bottom:0">
+  <div class="container">
+    <div class="proof-strip reveal">
+      <div class="proof"><b>+2.400</b><span>peças impressas</span></div>
+      <div class="proof"><b>4.8★</b><span>média de avaliação</span></div>
+      <div class="proof"><b>48h</b><span>produção média</span></div>
+      <div class="proof"><b>Brasil</b><span>envio para todo o país</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CATEGORIAS ===================== -->
+{% if home_categories %}
+<section class="section" style="padding-bottom:0">
+  <div class="container">
+    <div class="section-head reveal">
+      <div><span class="eyebrow">Navegue por categoria</span><h2 class="section-title">O que você procura</h2></div>
+      <a href="{% url 'catalog:product_list' %}" class="link">Ver tudo <svg class="icon icon-arrow"><use href="#i-arrow-right"></use></svg></a>
+    </div>
+    <div class="cat-chips reveal">
+      {% for cat in home_categories %}
+        <a href="{% url 'catalog:product_list' %}?categoria={{ cat.slug }}" class="cat-chip">
+          <span class="cc-ic" style="--acc:{{ cat.accent }}"><svg class="icon"><use href="#i-{{ cat.icon }}"></use></svg></span>
+          <span>{{ cat.name }}</span>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ===================== DESTAQUES ===================== -->
+{% if featured %}
+<section class="section" style="padding-bottom:0">
+  <div class="container">
+    <div class="section-head reveal">
+      <div><span class="eyebrow">Os queridinhos da loja</span><h2 class="section-title">Mais vendidos</h2></div>
+      <a href="{% url 'catalog:product_list' %}?sort=popular" class="link">Ver catálogo <svg class="icon icon-arrow"><use href="#i-arrow-right"></use></svg></a>
+    </div>
+    <div class="product-grid reveal">
+      {% for product in featured %}
+        <div style="--i:{{ forloop.counter0 }}">{% include "catalog/partials/product_card.html" with product=product %}</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
 <!-- ===================== COMO FUNCIONA ===================== -->
 <section class="section" style="padding-top:0">
   <div class="container">
