@@ -85,3 +85,13 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 (Fase 1 e Fase 2 são indep
 | 2. Fundação de Dados 3D | 0/1 | Planned | - |
 | 3. Visualizador 3D & Galeria | 2/2 | Complete   | 2026-06-06 |
 | 4. Faça meu Lithophane | 1/4 | Complete    | 2026-06-07 |
+
+### Phase 5: Catalogo MakerWorld — importar produtos relevantes, padronizar fotos com a identidade L3D Labz e mapear com filtros
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 4
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 5 to break down)
