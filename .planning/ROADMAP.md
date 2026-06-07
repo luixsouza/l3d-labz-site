@@ -66,3 +66,13 @@ Phases execute in numeric order: 1 → 2 → 3 (Fase 1 e Fase 2 são independent
 | 1. Rebrand & UI Minimalista | 0/2 | Planned | - |
 | 2. Fundação de Dados 3D | 0/1 | Planned | - |
 | 3. Visualizador 3D & Galeria | 2/2 | Complete   | 2026-06-06 |
+
+### Phase 4: Faça meu Lithophane — editor de upload+ajuste 2D, geração 3D server-side (GLB+STL) com toggle de luz emissivo, e pedido de orçamento no carrinho
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 3
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 4 to break down)

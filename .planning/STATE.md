@@ -6,7 +6,7 @@ status: unknown
 stopped_at: Completed 03-01-PLAN.md
 last_updated: "2026-06-06T13:13:52.285Z"
 progress:
-  total_phases: 3
+  total_phases: 4
   completed_phases: 3
   total_plans: 5
   completed_plans: 5
@@ -71,6 +71,11 @@ Recent decisions affecting current work:
 - [Phase 03-visualizador-3d-galeria]: [Phase 03] AR incluído no model-viewer (ar/ar-modes/ar-scale): 2 atributos, AR Android grátis do GLB, no-op no desktop/iOS.
 - [Phase 03-visualizador-3d-galeria]: [Phase 03] model-viewer fixado @4.3.1 via CDN ES module, carregado por página em extra_js gated por has_3d_model; sem nomodule.
 - [Phase 03]: Galeria 'Modelos 3D' via with_3d (sem cache) → gallery → models_3d; cards linkam ao detalhe, sem viewer por card.
+
+### Roadmap Evolution
+
+- Phase 4 added: Faça meu Lithophane — editor de upload+ajuste 2D, geração 3D server-side (GLB+STL) com toggle de luz emissivo, e pedido de orçamento no carrinho. Design: docs/superpowers/specs/2026-06-07-faca-meu-lithophane-design.md
+- Note: nexora rebrand L3dLabZ + papéis cliente/vendedor + app seller foi mesclado (cherry-pick) na branch merge/nexora-l3dlabz-rebrand antes desta fase.
 
 ### Pending Todos
 
