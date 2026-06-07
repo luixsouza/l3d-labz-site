@@ -15,6 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 1: Rebrand & UI Minimalista** - Marca L3D Labz, paleta Luigi nos dois temas e redesign minimalista das páginas-chave
 - [ ] **Phase 2: Fundação de Dados 3D** - Campos GLB/STL no `Product` com upload via Django admin e migração
 - [x] **Phase 3: Visualizador 3D & Galeria** - `<model-viewer>` no detalhe do produto, fallback de imagem, download STL e aba de Modelos 3D (completed 2026-06-06)
+- [ ] **Phase 4: Faça meu Lithophane** - Editor de upload+ajuste 2D, geração 3D server-side (GLB+STL) com toggle de luz emissivo, e pedido de orçamento no carrinho
 
 ## Phase Details
 
@@ -56,23 +57,31 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 03-01-PLAN.md — Viewer no detalhe: `<model-viewer>` (VIEW-01) + fallback de imagem (VIEW-02) + botão Baixar STL (VIEW-03) + script CDN gated + CSS do container
 - [x] 03-02-PLAN.md — Galeria "Modelos 3D" (VIEW-04): `with_3d` query, `gallery` service, view, rota `modelos-3d/`, template e link na navbar
 
+### Phase 4: Faça meu Lithophane — editor de upload+ajuste 2D, geração 3D server-side (GLB+STL) com toggle de luz emissivo, e pedido de orçamento no carrinho
+
+**Goal:** O cliente abre o editor "Faça meu Lithophane", sobe uma foto, ajusta em 2D ao vivo (escala/brilho/inverter), gera no servidor o modelo 3D (GLB para visualização + STL imprimível), visualiza no `<model-viewer>` com toggle "Com luz / Sem luz" (efeito emissivo onde a foto acende), e encomenda a peça como pedido de orçamento "a combinar" via carrinho/checkout existentes — tudo com identidade Luigi, tema claro/escuro e copy pt-br.
+**Requirements**: LITHO-GEN, LITHO-DATA, LITHO-ORDER, LITHO-UI
+**Depends on:** Phase 3
+**Success Criteria** (what must be TRUE):
+  1. Uma foto real vira um GLB watertight (com a foto como emissiveTexture, < 5MB) + um STL imprimível, com relevo invertido (claro=fino, escuro=grosso).
+  2. Existe um `LithophaneDraft` persistível e um `LithophaneService` (única escrita) que envolve o motor isolado e salva os arquivos gerados.
+  3. O cliente acessa `/lithophane/`, ajusta a foto no canvas, clica "Gerar 3D" e vê o lithophane no `<model-viewer>` com o toggle de luz acendendo a foto.
+  4. O cliente clica "Encomendar" e a peça entra no carrinho como item "a combinar"; o checkout cria um `Order` com status `orcamento`, sem captura de pagamento.
+  5. O navbar tem o link "Faça meu Lithophane", o slogan "Onde memórias preciosas ganham forma na luz" aparece, e há botão "Baixar STL".
+**Plans:** 4 plans
+- [x] 04-01-PLAN.md — Motor de geração `generation.py` (TDD): foto → heightmap → malha watertight → GLB emissivo + STL (numpy+trimesh)
+- [ ] 04-02-PLAN.md — Camada Django: `LithophaneDraft` + migration + `LithophaneService` (envolve o motor) + `LithophaneQuery`/`LithophaneMapper` + app registrado
+- [ ] 04-03-PLAN.md — Integração carrinho/pedido: `cart_litho`, `Order.Status.ORCAMENTO`, `OrderItem.draft_id`/`litho_specs`, checkout pula pagamento, tolerância a item "a combinar"
+- [ ] 04-04-PLAN.md — Editor front-end (canvas vanilla) + endpoint `gerar` + `<model-viewer>` com toggle emissivo + Encomendar/Baixar STL + rota `/lithophane/` + link no navbar + CSS Luigi
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 (Fase 1 e Fase 2 são independentes e podem ser paralelizadas; Fase 3 depende da Fase 2)
+Phases execute in numeric order: 1 → 2 → 3 → 4 (Fase 1 e Fase 2 são independentes e podem ser paralelizadas; Fase 3 depende da Fase 2; Fase 4 depende da Fase 3)
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Rebrand & UI Minimalista | 0/2 | Planned | - |
 | 2. Fundação de Dados 3D | 0/1 | Planned | - |
 | 3. Visualizador 3D & Galeria | 2/2 | Complete   | 2026-06-06 |
-
-### Phase 4: Faça meu Lithophane — editor de upload+ajuste 2D, geração 3D server-side (GLB+STL) com toggle de luz emissivo, e pedido de orçamento no carrinho
-
-**Goal:** [To be planned]
-**Requirements**: TBD
-**Depends on:** Phase 3
-**Plans:** 0 plans
-
-Plans:
-- [ ] TBD (run /gsd:plan-phase 4 to break down)
+| 4. Faça meu Lithophane | 1/4 | Planned | - |
