@@ -29,6 +29,14 @@
         {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
         <input type="number" name="min" placeholder="mín R$" value="{{ request.GET.min }}" step="0.01">
         <input type="number" name="max" placeholder="máx R$" value="{{ request.GET.max }}" step="0.01">
+        {% if materials %}
+        <select name="material" onchange="this.form.submit()">
+          <option value="">Todo material</option>
+          {% for mat in materials %}
+            <option value="{{ mat }}" {% if active_material == mat %}selected{% endif %}>{{ mat }}</option>
+          {% endfor %}
+        </select>
+        {% endif %}
         <select name="sort" onchange="this.form.submit()">
           <option value="relevance" {% if current_sort == "relevance" %}selected{% endif %}>Relevância</option>
           <option value="new" {% if current_sort == "new" %}selected{% endif %}>Mais novos</option>

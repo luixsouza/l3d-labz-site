@@ -42,6 +42,7 @@ class CatalogService(BaseService):
         category_slug = params.get("categoria") or None
         query = params.get("q") or None
         sort = params.get("sort") or "relevance"
+        material = params.get("material") or None
         min_price = _to_decimal(params.get("min"))
         max_price = _to_decimal(params.get("max"))
 
@@ -51,6 +52,7 @@ class CatalogService(BaseService):
             sort=sort,
             min_price=min_price,
             max_price=max_price,
+            material=material,
         )
         paginator = Paginator(qs, PAGE_SIZE)
         page_obj = paginator.get_page(page)
@@ -70,6 +72,8 @@ class CatalogService(BaseService):
             "categories": CategoryMapper.to_list(CategoryQuery.all_with_counts()),
             "active_category": active_category,
             "current_sort": sort,
+            "materials": ProductQuery.materials(),
+            "active_material": material or "",
             "query": query or "",
             "promotions": PromotionService.list_active_promotions(limit=5),
             "flash_sale": ProductMapper.to_list(ProductQuery.on_sale(8)),
