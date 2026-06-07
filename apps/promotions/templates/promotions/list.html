@@ -77,23 +77,6 @@
 
       <!-- sidebar -->
       <aside class="shop-aside">
-        <!-- cupons -->
-        {% if coupons %}
-        <div class="aside-card">
-          <h3><svg class="icon"><use href="#i-tag"></use></svg> Cupons da casa</h3>
-          <div class="coupon-mini-list">
-            {% for c in coupons %}
-              <div class="coupon-mini">
-                <span class="cm-off">{{ c.off }}</span>
-                <span class="cm-code">{{ c.code }}</span>
-                <span class="cm-min">{{ c.min }}</span>
-              </div>
-            {% endfor %}
-          </div>
-          <p class="text-dim" style="font-size:.78rem;margin:.9rem 0 0">Cole o código no carrinho antes de finalizar.</p>
-        </div>
-        {% endif %}
-
         <!-- mais vendidos -->
         {% if best_sellers %}
         <div class="aside-card">
