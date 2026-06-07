@@ -1948,3 +1948,20 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .geek-hero--clean { grid-template-columns: 1fr; }
   .geek-hero--clean .gh-deco { display: none; }
 }
+
+/* ---- hero verde Luigi (vibrante, texto branco) ---- */
+.geek-hero--clean {
+  background:
+    radial-gradient(130% 150% at 82% 16%, rgba(150,240,175,.45), transparent 55%),
+    linear-gradient(120deg, #178B3C 0%, #2FA84F 54%, #43C266 100%) !important;
+}
+.geek-hero--clean .gh-inner { color: #fff; }
+.geek-hero--clean .gh-inner h1 { color: #fff; text-shadow: 0 2px 16px rgba(6,40,18,.28); }
+.geek-hero--clean .lead { color: rgba(255,255,255,.94); }
+.geek-hero--clean .eyebrow { color: #eafff0; }
+.geek-hero--clean .eyebrow::before { background: repeating-linear-gradient(90deg, #ffffff 0 3px, transparent 3px 5px); }
+.geek-hero--clean .gh-deco span { background: rgba(255,255,255,.3); border-color: rgba(255,255,255,.6); }
+.geek-hero--clean .gh-btn.primary { background: #06280f; color: #fff; border: 0; }
+.geek-hero--clean .gh-btn.primary:hover { background: #0c3c1a; }
+.geek-hero--clean .gh-btn.ghost { border: 1.5px solid rgba(255,255,255,.65); color: #fff; background: transparent; }
+.geek-hero--clean .gh-btn.ghost:hover { background: rgba(255,255,255,.16); }
