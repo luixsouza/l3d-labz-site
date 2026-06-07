@@ -9,11 +9,9 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
 from django.utils.text import slugify
 
-from apps.catalog.branding import gerar_card
 from apps.catalog.models import Category, Product
 
 # (nome, icone do sprite, accent)
@@ -99,10 +97,7 @@ class Command(BaseCommand):
                 },
             )
             novos += criado
-            # gera a foto padronizada se ainda não houver
-            if not obj.image:
-                png = gerar_card(nome, cat.accent)
-                obj.image.save(f"{obj.slug}.png", ContentFile(png), save=True)
 
         total = Product.objects.count()
         self.stdout.write(self.style.SUCCESS(f"Produtos novos: {novos} (total {total})"))
+        self.stdout.write("Rode `python manage.py padronizar_fotos` para as fotos reais.")

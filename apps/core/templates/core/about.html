@@ -6,20 +6,18 @@
 <!-- ===================== HERO PROMOCIONAL ===================== -->
 <section class="section" style="padding-top:1.6rem;padding-bottom:0">
   <div class="container">
-    <div class="geek-hero reveal">
-      <div class="gh-bg">
-        <img src="https://loremflickr.com/1600/600/batman,figure,toy?lock=84" alt=""
-             onerror="this.onerror=null;this.src='https://picsum.photos/seed/l3dgeekhero4/1600/600'">
-      </div>
+    <div class="geek-hero geek-hero--clean reveal">
       <div class="gh-inner">
-        <span class="eyebrow">Especial Nerd</span>
-        <h1>A loja mais geek da impressão 3D</h1>
-        <span class="gh-off">Ofertas de até 50% OFF</span>
-        <p class="lead">Action figures, articulados, luminárias, miniaturas e decoração — impressos camada por camada, sob demanda, com o acabamento de laboratório da {{ SITE.name }}.</p>
+        <span class="eyebrow">Impressão 3D sob demanda</span>
+        <h1>Sua estante, impressa camada por camada</h1>
+        <p class="lead">Action figures, articulados, luminárias, miniaturas e decoração — produzidos sob demanda com o acabamento de laboratório da {{ SITE.name }}.</p>
         <div class="hero-cta">
-          <a href="{% url 'catalog:product_list' %}" class="gh-btn primary">Ver produtos <svg class="icon icon-arrow"><use href="#i-arrow-right"></use></svg></a>
-          <a href="{% url 'promotions:list' %}" class="gh-btn ghost">Ver ofertas</a>
+          <a href="{% url 'catalog:product_list' %}" class="gh-btn primary">Ver catálogo <svg class="icon icon-arrow"><use href="#i-arrow-right"></use></svg></a>
+          <a href="{% url 'lithophane:editor' %}" class="gh-btn ghost">Faça meu Lithophane</a>
         </div>
+      </div>
+      <div class="gh-deco" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
       </div>
     </div>
   </div>
@@ -58,33 +56,6 @@
       <div class="step"><span class="st-ico"><svg class="icon"><use href="#i-quality"></use></svg></span><span class="st-n">Passo 3</span><h4>Acabamento</h4><p>Revisão e finish artesanal, peça por peça.</p></div>
       <div class="step"><span class="st-ico"><svg class="icon"><use href="#i-delivery"></use></svg></span><span class="st-n">Passo 4</span><h4>Entrega</h4><p>Embalada com carinho e enviada pro Brasil todo.</p></div>
     </div>
-  </div>
-</section>
-
-<!-- ===================== CUPONS ===================== -->
-<section class="section" style="padding-top:0">
-  <div class="container">
-    <div class="section-head center reveal">
-      <span class="eyebrow">Descontos</span>
-      <h2 class="section-title">Cupons pra usar agora</h2>
-    </div>
-    <p class="text-muted reveal" style="text-align:center;max-width:62ch;margin:-.6rem auto 1.6rem">
-      Copie o código e cole no campo <strong>“cupom”</strong> dentro do carrinho, antes de fechar o pedido — o desconto entra na hora sobre o subtotal.
-    </p>
-    {% if coupons %}
-    <div class="coupon-cards reveal">
-      {% for c in coupons %}
-        <div class="coupon-card">
-          <span class="cc-ico"><svg class="icon icon-lg"><use href="#i-tag"></use></svg></span>
-          <div>
-            <div class="cc-off">{{ c.off }}</div>
-            <span class="cc-code">{{ c.code }}</span>
-            <div class="cc-min">{{ c.min }}</div>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-    {% endif %}
   </div>
 </section>
 
