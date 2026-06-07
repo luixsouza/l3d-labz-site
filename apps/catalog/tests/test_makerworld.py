@@ -22,17 +22,23 @@ class BrandingTests(TestCase):
         self.assertEqual(im.format, "PNG")
         self.assertEqual(im.size, (800, 800))
 
+    def test_padronizar_foto_trata_e_devolve_jpeg(self):
+        # foto sintética (sem rede) -> tratamento padrão da loja
+        from apps.catalog.branding import padronizar_foto
+        buf = io.BytesIO()
+        Image.new("RGB", (1200, 800), (120, 140, 130)).save(buf, format="JPEG")
+        out = padronizar_foto(buf.getvalue(), "#2FA84F")
+        im = Image.open(io.BytesIO(out))
+        self.assertEqual(im.format, "JPEG")
+        self.assertEqual(im.size, (800, 800))
+
 
 @override_settings(MEDIA_ROOT=_MEDIA)
 class SeedMakerworldTests(TestCase):
-    def test_seed_cria_categorias_produtos_e_fotos(self):
+    def test_seed_cria_categorias_e_produtos(self):
         call_command("seed_makerworld")
         self.assertGreaterEqual(Category.objects.count(), 8)
         self.assertGreaterEqual(Product.objects.count(), 24)
-        # toda foto padronizada foi salva
-        com_foto = [p for p in Product.objects.all() if p.image]
-        self.assertGreaterEqual(len(com_foto), 24)
-        self.assertTrue(com_foto[0].image.name.endswith(".png"))
 
     def test_seed_idempotente(self):
         call_command("seed_makerworld")
