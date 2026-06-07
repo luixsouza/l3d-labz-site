@@ -11,13 +11,14 @@ User = get_user_model()
 class RegisterForm(UserCreationForm):
     first_name = forms.CharField(label="Nome", max_length=60)
     email = forms.EmailField(label="E-mail")
+    phone = forms.CharField(label="Telefone", max_length=20, required=False)
     newsletter_opt_in = forms.BooleanField(
         label="Quero receber novidades e promoções", required=False, initial=True
     )
 
     class Meta:
         model = User
-        fields = ("first_name", "email", "newsletter_opt_in")
+        fields = ("first_name", "email", "phone", "newsletter_opt_in")
 
     def clean_email(self):
         email = self.cleaned_data["email"].lower()

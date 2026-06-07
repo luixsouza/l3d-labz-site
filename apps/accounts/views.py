@@ -17,6 +17,10 @@ class NexoraLoginView(LoginView):
     authentication_form = EmailLoginForm
     redirect_authenticated_user = True
 
+    def get_success_url(self):
+        # respeita ?next= se houver; senão volta pra landing
+        return self.get_redirect_url() or reverse_lazy("core:home")
+
 
 class NexoraLogoutView(LogoutView):
     next_page = reverse_lazy("core:home")
