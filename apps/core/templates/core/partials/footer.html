@@ -1,3 +1,4 @@
+{% load static %}
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">
@@ -11,7 +12,7 @@
       <div>
         <h5>Loja</h5>
         <a href="{% url 'catalog:product_list' %}">Catálogo</a>
-        <a href="{% url 'catalog:product_list' %}?sort=new">Lançamentos</a>
+        <a href="{% url 'catalog:models_3d' %}">Modelos 3D</a>
         <a href="{% url 'promotions:list' %}">Promoções</a>
         <a href="{% url 'cart:detail' %}">Carrinho</a>
       </div>

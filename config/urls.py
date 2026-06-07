@@ -12,6 +12,7 @@ urlpatterns = [
     path("promocoes/", include("apps.promotions.urls")),
     path("carrinho/", include("apps.cart.urls")),
     path("pedidos/", include("apps.orders.urls")),
+    path("lithophane/", include("apps.lithophane.urls")),
 ]
 
 if settings.DEBUG:

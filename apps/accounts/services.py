@@ -18,8 +18,10 @@ class AccountService(BaseService):
     def register(form) -> User:
         """Cria o usuário a partir do RegisterForm já validado."""
         user = form.save(commit=False)
-        user.email = form.cleaned_data["email"]
-        user.newsletter_opt_in = form.cleaned_data.get("newsletter_opt_in", True)
+        data = form.cleaned_data
+        user.email = data["email"]
+        user.phone = data.get("phone", "")
+        user.newsletter_opt_in = data.get("newsletter_opt_in", True)
         user.save()
         return user
 
