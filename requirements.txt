@@ -20,6 +20,7 @@ trimesh==4.12.2
 fast-simplification           # decimação de malha (STL gigante -> GLB leve p/ o viewer)
 networkx                      # requerido pelo trimesh p/ ler .3mf (grafo de cena)
 lxml                          # requerido pelo trimesh p/ parsear o XML do .3mf
+matplotlib                    # render headless (Agg) da foto padronizada do modelo
 
 # --- Filtros de catálogo ---
 django-filter==25.1
