@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from django import forms
 
-from .models import Product, Review
+from .models import Product, Question, Review
 
 
 class ProductForm(forms.ModelForm):
@@ -70,3 +70,21 @@ class ReviewForm(forms.ModelForm):
             "comment": forms.Textarea(attrs={"rows": 3, "placeholder": "O que achou do produto?"}),
             "title": forms.TextInput(attrs={"placeholder": "Resumo em poucas palavras"}),
         }
+
+
+class QuestionForm(forms.ModelForm):
+    class Meta:
+        model = Question
+        fields = ("text",)
+        labels = {"text": "Sua pergunta"}
+        widgets = {
+            "text": forms.Textarea(attrs={"rows": 2, "placeholder": "Tem alguma dúvida sobre este produto?"}),
+        }
+
+
+class AnswerForm(forms.Form):
+    answer = forms.CharField(
+        label="Sua resposta",
+        widget=forms.Textarea(attrs={"rows": 2, "placeholder": "Responda à dúvida do cliente"}),
+        max_length=1000,
+    )

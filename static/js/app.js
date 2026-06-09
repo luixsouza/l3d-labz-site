@@ -124,6 +124,51 @@
     badge.style.animation = "none"; void badge.offsetWidth; badge.style.animation = "";
   }
 
+  /* ---------------------------------------------------- autocomplete da busca */
+  (function searchAutocomplete() {
+    const form = document.querySelector("form[data-autocomplete]");
+    if (!form) return;
+    const input = form.querySelector("[data-suggest-input]");
+    const box = form.querySelector("[data-suggest-box]");
+    const url = form.getAttribute("data-suggest-url");
+    if (!input || !box || !url) return;
+    let timer, lastTerm = "";
+    const hide = () => { box.hidden = true; };
+    const render = (items) => {
+      if (!items.length) { box.innerHTML = ""; hide(); return; }
+      box.innerHTML = items.map((it) => (
+        '<a class="suggest-item" href="' + it.url + '">' +
+        (it.image_url ? '<img src="' + it.image_url + '" alt="" loading="lazy">' : '<span class="suggest-ph"></span>') +
+        '<span class="suggest-info"><strong>' + esc(it.name) + '</strong>' +
+        '<span class="text-dim">' + esc(it.category) + '</span></span>' +
+        '<span class="suggest-price">' + esc(it.price) + '</span></a>'
+      )).join("");
+      box.hidden = false;
+    };
+    const fetchSuggest = async (term) => {
+      try {
+        const res = await fetch(url + "?q=" + encodeURIComponent(term), { headers: { "X-Requested-With": "XMLHttpRequest" } });
+        const data = await res.json();
+        if (input.value.trim() === term) render(data.results || []);
+      } catch (e) { hide(); }
+    };
+    input.addEventListener("input", () => {
+      const term = input.value.trim();
+      if (term.length < 2) { hide(); return; }
+      if (term === lastTerm) return;
+      lastTerm = term;
+      clearTimeout(timer);
+      timer = setTimeout(() => fetchSuggest(term), 180);
+    });
+    input.addEventListener("focus", () => { if (box.innerHTML) box.hidden = false; });
+    document.addEventListener("click", (e) => { if (!form.contains(e.target)) hide(); });
+    function esc(s) {
+      return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => (
+        { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+      ));
+    }
+  })();
+
   /* ---------------------------------------------------- carrosséis */
   document.querySelectorAll(".carousel").forEach((root) => {
     const track = root.querySelector(".carousel-track");

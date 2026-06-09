@@ -1,6 +1,7 @@
 """Modelos do catálogo."""
 from __future__ import annotations
 
+import math
 from datetime import timedelta
 from decimal import Decimal
 
@@ -152,6 +153,21 @@ class Product(TimeStampedModel):
         return self.created_at >= timezone.now() - timedelta(days=NEW_PRODUCT_WINDOW_DAYS)
 
     @property
+    def lead_time_days(self) -> int:
+        """Prazo de producao (dias uteis): ~8h de impressao por dia + 2 de acabamento.
+
+        Impressao sob demanda: a peca e produzida por pedido, entao o prazo de
+        producao depende do tempo de impressao do modelo.
+        """
+        printing = math.ceil(self.print_time_hours / 8) if self.print_time_hours else 0
+        return max(2, printing + 2)
+
+    @property
+    def lead_time_label(self) -> str:
+        d = self.lead_time_days
+        return f"{d}-{d + 2} dias úteis"
+
+    @property
     def cover_image_url(self) -> str:
         """Primeira foto da galeria; cai para o upload/URL legado do produto."""
         first = self.images.first() if self.pk else None
@@ -244,3 +260,34 @@ class Favorite(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.user_id} <3 {self.product_id}"
+
+
+class Question(TimeStampedModel):
+    """Pergunta de um cliente sobre o produto, respondida pelo vendedor/staff."""
+
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="questions", verbose_name="produto"
+    )
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="questions", verbose_name="autor"
+    )
+    text = models.TextField("pergunta", max_length=500)
+    answer = models.TextField("resposta", max_length=1000, blank=True)
+    answered_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="answered_questions", verbose_name="respondido por",
+    )
+    answered_at = models.DateTimeField("respondido em", null=True, blank=True)
+
+    class Meta:
+        verbose_name = "pergunta"
+        verbose_name_plural = "perguntas"
+        ordering = ["-created_at"]
+        indexes = [models.Index(fields=["product", "-created_at"])]
+
+    @property
+    def is_answered(self) -> bool:
+        return bool(self.answer)
+
+    def __str__(self) -> str:
+        return f"Pergunta {self.pk} sobre {self.product_id}"

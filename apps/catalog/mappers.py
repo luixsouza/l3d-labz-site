@@ -6,7 +6,7 @@ from typing import Any
 from apps.core.formatting import format_brl
 from apps.core.layers import BaseMapper
 
-from .models import Category, Product, ProductImage, Review
+from .models import Category, Product, ProductImage, Question, Review
 
 
 class CategoryMapper(BaseMapper[Category]):
@@ -54,6 +54,25 @@ class ReviewMapper(BaseMapper[Review]):
         }
 
 
+class QuestionMapper(BaseMapper[Question]):
+    @classmethod
+    def to_dict(cls, instance: Question) -> dict[str, Any]:
+        author = instance.author
+        name = author.display_name if author else "Cliente"
+        responder = instance.answered_by
+        return {
+            "id": instance.id,
+            "author_name": name,
+            "monogram": (name[:1] or "?").upper(),
+            "text": instance.text,
+            "created_at": instance.created_at,
+            "answer": instance.answer,
+            "is_answered": instance.is_answered,
+            "answered_by_name": responder.display_name if responder else "Vendedor",
+            "answered_at": instance.answered_at,
+        }
+
+
 class ProductMapper(BaseMapper[Product]):
     @staticmethod
     def _cover(instance: Product) -> str:
@@ -87,6 +106,8 @@ class ProductMapper(BaseMapper[Product]):
             "in_stock": instance.in_stock,
             "rating": float(instance.rating),
             "review_count": instance.review_count,
+            "lead_time_days": instance.lead_time_days,
+            "lead_time_label": instance.lead_time_label,
             "url": instance.get_absolute_url(),
         }
 

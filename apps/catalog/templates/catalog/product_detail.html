@@ -13,11 +13,24 @@
       <div class="detail-gallery reveal">
         <div class="detail-media" data-gallery-main>
           {% if product.has_3d_model %}
-            <model-viewer src="{{ product.model_3d_url }}" poster="{{ product.image_url }}"
+            <model-viewer id="mv" src="{{ product.model_3d_url }}" poster="{{ product.image_url }}"
                           alt="Modelo 3D de {{ product.name }}"
+                          data-dims="{{ product.dimensions }}"
                           camera-controls auto-rotate touch-action="pan-y"
                           shadow-intensity="1" loading="lazy" reveal="auto"
-                          ar ar-modes="webxr scene-viewer quick-look" ar-scale="auto"></model-viewer>
+                          ar ar-modes="webxr scene-viewer quick-look" ar-scale="auto">
+              <button slot="hotspot-dim-X" class="dim-label" data-axis="x" hidden></button>
+              <button slot="hotspot-dim-Y" class="dim-label" data-axis="y" hidden></button>
+              <button slot="hotspot-dim-Z" class="dim-label" data-axis="z" hidden></button>
+            </model-viewer>
+            <div class="mv-tools">
+              <button type="button" class="btn btn-ghost btn-sm" id="measureToggle" aria-pressed="false">
+                <svg class="icon"><use href="#i-ruler"></use></svg> Mostrar medidas
+              </button>
+              <button type="button" class="btn btn-ghost btn-sm" id="arBtn">
+                <svg class="icon"><use href="#i-cube"></use></svg> Ver em escala real (AR)
+              </button>
+            </div>
           {% else %}
             <span class="thumb-mono" style="--acc:{{ product.accent }}">{{ product.monogram }}</span>
             {% if product.gallery %}
@@ -58,6 +71,7 @@
           <span class="chip"><svg class="icon"><use href="#i-layers"></use></svg> {{ product.material }}</span>
           {% if product.dimensions %}<span class="chip"><svg class="icon"><use href="#i-ruler"></use></svg> {{ product.dimensions }}</span>{% endif %}
           <span class="chip"><svg class="icon"><use href="#i-clock"></use></svg> {{ product.print_time_hours }}h de impressão</span>
+          <span class="chip chip-lead"><svg class="icon"><use href="#i-truck"></use></svg> Pronto em {{ product.lead_time_label }}</span>
           {% if product.in_stock %}<span class="chip"><svg class="icon"><use href="#i-check"></use></svg> {{ product.stock }} em estoque</span>
           {% else %}<span class="chip">Esgotado</span>{% endif %}
         </div>
@@ -138,6 +152,57 @@
       {% endif %}
     </div>
 
+    <!-- perguntas & respostas -->
+    <div class="section reviews-section" id="perguntas">
+      {% include "core/partials/section_head.html" with title="Perguntas & respostas" %}
+
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'catalog:question_create' product.id %}" class="card review-form reveal">
+          {% csrf_token %}
+          <label class="field-label" for="qtext">Sua pergunta</label>
+          <textarea id="qtext" name="text" rows="2" maxlength="500" required
+                    placeholder="Tem alguma dúvida sobre este produto?"></textarea>
+          <button class="btn btn-primary mt-1" type="submit">Enviar pergunta</button>
+        </form>
+      {% else %}
+        <div class="reviews-cta">
+          <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn btn-ghost btn-sm">Entre para perguntar</a>
+        </div>
+      {% endif %}
+
+      {% if questions %}
+        <div class="qa-list mt-2">
+          {% for q in questions %}
+            <div class="qa-item reveal">
+              <div class="qa-q">
+                <span class="qa-mono">{{ q.monogram }}</span>
+                <div>
+                  <p class="qa-text">{{ q.text }}</p>
+                  <span class="text-dim qa-meta">{{ q.author_name }} · {{ q.created_at|date:"d/m/Y" }}</span>
+                </div>
+              </div>
+              {% if q.is_answered %}
+                <div class="qa-a">
+                  <strong>Resposta de {{ q.answered_by_name }}</strong>
+                  <p>{{ q.answer }}</p>
+                </div>
+              {% elif can_answer %}
+                <form method="post" action="{% url 'catalog:answer_create' q.id %}" class="qa-answer-form mt-1">
+                  {% csrf_token %}
+                  <textarea name="answer" rows="2" maxlength="1000" required placeholder="Responder à dúvida do cliente"></textarea>
+                  <button class="btn btn-ghost btn-sm mt-1" type="submit">Responder</button>
+                </form>
+              {% else %}
+                <span class="chip">Aguardando resposta</span>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-muted reveal">Nenhuma pergunta ainda. {% if user.is_authenticated %}Seja o primeiro a perguntar!{% endif %}</p>
+      {% endif %}
+    </div>
+
     {% if bought_together %}
     <div class="section" style="padding-bottom:0">
       <div class="section-head reveal"><h2 class="section-title">Quem comprou também levou</h2></div>
@@ -171,5 +236,46 @@
   {% if product.has_3d_model %}
   <script type="module"
           src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js"></script>
+  <script type="module">
+    const mv = document.getElementById("mv");
+    const toggle = document.getElementById("measureToggle");
+    const arBtn = document.getElementById("arBtn");
+
+    // dimensoes reais do catalogo (autoritativas) — "20×9×7 cm" -> [20,9,7] (L×A×P)
+    function realDims() {
+      const raw = (mv.dataset.dims || "").replace(",", ".");
+      const nums = (raw.match(/[\d.]+/g) || []).map(Number).filter((n) => n > 0);
+      return nums.length >= 3 ? nums.slice(0, 3) : null;
+    }
+
+    function place() {
+      const c = mv.getBoundingBoxCenter();
+      const s = mv.getDimensions();           // geometria (posicionamento)
+      const real = realDims();                // cm reais (rotulos)
+      const cm = real || [s.x * 100, s.y * 100, s.z * 100];
+      const labels = {
+        x: { el: mv.querySelector('[slot="hotspot-dim-X"]'), pos: [c.x, c.y - s.y / 2, c.z + s.z / 2], txt: cm[0].toFixed(1) + " cm" },
+        y: { el: mv.querySelector('[slot="hotspot-dim-Y"]'), pos: [c.x - s.x / 2, c.y, c.z + s.z / 2], txt: cm[1].toFixed(1) + " cm" },
+        z: { el: mv.querySelector('[slot="hotspot-dim-Z"]'), pos: [c.x - s.x / 2, c.y - s.y / 2, c.z], txt: cm[2].toFixed(1) + " cm" },
+      };
+      for (const k in labels) {
+        const d = labels[k];
+        mv.updateHotspot({ name: "hotspot-dim-" + k.toUpperCase(), position: d.pos.join(" ") });
+        if (d.el) d.el.textContent = d.txt;
+      }
+    }
+
+    let ready = false;
+    mv.addEventListener("load", () => { ready = true; place(); });
+    mv.addEventListener("camera-change", () => { if (ready && mv.classList.contains("show-dims")) place(); });
+
+    if (toggle) toggle.addEventListener("click", () => {
+      const on = mv.classList.toggle("show-dims");
+      toggle.setAttribute("aria-pressed", on ? "true" : "false");
+      mv.querySelectorAll(".dim-label").forEach((el) => { el.hidden = !on; });
+      if (on && ready) place();
+    });
+    if (arBtn) arBtn.addEventListener("click", () => { if (mv.canActivateAR) mv.activateAR(); });
+  </script>
   {% endif %}
 {% endblock %}

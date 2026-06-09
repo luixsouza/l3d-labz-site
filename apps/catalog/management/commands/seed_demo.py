@@ -14,7 +14,7 @@ from django.db.models import Count
 from django.utils import timezone
 from django.utils.text import slugify
 
-from apps.catalog.models import Category, Product, ProductImage, Review
+from apps.catalog.models import Category, Product, ProductImage, Question, Review
 from apps.orders.models import Order, OrderItem
 from apps.promotions.models import Coupon, Offer, Promotion
 
@@ -356,6 +356,25 @@ class Command(BaseCommand):
             for buyer, combo in zip(buyers, combos):
                 baskets += _ensure_basket(buyer, combo)
         self.stdout.write(self.style.SUCCESS(f"Carrinhos multi-item (co-compra): {baskets}"))
+
+        # ---- perguntas & respostas demo ----
+        seller = User.objects.filter(role=User.Role.VENDEDOR).first()
+        demo_qa = [
+            ("Esse modelo vem montado e pronto pra uso?", "Vem em peça única, já pronto — é só tirar da caixa."),
+            ("Qual a altura aproximada da peça?", None),  # pendente de resposta
+        ]
+        qa_made = 0
+        for product, (qtext, atext) in zip(Product.objects.order_by("id")[:2], demo_qa):
+            obj, made = Question.objects.get_or_create(
+                product=product, author=buyers[0], text=qtext,
+            )
+            if made and atext and seller:
+                obj.answer = atext
+                obj.answered_by = seller
+                obj.answered_at = timezone.now()
+                obj.save()
+            qa_made += made
+        self.stdout.write(self.style.SUCCESS(f"Perguntas demo: {qa_made}"))
 
         self.stdout.write(self.style.SUCCESS(
             "\nSeed concluido!\n"

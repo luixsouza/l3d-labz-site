@@ -2195,3 +2195,45 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .fav-on-card { position: absolute; top: 10px; right: 10px; z-index: 3; }
 .fav-on-card .fav-btn { width: 36px; height: 36px; }
 .fav-inline { display: inline-flex; }
+
+/* ---- perguntas & respostas ---- */
+.qa-list { display: grid; gap: 1rem; }
+.qa-item { padding: 1rem 1.1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-card); }
+.qa-q { display: flex; gap: .75rem; align-items: flex-start; }
+.qa-mono { flex: 0 0 auto; width: 34px; height: 34px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; background: var(--accent-soft); color: var(--accent-strong); }
+.qa-text { margin: 0; font-weight: 600; }
+.qa-meta { font-size: .8rem; }
+.qa-a { margin-top: .7rem; padding: .7rem .9rem; border-left: 3px solid var(--accent); background: var(--bg-soft); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.qa-a p { margin: .25rem 0 0; }
+.qa-answer-form textarea { width: 100%; }
+
+/* ---- autocomplete da busca ---- */
+.search-bar { position: relative; }
+.suggest-box {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 40;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow); overflow: hidden; max-height: 60vh; overflow-y: auto;
+}
+.suggest-item { display: flex; align-items: center; gap: .75rem; padding: .6rem .8rem; border-bottom: 1px solid var(--border-soft); }
+.suggest-item:last-child { border-bottom: 0; }
+.suggest-item:hover { background: var(--bg-soft); }
+.suggest-item img, .suggest-ph { width: 44px; height: 44px; border-radius: var(--radius-sm); object-fit: cover; background: var(--bg-soft); flex: 0 0 auto; }
+.suggest-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.suggest-info strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.suggest-info .text-dim { font-size: .8rem; }
+.suggest-price { font-weight: 700; color: var(--accent-strong); white-space: nowrap; }
+
+/* ---- galeria 3D: ferramentas + medidas ---- */
+.mv-tools { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .6rem; }
+.dim-label {
+  background: var(--bg-elevated, #111); color: #fff; border: 1px solid var(--border);
+  border-radius: 999px; padding: 2px 9px; font-size: .72rem; font-weight: 700;
+  white-space: nowrap; cursor: default; box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  --min-hotspot-opacity: 0;
+}
+.dim-label[hidden] { display: none; }
+
+/* ---- prazo de producao ---- */
+.chip-lead { color: var(--accent-strong); border-color: var(--accent); }
+.product-lead { display: inline-flex; align-items: center; gap: .35rem; font-size: .78rem; margin-top: .15rem; }
+.product-lead .icon { width: 14px; height: 14px; }

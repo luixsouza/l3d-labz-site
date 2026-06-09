@@ -5,11 +5,11 @@ lançamentos) são cacheadas; a busca filtrada usa TTL curto.
 """
 from __future__ import annotations
 
-from django.db.models import Avg, Count, F, Q
+from django.db.models import Avg, Case, Count, F, IntegerField, Q, Value, When
 
 from apps.core import cache as cache_utils
 
-from .models import Category, Favorite, Product, Review
+from .models import Category, Favorite, Product, Question, Review
 
 NS_FEATURED = "catalog:featured"
 NS_NEW = "catalog:new"
@@ -199,6 +199,18 @@ class ProductQuery:
         if max_price is not None:
             qs = qs.filter(price__lte=max_price)
 
+        # relevancia com termo de busca: prioriza match no inicio > no nome > na descricao
+        if query and sort == "relevance":
+            qs = qs.annotate(
+                rank=Case(
+                    When(name__istartswith=query, then=Value(3)),
+                    When(name__icontains=query, then=Value(2)),
+                    default=Value(1),
+                    output_field=IntegerField(),
+                )
+            )
+            return qs.order_by("-rank", "-is_featured", "-sales_count")
+
         ordering = {
             "new": "-created_at",
             "popular": "-sales_count",
@@ -207,6 +219,26 @@ class ProductQuery:
             "relevance": "-is_featured",
         }.get(sort, "-is_featured")
         return qs.order_by(ordering, "-sales_count")
+
+    @staticmethod
+    def suggest(term: str, limit: int = 6) -> list[Product]:
+        """Sugestoes de autocomplete: produtos cujo nome casa com o termo."""
+        term = (term or "").strip()
+        if len(term) < 2:
+            return []
+        qs = (
+            Product.objects.active()
+            .filter(name__icontains=term)
+            .annotate(
+                rank=Case(
+                    When(name__istartswith=term, then=Value(2)),
+                    default=Value(1),
+                    output_field=IntegerField(),
+                )
+            )
+            .order_by("-rank", "-sales_count")
+        )
+        return list(qs[:limit])
 
     @staticmethod
     def materials() -> list[str]:
@@ -242,6 +274,20 @@ class ReviewQuery:
             Review.objects.filter(author=user, product_id__in=product_ids)
             .values_list("product_id", flat=True)
         )
+
+
+class QuestionQuery:
+    @staticmethod
+    def for_product(product: Product, *, only_answered: bool = False):
+        """Perguntas do produto (autor + respondente pre-carregados)."""
+        qs = (
+            Question.objects.filter(product=product)
+            .select_related("author", "answered_by")
+            .order_by("-created_at")
+        )
+        if only_answered:
+            qs = qs.exclude(answer="")
+        return qs
 
 
 class FavoriteQuery:

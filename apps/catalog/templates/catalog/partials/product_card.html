@@ -15,6 +15,7 @@
     <span class="product-cat">{{ product.category_name }}</span>
     <a href="{{ product.url }}" class="product-name">{{ product.name }}</a>
     <span class="product-rating"><svg class="icon"><use href="#i-star"></use></svg> {{ product.rating }}</span>
+    <span class="product-lead text-dim"><svg class="icon"><use href="#i-truck"></use></svg> Pronto em {{ product.lead_time_label }}</span>
     <div class="price-row">
       <span class="price">{{ product.price_display }}</span>
       {% if product.has_discount %}<span class="price-old">{{ product.old_price_display }}</span>{% endif %}

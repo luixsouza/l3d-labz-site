@@ -10,12 +10,15 @@ from django.utils.text import slugify
 
 from apps.core.layers import BaseService
 
-from .mappers import CategoryMapper, ProductMapper, ReviewMapper
-from .models import MAX_PRODUCT_IMAGES, Favorite, Product, ProductImage, Review
+from django.utils import timezone
+
+from .mappers import CategoryMapper, ProductMapper, QuestionMapper, ReviewMapper
+from .models import MAX_PRODUCT_IMAGES, Favorite, Product, ProductImage, Question, Review
 from .queries import (
     CategoryQuery,
     FavoriteQuery,
     ProductQuery,
+    QuestionQuery,
     ReviewQuery,
     invalidate_catalog_cache,
     invalidate_product,
@@ -47,6 +50,20 @@ class CatalogService(BaseService):
     @staticmethod
     def gallery() -> dict[str, Any]:
         return {"products": ProductMapper.to_list(ProductQuery.with_3d())}
+
+    @staticmethod
+    def suggest(term: str) -> list[dict[str, Any]]:
+        """Sugestoes leves para o autocomplete da busca."""
+        return [
+            {
+                "name": p["name"],
+                "url": p["url"],
+                "image_url": p.get("image_url", ""),
+                "price": p["price_display"],
+                "category": p["category_name"],
+            }
+            for p in ProductMapper.to_list(ProductQuery.suggest(term))
+        ]
 
     # ---- catálogo (listagem com filtros + paginação) ----
     @staticmethod
@@ -106,6 +123,8 @@ class CatalogService(BaseService):
             "reviews": ReviewMapper.to_list(reviews),
             "review_summary": ReviewService.summary(product),
             "review_state": ReviewService.eligibility(user, product),
+            "questions": QuestionMapper.to_list(QuestionQuery.for_product(product)),
+            "can_answer": QuestionService.can_answer(user, product),
             "product_obj": product,
         }
 
@@ -230,6 +249,37 @@ class FavoriteService(BaseService):
     def list_for_user(user) -> dict[str, Any]:
         products = FavoriteQuery.products_for_user(user)
         return {"products": ProductMapper.to_list(products), "count": len(products)}
+
+
+class QuestionService(BaseService):
+    """Perguntas & respostas. Cliente pergunta; vendedor do produto (ou staff) responde."""
+
+    @staticmethod
+    def can_answer(user, product) -> bool:
+        if not getattr(user, "is_authenticated", False):
+            return False
+        return bool(user.is_staff or product.seller_id == user.id)
+
+    @staticmethod
+    def ask(user, product, text: str) -> tuple[bool, str]:
+        text = (text or "").strip()
+        if not text:
+            return False, "Escreva sua pergunta."
+        Question.objects.create(product=product, author=user, text=text)
+        return True, "Pergunta enviada! Avisaremos quando for respondida."
+
+    @staticmethod
+    def answer(user, question, text: str) -> tuple[bool, str]:
+        if not QuestionService.can_answer(user, question.product):
+            return False, "Apenas o vendedor pode responder."
+        text = (text or "").strip()
+        if not text:
+            return False, "Escreva a resposta."
+        question.answer = text
+        question.answered_by = user
+        question.answered_at = timezone.now()
+        question.save(update_fields=["answer", "answered_by", "answered_at", "updated_at"])
+        return True, "Resposta publicada."
 
 
 def _unique_slug(name: str) -> str:

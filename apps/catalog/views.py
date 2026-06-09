@@ -6,9 +6,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import ReviewForm
-from .models import Product
-from .services import CatalogService, FavoriteService, ReviewService
+from .forms import AnswerForm, QuestionForm, ReviewForm
+from .models import Product, Question
+from .services import CatalogService, FavoriteService, QuestionService, ReviewService
 
 
 def product_list(request):
@@ -50,6 +50,11 @@ def models_3d(request):
     return render(request, "catalog/models_3d.html", CatalogService.gallery())
 
 
+def search_suggest(request):
+    """Autocomplete da busca (JSON)."""
+    return JsonResponse({"results": CatalogService.suggest(request.GET.get("q", ""))})
+
+
 @login_required
 def favorite_toggle(request, product_id):
     """Favoritar/desfavoritar. Responde JSON p/ AJAX (fetch) ou redireciona."""
@@ -66,3 +71,29 @@ def favorite_toggle(request, product_id):
 @login_required
 def wishlist(request):
     return render(request, "catalog/wishlist.html", FavoriteService.list_for_user(request.user))
+
+
+@login_required
+def question_create(request, product_id):
+    product = get_object_or_404(Product.objects.active(), pk=product_id)
+    if request.method == "POST":
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            ok, message = QuestionService.ask(request.user, product, form.cleaned_data["text"])
+            messages.success(request, message) if ok else messages.error(request, message)
+        else:
+            messages.error(request, "Escreva sua pergunta.")
+    return redirect(f"{product.get_absolute_url()}#perguntas")
+
+
+@login_required
+def answer_create(request, question_id):
+    question = get_object_or_404(Question.objects.select_related("product"), pk=question_id)
+    if request.method == "POST":
+        form = AnswerForm(request.POST)
+        if form.is_valid():
+            ok, message = QuestionService.answer(request.user, question, form.cleaned_data["answer"])
+            messages.success(request, message) if ok else messages.error(request, message)
+        else:
+            messages.error(request, "Escreva a resposta.")
+    return redirect(f"{question.product.get_absolute_url()}#perguntas")
