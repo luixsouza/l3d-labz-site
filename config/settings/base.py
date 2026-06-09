@@ -101,6 +101,11 @@ _use_postgres = env("DATABASE_ENGINE", "sqlite").lower() == "postgres" or bool(
 )
 
 if _use_postgres:
+    # Pool e conexões persistentes (CONN_MAX_AGE>0) são mutuamente exclusivos no
+    # backend postgres do Django 5.2 ("Pooling doesn't support persistent
+    # connections."). Com pool ligado, força CONN_MAX_AGE=0 (o pool gerencia).
+    _db_pool = env_bool("DB_POOL", True)
+    _conn_max_age = 0 if _db_pool else env_int("DB_CONN_MAX_AGE", 60)
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -109,9 +114,9 @@ if _use_postgres:
             "PASSWORD": env("POSTGRES_PASSWORD", "nexora"),
             "HOST": env("POSTGRES_HOST", "127.0.0.1"),
             "PORT": env("POSTGRES_PORT", "5432"),
-            "CONN_MAX_AGE": env_int("DB_CONN_MAX_AGE", 60),
+            "CONN_MAX_AGE": _conn_max_age,
             "CONN_HEALTH_CHECKS": True,
-            "OPTIONS": {"pool": True},
+            "OPTIONS": {"pool": True} if _db_pool else {},
         }
     }
 else:

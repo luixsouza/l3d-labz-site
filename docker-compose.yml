@@ -1,0 +1,88 @@
+# L3D Labz — stack de produção (server caseiro + Cloudflare Tunnel).
+# Sobe com: docker compose --env-file .env.prod up -d --build
+# Tunnel:   docker compose --env-file .env.prod --profile tunnel up -d cloudflared
+#
+# O HTTPS/SSL e o IP dinâmico são resolvidos pelo Cloudflare Tunnel — por isso
+# NÃO tem certbot/nginx-ssl aqui. O nginx serve HTTP interno (static/media +
+# proxy p/ gunicorn); o cloudflared expõe na internet via http://nginx:80.
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-l3dlabz}
+      POSTGRES_USER: ${POSTGRES_USER:-l3dlabz}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env.prod}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-l3dlabz} -d ${POSTGRES_DB:-l3dlabz}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: .
+    restart: unless-stopped
+    env_file: .env.prod
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.prod
+      POSTGRES_HOST: db
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - static_data:/app/staticfiles
+      - media_data:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/", "-o", "/dev/null"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    volumes:
+      - ./docker/nginx/templates:/etc/nginx/templates:ro
+      - static_data:/static:ro
+      - media_data:/media:ro
+    # Bind em localhost só p/ teste/curl no próprio server; quem expõe é o tunnel.
+    ports:
+      - "127.0.0.1:8080:80"
+    depends_on:
+      - web
+
+  # Conector do Cloudflare Tunnel (HTTPS + IP dinâmico resolvidos pela CF).
+  # Só sobe com --profile tunnel, depois que CLOUDFLARE_TUNNEL_TOKEN estiver no .env.prod.
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    profiles: ["tunnel"]
+    command: ["tunnel", "--no-autoupdate", "run", "--token", "${CLOUDFLARE_TUNNEL_TOKEN}"]
+    depends_on:
+      - nginx
+
+volumes:
+  postgres_data:
+  redis_data:
+  static_data:
+  media_data:

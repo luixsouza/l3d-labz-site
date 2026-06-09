@@ -29,8 +29,12 @@ def _rgb(h: str) -> tuple[int, int, int]:
 
 def _fonte(tamanho: int, bold: bool = False) -> ImageFont.FreeTypeFont:
     candidatos = (
-        ["C:/Windows/Fonts/segoeuib.ttf", "C:/Windows/Fonts/arialbd.ttf"] if bold
-        else ["C:/Windows/Fonts/segoeui.ttf", "C:/Windows/Fonts/arial.ttf"]
+        # Windows (dev local) primeiro, depois Linux/DejaVu (VM/Docker) — fonts-dejavu-core.
+        ["C:/Windows/Fonts/segoeuib.ttf", "C:/Windows/Fonts/arialbd.ttf",
+         "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+         "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"] if bold
+        else ["C:/Windows/Fonts/segoeui.ttf", "C:/Windows/Fonts/arial.ttf",
+              "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"]
     )
     for caminho in candidatos:
         try:

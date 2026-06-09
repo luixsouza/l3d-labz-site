@@ -1,0 +1,53 @@
+# nginx interno (HTTP) — TLS é resolvido pelo Cloudflare Tunnel na borda.
+# Serve static/media direto do disco e faz proxy do resto p/ o gunicorn.
+
+# Preserva o protocolo original (https) que o cloudflared manda em X-Forwarded-Proto;
+# se vier vazio (acesso local direto), cai no $scheme.
+map $http_x_forwarded_proto $fwd_proto {
+    default $http_x_forwarded_proto;
+    ""      $scheme;
+}
+
+upstream django {
+    server web:8000;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name _;
+
+    # Arquivos 3D (GLB/STL) podem ser grandes
+    client_max_body_size 50m;
+
+    # Estáticos coletados (collectstatic -> volume static_data)
+    location /static/ {
+        alias /static/;
+        access_log off;
+        expires 30d;
+        add_header Cache-Control "public";
+    }
+
+    # Media gerada/enviada (fotos + GLB/STL -> volume media_data)
+    location /media/ {
+        alias /media/;
+        access_log off;
+        expires 7d;
+        add_header Cache-Control "public";
+        types {
+            model/gltf-binary glb;
+            model/stl         stl;
+        }
+        default_type application/octet-stream;
+    }
+
+    location / {
+        proxy_pass http://django;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        # base.py confia neste header p/ saber que a origem é HTTPS (Cloudflare)
+        proxy_set_header X-Forwarded-Proto $fwd_proto;
+        proxy_redirect off;
+    }
+}
