@@ -1,0 +1,46 @@
+# Deploy de produção — server caseiro `contta-inteligencia`, alcançado via Tailscale.
+#
+# Disparo MANUAL (workflow_dispatch) de propósito: o runner do GitHub precisa
+# entrar na tailnet (Tailscale) p/ chegar no IP 100.113.195.104, então não faz
+# sentido rodar em todo push até os secrets estarem configurados.
+#
+# Pré-requisitos no server (uma vez): o projeto em /home/contta/sites/l3dlabz
+# precisa ser um `git clone` (hoje foi enviado por tarball) e ter o .env.prod.
+#
+# Secrets necessários (Settings > Secrets and variables > Actions):
+#   TS_OAUTH_CLIENT_ID / TS_OAUTH_SECRET  -> OAuth client da Tailscale (tag:ci)
+#   SSH_KEY                               -> chave PRIVADA SSH autorizada no server (contta)
+
+name: deploy
+
+on:
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Conectar na Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+
+      - name: Deploy via SSH (git pull + compose up)
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.SSH_KEY }}" > ~/.ssh/id
+          chmod 600 ~/.ssh/id
+          ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id contta@100.113.195.104 '
+            set -e
+            cd /home/contta/sites/l3dlabz
+            git pull --ff-only
+            docker compose --env-file .env.prod build
+            docker compose --env-file .env.prod up -d
+            docker image prune -f
+          '

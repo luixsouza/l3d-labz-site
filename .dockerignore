@@ -1,0 +1,32 @@
+# Controle de versão / CI
+.git
+.github
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Dados locais (regenerados na VM)
+db.sqlite3
+media/
+staticfiles/
+
+# Ambiente / segredos
+.env
+.env.*
+!.env.prod.example
+
+# Editores / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Docs/infra que não precisam na imagem
+*.md
+docker-compose*.yml

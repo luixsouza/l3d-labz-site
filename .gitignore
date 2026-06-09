@@ -16,6 +16,7 @@ env/
 .env
 .env.*
 !.env.example
+!.env.prod.example
 
 # ----- Banco de dados -----
 *.sqlite3

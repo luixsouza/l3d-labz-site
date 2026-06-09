@@ -4,7 +4,7 @@ djangorestframework==3.16.1
 djangorestframework-camel-case==1.4.2
 
 # --- Banco ---
-psycopg[binary]==3.3.3          # Postgres (produção)
+psycopg[binary,pool]==3.3.3     # Postgres (produção) + connection pool
 # SQLite é nativo no Python (dev)
 
 # --- Cache ---
@@ -17,6 +17,9 @@ Pillow==11.2.1
 # --- Geração 3D do lithophane ---
 numpy==2.2.6
 trimesh==4.12.2
+fast-simplification           # decimação de malha (STL gigante -> GLB leve p/ o viewer)
+networkx                      # requerido pelo trimesh p/ ler .3mf (grafo de cena)
+lxml                          # requerido pelo trimesh p/ parsear o XML do .3mf
 
 # --- Filtros de catálogo ---
 django-filter==25.1

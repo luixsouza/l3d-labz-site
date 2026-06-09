@@ -39,7 +39,9 @@ class ProductMapper(BaseMapper[Product]):
             "monogram": instance.name[:1].upper(),
             "image_url": instance.image.url if instance.image else (instance.image_url or ""),
             "price": instance.price,
-            "price_display": format_brl(instance.price),
+            # Preço 0 = produzido sob demanda (orçamento no WhatsApp), não "R$ 0,00".
+            "price_display": format_brl(instance.price) if instance.price > 0 else "Sob consulta",
+            "on_demand": instance.price <= 0,
             "old_price_display": format_brl(instance.compare_at_price) if instance.has_discount else "",
             "has_discount": instance.has_discount,
             "discount_pct": instance.discount_pct,
