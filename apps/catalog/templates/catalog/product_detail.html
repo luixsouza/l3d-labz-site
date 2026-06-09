@@ -15,7 +15,10 @@
           <model-viewer src="{{ product.model_3d_url }}" poster="{{ product.image_url }}"
                         alt="Modelo 3D de {{ product.name }}"
                         camera-controls auto-rotate touch-action="pan-y"
-                        shadow-intensity="1" loading="lazy" reveal="auto"
+                        environment-image="neutral" tone-mapping="commerce"
+                        exposure="1.05" shadow-intensity="1.4" shadow-softness="1"
+                        camera-orbit="-25deg 72deg auto" interaction-prompt="none"
+                        loading="lazy" reveal="auto" style="background:#fbfbfd"
                         ar ar-modes="webxr scene-viewer quick-look" ar-scale="auto"></model-viewer>
         {% else %}
           <span class="thumb-mono" style="--acc:{{ product.accent }}">{{ product.monogram }}</span>

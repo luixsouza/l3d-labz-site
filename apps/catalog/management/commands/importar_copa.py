@@ -17,19 +17,22 @@ from __future__ import annotations
 from decimal import Decimal
 from pathlib import Path
 
+import numpy as np
 import trimesh
+import trimesh.transformations as tf
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
 from django.utils.text import slugify
 
+from apps.catalog import render3d
 from apps.catalog.branding import gerar_card
 from apps.catalog.models import Category, Product
 
-# STL primeiro: geometria crua e previsível. O .3mf pode conter centenas de
-# instâncias (build "ladrilhado") que explodem a RAM ao achatar — só usamos
-# .3mf quando não há STL.
-MESH_PREF = [".stl", ".3mf", ".obj", ".ply"]
-MAX_FACES_IN = 6_000_000  # acima disso, aborta o produto (evita OOM do box)
+# 3MF primeiro: vem MONTADO (transforms do build) — é a "foto do stl montado".
+# STL costuma ser peças no layout da mesa de impressão (espalhadas), por isso
+# para STL multi-peça usamos só a peça maior. Guard de OOM no 3mf ladrilhado.
+MESH_PREF = [".3mf", ".stl", ".obj", ".ply"]
+MAX_FACES_IN = 6_000_000  # acima disso, aborta/cai p/ peça única (evita OOM do box)
 IMG_EXTS = {".jpg", ".jpeg", ".png", ".webp"}
 TARGET_FACES = 60000
 
@@ -68,10 +71,12 @@ class Command(BaseCommand):
                             help="Processa só o produto com este slug (isola OOM).")
         parser.add_argument("--sem3d", action="store_true",
                             help="Cria só com foto (sem gerar GLB) — p/ malhas que estouram a RAM.")
+        parser.add_argument("--stl", action="store_true",
+                            help="Ignora .3mf e usa só STL (p/ 3mf que estoura a RAM).")
 
     # ---- helpers ----
-    def _coletar_malhas(self, pasta: Path) -> list[Path]:
-        for ext in MESH_PREF:
+    def _coletar_malhas(self, pasta: Path, prefs=None) -> list[Path]:
+        for ext in (prefs or MESH_PREF):
             achados = sorted(p for p in pasta.rglob("*") if p.suffix.lower() == ext)
             if achados:
                 return achados
@@ -81,39 +86,109 @@ class Command(BaseCommand):
         imgs = [p for p in pasta.rglob("*") if p.suffix.lower() in IMG_EXTS]
         return max(imgs, key=lambda p: p.stat().st_size) if imgs else None
 
-    def _gerar_glb(self, malhas: list[Path]) -> bytes:
-        partes = []
-        for m in malhas:
-            try:
-                # NÃO usar force='mesh': em .3mf isso "assa" todas as instâncias
-                # (build ladrilhado) e estoura a RAM. Carrega como cena e pega só
-                # as geometrias ÚNICAS (1 cópia do modelo, sem replicar instâncias).
-                loaded = trimesh.load(str(m))
-                if isinstance(loaded, trimesh.Scene):
-                    geoms = [g for g in loaded.geometry.values()
-                             if isinstance(g, trimesh.Trimesh) and len(g.faces)]
-                    if not geoms:
-                        continue
-                    geo = trimesh.util.concatenate(geoms) if len(geoms) > 1 else geoms[0]
-                elif isinstance(loaded, trimesh.Trimesh) and len(loaded.faces):
-                    geo = loaded
-                else:
-                    continue
-                partes.append(geo)
-            except Exception as e:
-                self.stderr.write(f"      ! falha lendo {m.name}: {e}")
-        if not partes:
-            raise ValueError("nenhuma malha válida")
-        mesh = trimesh.util.concatenate(partes) if len(partes) > 1 else partes[0]
-        n = len(mesh.faces)
-        if n > MAX_FACES_IN:
-            raise ValueError(f"malha grande demais ({n} faces) — abortando p/ não estourar RAM")
-        if n > TARGET_FACES:
-            try:
-                mesh = mesh.simplify_quadric_decimation(face_count=TARGET_FACES)
-            except TypeError:
-                mesh = mesh.simplify_quadric_decimation(TARGET_FACES)
-            self.stdout.write(f"      decimado {n} -> {len(mesh.faces)} faces")
+    def _carregar_3mf(self, path: Path):
+        """Carrega .3mf MONTADO (aplica os transforms do build). Guard de OOM: se
+        as instâncias somarem faces demais (build ladrilhado), cai p/ a maior
+        geometria única (1 cópia) em vez de bakear tudo e estourar a RAM."""
+        loaded = trimesh.load(str(path))
+        if isinstance(loaded, trimesh.Trimesh):
+            return loaded
+        if not isinstance(loaded, trimesh.Scene):
+            return None
+        total = 0
+        for node in loaded.graph.nodes_geometry:
+            g = loaded.geometry.get(loaded.graph[node][1])
+            if g is not None and getattr(g, "faces", None) is not None:
+                total += len(g.faces)
+        if total and total <= MAX_FACES_IN:
+            m = loaded.dump(concatenate=True)  # MONTADO
+            return m if isinstance(m, trimesh.Trimesh) and len(m.faces) else None
+        geoms = [g for g in loaded.geometry.values()
+                 if isinstance(g, trimesh.Trimesh) and len(g.faces)]
+        return max(geoms, key=lambda g: len(g.faces)) if geoms else None
+
+    def _construir_mesh(self, malhas: list[Path]):
+        if malhas[0].suffix.lower() == ".3mf":
+            partes = []
+            for m in malhas:
+                try:
+                    g = self._carregar_3mf(m)
+                    if g is not None and len(g.faces):
+                        partes.append(g)
+                except Exception as e:
+                    self.stderr.write(f"      ! falha lendo {m.name}: {e}")
+            if not partes:
+                raise ValueError("3mf sem malha válida")
+            mesh = trimesh.util.concatenate(partes) if len(partes) > 1 else partes[0]
+        else:
+            # STL/OBJ multi-peça = layout da mesa de impressão; concatenar
+            # espalharia as partes. Usa só a MAIOR peça (corpo principal).
+            maior = max(malhas, key=lambda p: p.stat().st_size)
+            mesh = trimesh.load(str(maior), force="mesh")
+            if not (isinstance(mesh, trimesh.Trimesh) and len(mesh.faces)):
+                raise ValueError("sem malha STL válida")
+
+        n0 = len(mesh.faces)
+        if n0 > MAX_FACES_IN:
+            raise ValueError(f"malha grande demais ({n0} faces) — abortando p/ não estourar RAM")
+
+        # pré-decima malhas enormes p/ o split (adjacência) caber na RAM
+        if n0 > 500_000:
+            mesh = self._decimar(mesh, 400_000)
+
+        # maior componente conectado: descarta plates de impressão / peças soltas
+        try:
+            comps = mesh.split(only_watertight=False)
+            if len(comps) > 1:
+                mesh = max(comps, key=lambda c: len(c.faces))
+                self.stdout.write(f"      maior de {len(comps)} componentes")
+        except Exception:
+            pass
+
+        mesh = self._orientar(mesh)
+
+        if len(mesh.faces) > TARGET_FACES:
+            mesh = self._decimar(mesh, TARGET_FACES)
+        return mesh
+
+    @staticmethod
+    def _decimar(mesh, alvo: int):
+        try:
+            return mesh.simplify_quadric_decimation(face_count=alvo)
+        except TypeError:
+            return mesh.simplify_quadric_decimation(alvo)
+
+    def _orientar(self, mesh):
+        """Coloca o objeto "em pé": eixo mais longo na vertical (Z). Se for uma
+        placa fina, o eixo FINO vai p/ Z (deita) e o render usa vista de cima.
+        Rotações próprias (sem espelhar — logos não saem invertidos)."""
+        try:
+            ext = mesh.extents
+            alvo = int(np.argmin(ext)) if ext.min() < 0.30 * ext.max() else int(np.argmax(ext))
+            if alvo == 0:
+                mesh.apply_transform(tf.rotation_matrix(-np.pi / 2, [0, 1, 0]))
+            elif alvo == 1:
+                mesh.apply_transform(tf.rotation_matrix(np.pi / 2, [1, 0, 0]))
+        except Exception:
+            pass
+        return mesh
+
+    def _finalizar_glb(self, mesh) -> bytes:
+        """Suaviza normais + material PBR claro p/ o viewer não ficar 'cinza morto'."""
+        try:
+            mesh.merge_vertices()
+            mesh.fix_normals()
+        except Exception:
+            pass
+        try:
+            mesh.visual = trimesh.visual.TextureVisuals(
+                material=trimesh.visual.material.PBRMaterial(
+                    baseColorFactor=[0.84, 0.86, 0.90, 1.0],
+                    metallicFactor=0.0, roughnessFactor=0.55,
+                )
+            )
+        except Exception:
+            pass
         return mesh.export(file_type="glb")
 
     # ---- main ----
@@ -153,27 +228,30 @@ class Command(BaseCommand):
             cat = cats[cat_nome]
             accent = cat.accent
 
-            # 3D (pulável via --sem3d para malhas que estouram a RAM)
+            # 3D + foto renderizada do modelo (pulável via --sem3d p/ malhas que estouram a RAM)
             glb = None
             if not options["sem3d"]:
-                malhas = self._coletar_malhas(pasta)
+                prefs = [".stl", ".obj", ".ply"] if options["stl"] else None
+                malhas = self._coletar_malhas(pasta, prefs)
                 if not malhas:
                     self.stderr.write(f"      ! sem malha 3D — pulando {nome}")
                     continue
                 try:
-                    glb = self._gerar_glb(malhas)
+                    mesh = self._construir_mesh(malhas)
                 except Exception as e:
-                    self.stderr.write(f"      ! falha no GLB: {e} — pulando")
+                    self.stderr.write(f"      ! falha na malha: {e} — pulando")
                     continue
-
-            # imagem
-            img_path = self._melhor_imagem(pasta)
-            if img_path:
-                img_bytes = img_path.read_bytes()
-                img_ext = img_path.suffix.lower().lstrip(".").replace("jpeg", "jpg")
+                # foto padronizada (render minimalista do próprio modelo)
+                try:
+                    img_bytes = render3d.render_thumb(mesh, nome, accent)
+                    img_ext = "jpg"
+                except Exception as e:
+                    self.stderr.write(f"      ! falha no render ({e}) — card de fallback")
+                    img_bytes, img_ext = gerar_card(nome, accent), "png"
+                glb = self._finalizar_glb(mesh)
             else:
-                img_bytes = gerar_card(nome, accent)
-                img_ext = "png"
+                # sem malha utilizável: card de marca consistente
+                img_bytes, img_ext = gerar_card(nome, accent), "png"
 
             p = existente or Product(slug=slug)
             p.category = cat
