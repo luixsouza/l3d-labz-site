@@ -137,3 +137,21 @@ class Product(TimeStampedModel):
     @property
     def has_stl(self) -> bool:
         return bool(self.model_stl)
+
+
+class ProductImage(TimeStampedModel):
+    """Imagem extra de galeria vinculada a um produto."""
+
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="gallery", verbose_name="produto"
+    )
+    image = models.ImageField("imagem", upload_to="products/gallery/")
+    order = models.PositiveSmallIntegerField("ordem", default=0)
+
+    class Meta:
+        verbose_name = "imagem da galeria"
+        verbose_name_plural = "imagens da galeria"
+        ordering = ("order",)
+
+    def __str__(self) -> str:
+        return f"{self.product.name} #{self.order}"

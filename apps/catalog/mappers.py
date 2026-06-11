@@ -49,14 +49,15 @@ class ProductMapper(BaseMapper[Product]):
             "in_stock": instance.in_stock,
             "rating": float(instance.rating),
             "url": instance.get_absolute_url(),
-            # campos de visualização 3D no card (modal do catálogo)
-            "model_3d_url": instance.model_3d.url if instance.model_3d else "",
-            "has_3d": instance.has_3d_model,
         }
 
     @classmethod
     def to_detail(cls, instance: Product) -> dict[str, Any]:
         data = cls.to_dict(instance)
+        # Galeria: foto principal primeiro, depois imagens extras ordenadas por order.
+        foto_principal = instance.image.url if instance.image else (instance.image_url or "")
+        extras = [img.image.url for img in instance.gallery.all() if img.image]
+        gallery = [url for url in ([foto_principal] + extras) if url]
         data.update(
             {
                 "description": instance.description,
@@ -65,10 +66,7 @@ class ProductMapper(BaseMapper[Product]):
                 "print_time_hours": instance.print_time_hours,
                 "stock": instance.stock,
                 "sales_count": instance.sales_count,
-                "model_3d_url": instance.model_3d.url if instance.model_3d else "",
-                "stl_url": instance.model_stl.url if instance.model_stl else "",
-                "has_3d_model": instance.has_3d_model,
-                "has_stl": instance.has_stl,
+                "gallery": gallery,
             }
         )
         return data
