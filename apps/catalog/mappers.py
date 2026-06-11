@@ -49,6 +49,9 @@ class ProductMapper(BaseMapper[Product]):
             "in_stock": instance.in_stock,
             "rating": float(instance.rating),
             "url": instance.get_absolute_url(),
+            # campos de visualização 3D no card (modal do catálogo)
+            "model_3d_url": instance.model_3d.url if instance.model_3d else "",
+            "has_3d": instance.has_3d_model,
         }
 
     @classmethod
