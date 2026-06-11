@@ -12,7 +12,19 @@
       <a href="{% url 'catalog:models_3d' %}" class="{% if vn == 'catalog:models_3d' %}active{% endif %}">Modelos 3D</a>
       <a href="{% url 'lithophane:editor' %}" class="{% if vn == 'lithophane:editor' %}active{% endif %}">Faça meu Lithophane</a>
       <a href="{% url 'promotions:list' %}" class="{% if vn == 'promotions:list' %}active{% endif %}">Promoções</a>
-      <a href="{% url 'core:about' %}" class="{% if vn == 'core:about' or vn == 'core:home' %}active{% endif %}">Sobre</a>
+      <a href="{% url 'core:about' %}" class="{% if vn == 'core:about' %}active{% endif %}">Sobre</a>
+      {# links de conta — visíveis só no menu mobile (header esconde .btn ≤720px) #}
+      <span class="nav-account-divider" aria-hidden="true"></span>
+      {% if user.is_authenticated %}
+        <a href="{% url 'accounts:profile' %}" class="nav-account-link"><svg class="icon"><use href="#i-user"></use></svg> Minha conta</a>
+        <form action="{% url 'accounts:logout' %}" method="post" style="display:contents">
+          {% csrf_token %}
+          <button type="submit" class="nav-account-link" style="background:none;border:none;cursor:pointer;text-align:left;width:100%;font-family:inherit">Sair</button>
+        </form>
+      {% else %}
+        <a href="{% url 'accounts:login' %}" class="nav-account-link"><svg class="icon"><use href="#i-user"></use></svg> Entrar</a>
+        <a href="{% url 'accounts:register' %}" class="nav-account-link">Criar conta</a>
+      {% endif %}
     </nav>
     {% endwith %}
 

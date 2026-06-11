@@ -2008,3 +2008,127 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .cat-chip:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-soft); }
 .cat-chip .cc-ic { color: var(--acc, var(--accent)); display: inline-flex; }
 .cat-chip .cc-ic .icon { width: 18px; height: 18px; }
+
+/* =========================================================================
+   UAT-fix: mobile header acessível + menu opaco + dark theme v2 pages
+   ========================================================================= */
+
+/* (1+2) Mobile ≤720px: esconde botões de texto (ficam no menu), contém header-actions */
+@media (max-width: 720px) {
+  /* esconde os .btn de texto (Entrar / Criar conta / Sair) — acessíveis pelo menu mobile */
+  .site-header .header-actions .btn { display: none !important; }
+
+  /* contém as ações para não transbordar: apenas tema + carrinho + toggle cabem */
+  .site-header .header-actions {
+    margin-left: auto;
+    gap: .5rem;
+    flex-shrink: 0;
+    overflow: visible;
+  }
+
+  /* toggle sempre visível e tocável — z-index acima de tudo */
+  .site-header .nav-toggle {
+    display: grid !important;
+    position: relative;
+    z-index: 60;
+    pointer-events: auto;
+    flex-shrink: 0;
+  }
+}
+
+/* (3) Menu mobile aberto: fundo sólido/opaco, links com contraste AA, z acima do hero */
+.main-nav.open {
+  display: flex !important;
+  flex-direction: column;
+  position: fixed;
+  top: var(--header-h);
+  left: 0; right: 0;
+  z-index: 49;
+  background: #0a0f0c;    /* sólido — não translúcido sobre o hero */
+  border-bottom: 1px solid #1a2e23;
+  padding: 1.2rem 1.4rem 1.6rem;
+  gap: 0;
+  box-shadow: 0 16px 40px -20px rgba(0,0,0,.8);
+}
+.main-nav.open a {
+  display: block;
+  color: #e9edf6;           /* var(--text) explícito = contraste AA garantido */
+  font-size: 1.05rem;
+  font-weight: 600;
+  padding: .82rem .2rem;
+  border-bottom: 1px solid #182820;
+  transition: color .15s;
+}
+.main-nav.open a:last-child { border-bottom: none; }
+.main-nav.open a:hover, .main-nav.open a.active { color: #3ee37a; }
+/* links de conta injetados no menu (separados dos links de nav por um divisor) */
+.main-nav.open .nav-account-divider {
+  border-bottom: 1px solid #2a3e30;
+  margin: .6rem 0;
+}
+.main-nav.open .nav-account-link {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  color: #a9c9b6;
+  font-size: .92rem;
+  font-weight: 600;
+  padding: .72rem .2rem;
+  border-bottom: 1px solid #182820;
+  transition: color .15s;
+}
+.main-nav.open .nav-account-link:hover { color: #3ee37a; }
+.main-nav.open .nav-account-link:last-child { border-bottom: none; }
+
+/* (4) Tema dark — páginas v2: superfícies que usavam bg/text hardcoded agora usam tokens */
+/* checkout */
+.checkout-section {
+  background: var(--bg-card);
+  color: var(--text);
+}
+/* auth */
+.auth-form-side {
+  background: var(--bg);
+  color: var(--text);
+}
+.auth-form-side .form-card {
+  background: var(--bg-card);
+  color: var(--text);
+}
+/* conta */
+.account-layout {
+  background: var(--bg);
+}
+.account-nav {
+  background: var(--bg-card);
+  color: var(--text);
+}
+/* pedidos — histório */
+.order-card {
+  background: var(--bg-card);
+  color: var(--text);
+}
+/* promoções */
+.promo-card .content h3,
+.promo-card .content { color: var(--text); }
+/* lithophane editor */
+.litho-panel .card,
+.litho-panel .aside-card {
+  background: var(--bg-card);
+  color: var(--text);
+}
+/* campos de formulário */
+.field input, .field select, .field textarea {
+  background: var(--bg-soft);
+  color: var(--text);
+  border-color: var(--border);
+}
+/* carrinho */
+.cart-layout .card {
+  background: var(--bg-card);
+}
+/* produto detalhe */
+.detail-media {
+  background: var(--bg-soft);
+}
+/* nav link ativo: corrige active para 'core:about' não marcar 'core:home' */
