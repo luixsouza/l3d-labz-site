@@ -92,7 +92,13 @@ class ProductQuery:
     @staticmethod
     def detail_by_slug(slug: str) -> Product | None:
         def producer():
-            return Product.objects.active().with_relations().filter(slug=slug).first()
+            return (
+                Product.objects.active()
+                .with_relations()
+                .prefetch_related("gallery")
+                .filter(slug=slug)
+                .first()
+            )
 
         return cache_utils.get_or_set(
             cache_utils.build_key(NS_PRODUCT, slug), producer, bucket="medium"
