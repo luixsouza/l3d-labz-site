@@ -92,8 +92,14 @@ None yet.
 - [Phase 2] Sem validação de upload (extensão/tamanho) no FileField — GLB/STL podem ser grandes; adicionar validators.
 - [Phase 3] Serving de media em prod não está endurecido (WhiteNoise só serve static); arquivos 3D grandes precisam de estratégia (lazy/poster; CDN/object storage fica para depois).
 
+## Quick Tasks Completed
+
+| ID | Descrição | Data | Commits |
+|----|-----------|------|---------|
+| 260611-go4 | Corrigir 9 achados do UAT 2026-06-11 (mobile nav, rebrand L3D-, 404/500, home/sobre, viewer 3/4, fotos coloridas) | 2026-06-11 | b2b2339, 1f0fa96, efd5dc5, fbe51aa |
+
 ## Session Continuity
 
-Last session: 2026-06-06T13:13:50.663Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-06-11 (UAT fixes + deploy Cloudflare Tunnel)
+Stopped at: Quick task 260611-go4 completa — deploy prod + E2E em andamento
 Resume file: None
