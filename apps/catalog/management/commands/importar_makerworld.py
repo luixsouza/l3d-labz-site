@@ -257,7 +257,9 @@ class Command(BaseCommand):
             if existente and existente.name != titulo_base:
                 nome_produto = existente.name
             else:
-                nome_produto = traduzir_nome(titulo_base) if titulo_en else titulo_base
+                # traduz SEMPRE: titulo_en vazio significa que o original JÁ é
+                # inglês (MakerWorld só preenche titleTranslated p/ não-inglês)
+                nome_produto = traduzir_nome(titulo_base)
 
             # --- categoria automática ---
             nome_cat = _detectar_categoria(nome_produto, tags)
