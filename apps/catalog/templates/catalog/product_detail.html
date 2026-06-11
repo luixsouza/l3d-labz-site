@@ -11,24 +11,32 @@
 
     <div class="product-detail mt-2">
       <div class="detail-media reveal">
-        {% if product.has_3d_model %}
-          <model-viewer src="{{ product.model_3d_url }}" poster="{{ product.image_url }}"
-                        alt="Modelo 3D de {{ product.name }}"
-                        camera-controls auto-rotate touch-action="pan-y"
-                        environment-image="neutral" tone-mapping="commerce"
-                        exposure="1.1" shadow-intensity="1" shadow-softness="0.8"
-                        camera-orbit="35deg 70deg auto"
-                        min-camera-orbit="-Infinity 10deg auto"
-                        max-camera-orbit="Infinity 160deg auto"
-                        interaction-prompt="none"
-                        loading="lazy" reveal="auto" style="background:#fbfbfd"
-                        ar ar-modes="webxr scene-viewer quick-look" ar-scale="auto"></model-viewer>
+        {% if product.gallery|length > 1 %}
+          <div class="carousel">
+            <div class="carousel-track">
+              {% for url in product.gallery %}
+                <div class="slide">
+                  <img src="{{ url }}" alt="{{ product.name }}"
+                       onerror="this.onerror=null;this.src='https://picsum.photos/seed/{{ product.slug }}/800/800'">
+                </div>
+              {% endfor %}
+            </div>
+            <div class="carousel-dots" data-carousel-dots></div>
+            <button class="carousel-arrow prev" data-carousel-prev type="button" aria-label="Foto anterior">
+              <svg class="icon"><use href="#i-chevron-left"></use></svg>
+            </button>
+            <button class="carousel-arrow next" data-carousel-next type="button" aria-label="Próxima foto">
+              <svg class="icon"><use href="#i-chevron-right"></use></svg>
+            </button>
+          </div>
         {% else %}
           <span class="thumb-mono" style="--acc:{{ product.accent }}">{{ product.monogram }}</span>
-          {% if product.image_url %}
-            <img src="{{ product.image_url }}" alt="{{ product.name }}"
-                 onerror="this.onerror=null;this.src='https://picsum.photos/seed/{{ product.slug }}/800/800'">
-          {% endif %}
+          {% with foto=product.gallery.0|default:product.image_url %}
+            {% if foto %}
+              <img src="{{ foto }}" alt="{{ product.name }}"
+                   onerror="this.onerror=null;this.src='https://picsum.photos/seed/{{ product.slug }}/800/800'">
+            {% endif %}
+          {% endwith %}
         {% endif %}
       </div>
 
@@ -71,11 +79,6 @@
           {% else %}
             <button class="btn btn-ghost" disabled>Produto indisponível</button>
           {% endif %}
-          {% if product.has_stl %}
-            <a href="{{ product.stl_url }}" download class="btn btn-ghost" style="margin-top:.8rem">
-              <svg class="icon"><use href="#i-box"></use></svg> Baixar STL
-            </a>
-          {% endif %}
         </div>
       </div>
     </div>
@@ -96,9 +99,3 @@
 </section>
 {% endblock %}
 
-{% block extra_js %}
-  {% if product.has_3d_model %}
-  <script type="module"
-          src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js"></script>
-  {% endif %}
-{% endblock %}
