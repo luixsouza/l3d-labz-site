@@ -39,8 +39,8 @@ def _req(url: str, token: str = "") -> bytes:
     """GET com timeout curto e 3 tentativas — CDN/API às vezes pendura a conexão."""
     h = {"User-Agent": UA, "Accept": "application/json"}
     if token:
+        # SOMENTE o cookie — mandar Authorization junto faz a API responder 403
         h["Cookie"] = f"token={token}"
-        h["Authorization"] = f"Bearer {token}"
     ultimo: Exception | None = None
     for tentativa in range(3):
         try:
