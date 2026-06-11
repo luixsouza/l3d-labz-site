@@ -4,9 +4,14 @@ matplotlib (Agg, headless, SEM OpenGL) sombreia a malha num ângulo/luz fixos; o
 modelo é composto sobre um fundo quase-branco com uma sombra de contato suave.
 SEM texto na imagem (nome/preço ficam no card) — produto centralizado, muito
 respiro, look minimalista e consistente entre todos os itens.
+
+Cor do material: derivada deterministicamente do slug/categoria (hash estável)
+sobre a paleta L3D Labz. Aceita override via parâmetro `accent`. Iluminação
+key + fill para dar contraste real e evitar renderes planos/brancos.
 """
 from __future__ import annotations
 
+import hashlib
 import io
 
 import matplotlib
@@ -19,15 +24,47 @@ from PIL import Image, ImageDraw, ImageFilter  # noqa: E402
 # ângulo padrão (objetos "em pé"); planos usam vista mais de cima (_VIEW_FLAT)
 _VIEW = dict(elev=22, azim=-58)
 _VIEW_FLAT = dict(elev=58, azim=-40)
-_LUZ = np.array([0.40, 0.55, 0.74])
-_LUZ = _LUZ / np.linalg.norm(_LUZ)
-_MAT = np.array([0.86, 0.88, 0.91])   # alumínio/resina clara (neutro, elegante)
-_AMB = 0.52                            # bem iluminado (clean, não escuro)
+
+# ---- Iluminação key + fill ----
+# Key light: diagonal superior frontal (dominante)
+_KEY = np.array([0.40, 0.55, 0.74])
+_KEY = _KEY / np.linalg.norm(_KEY)
+_KEY_INT = 0.78     # intensidade da key
+
+# Fill light: oposta/inferior (suaviza sombras, dá volume)
+_FILL = np.array([-0.55, -0.30, 0.40])
+_FILL = _FILL / np.linalg.norm(_FILL)
+_FILL_INT = 0.28    # intensidade do fill (mais fraca que a key)
+
+_AMB = 0.22         # ambiente base (mais baixo = mais contraste)
+
 _FACES_RENDER = 13000
+
+# ---- Paleta L3D Labz — cores determinísticas por produto ----
+# verde Luigi (marca), azul acento, coral vivo, âmbar, lilás, teal, terra
+_PALETA = [
+    np.array([0.18, 0.66, 0.31]),   # verde L3D
+    np.array([0.17, 0.65, 0.88]),   # azul L3D
+    np.array([0.91, 0.35, 0.25]),   # coral
+    np.array([0.88, 0.72, 0.18]),   # âmbar
+    np.array([0.56, 0.40, 0.88]),   # lilás
+    np.array([0.15, 0.72, 0.68]),   # teal
+    np.array([0.72, 0.44, 0.20]),   # terra cotta
+    np.array([0.22, 0.38, 0.82]),   # azul escuro
+]
 
 # fundo Apple-ish (#fbfbfd -> #f2f3f5)
 _BG_TOP = np.array([251, 251, 253])
 _BG_BOT = np.array([238, 239, 242])
+
+
+def _cor_por_nome(nome: str) -> np.ndarray:
+    """Deriva cor determinística do slug/nome via hash SHA-1.
+
+    Mesma entrada sempre retorna o mesmo índice na paleta.
+    """
+    h = int(hashlib.sha1(nome.encode(), usedforsecurity=False).hexdigest(), 16)
+    return _PALETA[h % len(_PALETA)]
 
 
 def _fundo(px: int) -> Image.Image:
@@ -50,7 +87,7 @@ def _sombra(px: int) -> Image.Image:
     return base
 
 
-def _render_modelo(mesh, px: int) -> Image.Image:
+def _render_modelo(mesh, px: int, mat_rgb: np.ndarray) -> Image.Image:
     m = mesh
     if len(m.faces) > _FACES_RENDER:
         try:
@@ -59,9 +96,15 @@ def _render_modelo(mesh, px: int) -> Image.Image:
             pass
 
     tris = m.vertices[m.faces]
-    s = np.clip(m.face_normals @ _LUZ, 0.0, 1.0)
-    s = _AMB + (1.0 - _AMB) * s
-    rgb = np.clip(_MAT[None, :] * s[:, None], 0.0, 1.0)
+    normals = m.face_normals
+
+    # Iluminação key + fill (dois termos difusos)
+    s_key  = np.clip(normals @ _KEY,  0.0, 1.0) * _KEY_INT
+    s_fill = np.clip(normals @ _FILL, 0.0, 1.0) * _FILL_INT
+    s_total = _AMB + s_key + s_fill
+
+    # Aplica cor do material com iluminação
+    rgb = np.clip(mat_rgb[None, :] * s_total[:, None], 0.0, 1.0)
     cores = np.concatenate([rgb, np.ones((len(rgb), 1))], axis=1)
 
     fig = plt.figure(figsize=(px / 100, px / 100), dpi=100)
@@ -95,10 +138,28 @@ def _render_modelo(mesh, px: int) -> Image.Image:
 
 
 def render_thumb(mesh, nome: str = "", accent: str = "", tamanho: int = 1000) -> bytes:
-    """JPEG (bytes): produto centralizado em fundo clean com sombra de contato."""
+    """JPEG (bytes): produto centralizado em fundo clean com sombra de contato.
+
+    Cor do material: derivada deterministicamente do `nome` (slug/categoria)
+    ou do parâmetro `accent` (se preenchido, ex.: '#2FA84F').
+    Iluminação key + fill garante variação de pixel (std > limiar).
+    """
+    # Determina cor do material
+    if accent and accent.startswith("#") and len(accent) in (4, 7):
+        # parse hex -> RGB [0,1]
+        a = accent.lstrip("#")
+        if len(a) == 3:
+            a = "".join(c * 2 for c in a)
+        try:
+            mat_rgb = np.array([int(a[i:i+2], 16) / 255.0 for i in (0, 2, 4)])
+        except ValueError:
+            mat_rgb = _cor_por_nome(nome or "produto")
+    else:
+        mat_rgb = _cor_por_nome(nome or "produto")
+
     img = _fundo(tamanho)
     img.alpha_composite(_sombra(tamanho))
-    modelo = _render_modelo(mesh, int(tamanho * 0.80))
+    modelo = _render_modelo(mesh, int(tamanho * 0.80), mat_rgb)
     # leve deslocamento p/ cima: produto "flutua" sobre a sombra
     x = (tamanho - modelo.size[0]) // 2
     y = int(tamanho * 0.09)

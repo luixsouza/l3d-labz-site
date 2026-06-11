@@ -16,8 +16,11 @@
                         alt="Modelo 3D de {{ product.name }}"
                         camera-controls auto-rotate touch-action="pan-y"
                         environment-image="neutral" tone-mapping="commerce"
-                        exposure="1.05" shadow-intensity="1.4" shadow-softness="1"
-                        camera-orbit="-25deg 72deg auto" interaction-prompt="none"
+                        exposure="1.1" shadow-intensity="1" shadow-softness="0.8"
+                        camera-orbit="35deg 70deg auto"
+                        min-camera-orbit="-Infinity 10deg auto"
+                        max-camera-orbit="Infinity 160deg auto"
+                        interaction-prompt="none"
                         loading="lazy" reveal="auto" style="background:#fbfbfd"
                         ar ar-modes="webxr scene-viewer quick-look" ar-scale="auto"></model-viewer>
         {% else %}

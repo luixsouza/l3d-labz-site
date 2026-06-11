@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Página não encontrada · L3D Labz{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="empty-state" style="padding:5rem 1rem">
+      <div class="ph" style="width:88px;height:88px;font-family:var(--font-display);font-size:2rem;font-weight:800;color:var(--accent-2)">404</div>
+      <h1 style="margin-top:1.4rem;font-size:clamp(1.8rem,1rem+3vw,2.8rem)">Página não encontrada</h1>
+      <p style="max-width:42ch;margin-inline:auto;margin-top:.8rem;color:var(--text-muted);font-size:1.05rem">
+        Parece que essa camada não foi impressa. O endereço pode estar errado ou a página foi removida.
+      </p>
+      <div style="display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;margin-top:2rem">
+        <a href="{% url 'catalog:product_list' %}" class="btn btn-primary">
+          <svg class="icon"><use href="#i-box"></use></svg> Ver catálogo
+        </a>
+        <a href="{% url 'core:home' %}" class="btn btn-ghost">Voltar ao início</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

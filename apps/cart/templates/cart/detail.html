@@ -90,7 +90,7 @@
             {% csrf_token %}
             <label style="font-size:.85rem;font-weight:600;color:var(--text-muted)">Cupom de desconto</label>
             <div class="coupon-row mt-1">
-              <input type="text" name="code" value="{{ summary.coupon_code|default:'' }}" placeholder="Ex.: NERD10" style="padding:.7rem .9rem">
+              <input type="text" name="code" value="{{ summary.coupon_code|default:'' }}" placeholder="Ex.: L3D10" style="padding:.7rem .9rem">
               <button type="submit" class="btn btn-ghost">Aplicar</button>
             </div>
           </form>
