@@ -173,8 +173,8 @@ class Command(BaseCommand):
             pass
         return mesh
 
-    def _finalizar_glb(self, mesh) -> bytes:
-        """Suaviza normais + material PBR claro p/ o viewer não ficar 'cinza morto'."""
+    def _finalizar_glb(self, mesh, nome: str = "") -> bytes:
+        """Suaviza normais + material PBR colorido (mesma cor da foto) p/ o viewer."""
         try:
             mesh.merge_vertices()
             mesh.fix_normals()
@@ -183,7 +183,7 @@ class Command(BaseCommand):
         try:
             mesh.visual = trimesh.visual.TextureVisuals(
                 material=trimesh.visual.material.PBRMaterial(
-                    baseColorFactor=[0.84, 0.86, 0.90, 1.0],
+                    baseColorFactor=render3d.cor_rgba_por_nome(nome or "produto"),
                     metallicFactor=0.0, roughnessFactor=0.55,
                 )
             )
@@ -243,12 +243,14 @@ class Command(BaseCommand):
                     continue
                 # foto padronizada (render minimalista do próprio modelo)
                 try:
-                    img_bytes = render3d.render_thumb(mesh, nome, accent)
+                    # cor vem da paleta L3D (determinística por nome) — accent da
+                    # categoria é pálido demais p/ material; fica só p/ cards/molduras
+                    img_bytes = render3d.render_thumb(mesh, nome)
                     img_ext = "jpg"
                 except Exception as e:
                     self.stderr.write(f"      ! falha no render ({e}) — card de fallback")
                     img_bytes, img_ext = gerar_card(nome, accent), "png"
-                glb = self._finalizar_glb(mesh)
+                glb = self._finalizar_glb(mesh, nome)
             else:
                 # sem malha utilizável: card de marca consistente
                 img_bytes, img_ext = gerar_card(nome, accent), "png"

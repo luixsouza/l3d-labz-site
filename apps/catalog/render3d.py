@@ -67,6 +67,11 @@ def _cor_por_nome(nome: str) -> np.ndarray:
     return _PALETA[h % len(_PALETA)]
 
 
+def cor_rgba_por_nome(nome: str) -> list[float]:
+    """RGBA [0-1] da paleta p/ material PBR do GLB — mesma cor da foto do produto."""
+    return [*_cor_por_nome(nome).tolist(), 1.0]
+
+
 def _fundo(px: int) -> Image.Image:
     t = np.linspace(0.0, 1.0, px)[:, None]
     col = (_BG_TOP[None, :] * (1 - t) + _BG_BOT[None, :] * t).astype("uint8")
