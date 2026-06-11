@@ -37,32 +37,7 @@
 
   {% include "core/partials/footer.html" %}
 
-  {# Modal 3D global — único por página, aberto via JS ao clicar "Ver em 3D" #}
-  <div class="viewer3d" id="viewer3d" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="Visualizador 3D">
-    <div class="viewer3d-backdrop"></div>
-    <div class="viewer3d-card">
-      <header class="viewer3d-header">
-        <span class="viewer3d-title" data-viewer-title></span>
-        <button class="viewer3d-close" data-viewer-close type="button" aria-label="Fechar visualizador 3D">
-          <svg class="icon"><use href="#i-x"></use></svg>
-        </button>
-      </header>
-      <model-viewer data-viewer-mv
-        camera-controls auto-rotate touch-action="pan-y"
-        environment-image="neutral" tone-mapping="commerce"
-        exposure="1.1" shadow-intensity="1" shadow-softness="0.8"
-        camera-orbit="35deg 75deg auto"
-        interaction-prompt="none"
-        loading="lazy" reveal="auto"
-        style="background:#fbfbfd;width:100%;flex:1;min-height:320px"
-        ar ar-modes="webxr scene-viewer quick-look" ar-scale="auto"></model-viewer>
-    </div>
-  </div>
-
   <script src="{% static 'js/app.js' %}" defer></script>
-  {# model-viewer carregado uma vez p/ o modal global (detail carrega o seu via extra_js — module dedup no browser) #}
-  <script type="module" defer
-          src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js"></script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>
