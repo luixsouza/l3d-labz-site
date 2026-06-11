@@ -157,6 +157,9 @@ def main() -> int:
     ap.add_argument("--dest", default="./makerworld", help="pasta de saída")
     ap.add_argument("--so-arquivos", action="store_true",
                     help="só baixa 3MF faltantes (meta/fotos já salvos)")
+    ap.add_argument("--urls", nargs="*", default=[],
+                    help="links/ids diretos de modelos (ignora busca): "
+                         "https://makerworld.com/pt/models/123-slug ou só 123")
     args = ap.parse_args()
 
     token = os.environ.get("MAKERWORLD_TOKEN", "").strip()
@@ -168,8 +171,26 @@ def main() -> int:
         print("AVISO: sem MAKERWORLD_TOKEN — baixando só meta+fotos (3MF pulado).")
 
     dest = Path(args.dest)
-    hits = listar_top(args.top, args.keyword, args.order)
-    print(f"{len(hits)} modelos (order={args.order}, keyword={args.keyword!r})\n")
+    if args.urls:
+        # modo curadoria: ids/links escolhidos a dedo (busca o detalhe de cada um)
+        hits = []
+        for u in args.urls:
+            m = re.search(r"/models/(\d+)", u) or re.fullmatch(r"(\d+)", u.strip())
+            if not m:
+                print(f"AVISO: não entendi o link {u!r} — pulando")
+                continue
+            did = int(m.group(1))
+            try:
+                d = _json(f"{API}/design-service/design/{did}")
+                hits.append({"id": did, "title": d.get("title"),
+                             "titleTranslated": d.get("titleTranslated"),
+                             "license": d.get("license")})
+            except Exception as e:
+                print(f"AVISO: falha no detalhe de {did}: {e}")
+            time.sleep(PAUSA)
+    else:
+        hits = listar_top(args.top, args.keyword, args.order)
+    print(f"{len(hits)} modelos (order={args.order}, keyword={args.keyword!r}, urls={len(args.urls)})\n")
     licencas: dict[str, int] = {}
     for i, h in enumerate(hits, 1):
         lic = h.get("license") or "?"
