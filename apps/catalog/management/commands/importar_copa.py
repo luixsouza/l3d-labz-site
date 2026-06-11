@@ -180,6 +180,12 @@ class Command(BaseCommand):
             mesh.fix_normals()
         except Exception:
             pass
+        # trimesh trabalha com Z-up; GLB/model-viewer assumem Y-up — sem esta
+        # rotação o modelo aparece deitado no visualizador
+        try:
+            mesh.apply_transform(tf.rotation_matrix(-np.pi / 2, [1, 0, 0]))
+        except Exception:
+            pass
         try:
             mesh.visual = trimesh.visual.TextureVisuals(
                 material=trimesh.visual.material.PBRMaterial(
