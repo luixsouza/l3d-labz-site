@@ -36,13 +36,21 @@ PAUSA = 1.5  # segundos entre requests — educado com o servidor deles
 
 
 def _req(url: str, token: str = "") -> bytes:
+    """GET com timeout curto e 3 tentativas — CDN/API às vezes pendura a conexão."""
     h = {"User-Agent": UA, "Accept": "application/json"}
     if token:
         h["Cookie"] = f"token={token}"
         h["Authorization"] = f"Bearer {token}"
-    req = urllib.request.Request(url, headers=h)
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return r.read()
+    ultimo: Exception | None = None
+    for tentativa in range(3):
+        try:
+            req = urllib.request.Request(url, headers=h)
+            with urllib.request.urlopen(req, timeout=25) as r:
+                return r.read()
+        except Exception as e:  # timeout, reset, 5xx...
+            ultimo = e
+            time.sleep(3 * (tentativa + 1))
+    raise RuntimeError(f"3 tentativas falharam p/ {url[:80]}: {ultimo}")
 
 
 def _json(url: str, token: str = "") -> dict:
