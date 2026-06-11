@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Erro interno · L3D Labz</title>
+  <style>
+    :root {
+      --bg: #0a0d15; --text: #e9edf6; --muted: #98a2b8;
+      --accent: #2FA84F; --accent2: #43C266; --border: #222a3a;
+      --card: #121826; --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; height: 100%; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+    .wrap { max-width: 500px; }
+    .badge {
+      display: inline-block;
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--accent2);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      width: 90px; height: 90px;
+      line-height: 90px;
+      margin-bottom: 1.4rem;
+    }
+    h1 { font-size: clamp(1.6rem, 1rem + 2.5vw, 2.4rem); margin: 0 0 .6rem; }
+    p { color: var(--muted); line-height: 1.6; margin: 0 0 2rem; }
+    a {
+      display: inline-block;
+      padding: .75rem 1.6rem;
+      background: var(--accent);
+      color: #06240f;
+      font-weight: 700;
+      border-radius: 999px;
+      text-decoration: none;
+      transition: opacity .2s;
+    }
+    a:hover { opacity: .88; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="badge">500</div>
+    <h1>Ops, algo deu errado</h1>
+    <p>
+      Nossa impressora tropicou em alguma camada. O problema já foi
+      registrado e estamos resolvendo. Tente novamente em alguns instantes.
+    </p>
+    <a href="/catalogo/">Ir para o catálogo</a>
+  </div>
+</body>
+</html>
