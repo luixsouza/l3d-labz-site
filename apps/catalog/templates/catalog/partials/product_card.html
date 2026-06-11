@@ -30,14 +30,6 @@
       {% else %}
         <button class="btn btn-ghost btn-sm btn-block" disabled>Indisponível</button>
       {% endif %}
-      {% if product.has_3d %}
-        <button type="button" class="btn-3d"
-                data-viewer-3d="{{ product.model_3d_url }}"
-                data-viewer-nome="{{ product.name }}"
-                aria-label="Ver modelo 3D de {{ product.name }}">
-          <svg class="icon"><use href="#i-cube"></use></svg> Ver em 3D
-        </button>
-      {% endif %}
     </div>
   </div>
 </article>
