@@ -2137,3 +2137,92 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   background: var(--bg-soft);
 }
 /* nav link ativo: corrige active para 'core:about' não marcar 'core:home' */
+
+/* =========================================================================
+   Modal 3D global + botão "Ver em 3D" no card
+   ========================================================================= */
+
+/* --- oculta quando hidden --- */
+.viewer3d[hidden] { display: none; }
+
+/* --- overlay fullscreen --- */
+.viewer3d {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.5rem;
+  animation: fadeIn .18s var(--ease);
+}
+.viewer3d-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(10, 12, 16, 0.62);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* --- card do modal --- */
+.viewer3d-card {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  width: min(860px, 100%); max-height: calc(100dvh - 3rem);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow), 0 0 0 1px var(--border-soft);
+  overflow: hidden;
+  animation: slideUp .22s var(--ease);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* --- cabeçalho --- */
+.viewer3d-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: .9rem 1.2rem; border-bottom: 1px solid var(--border-soft);
+  flex: none;
+}
+.viewer3d-title {
+  font-family: var(--font-display); font-weight: 700; font-size: 1rem;
+  color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.viewer3d-close {
+  display: grid; place-items: center;
+  width: 36px; height: 36px; flex: none;
+  background: transparent; border: 1px solid var(--border);
+  color: var(--text-muted); cursor: pointer;
+  transition: color .2s, border-color .2s, background .2s;
+}
+.viewer3d-close:hover { color: var(--text); border-color: var(--accent); background: var(--bg-card); }
+
+/* --- model-viewer dentro do card --- */
+.viewer3d-card model-viewer {
+  width: 100%; flex: 1; min-height: 320px;
+  display: block;
+}
+
+/* --- mobile: fullscreen sem bordas --- */
+@media (max-width: 600px) {
+  .viewer3d { padding: 0; align-items: flex-end; }
+  .viewer3d-card {
+    width: 100%; max-height: 92dvh;
+    border-left: none; border-right: none; border-bottom: none;
+  }
+  .viewer3d-card model-viewer { min-height: 60dvh; }
+}
+
+/* --- botão "Ver em 3D" no card do produto --- */
+.btn-3d {
+  display: inline-flex; align-items: center; gap: .4rem;
+  padding: .45rem .8rem;
+  background: transparent; border: 1px solid var(--border);
+  color: var(--text-muted); font-size: .78rem; font-weight: 700;
+  cursor: pointer; white-space: nowrap;
+  transition: color .2s, border-color .2s, background .2s;
+  width: 100%; justify-content: center; margin-top: .4rem;
+}
+.btn-3d:hover {
+  border-color: var(--accent); color: var(--accent-2);
+  background: var(--accent-soft);
+}
+.btn-3d .icon { width: 1em; height: 1em; }
