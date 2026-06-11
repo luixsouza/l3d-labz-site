@@ -7,12 +7,7 @@
   const nav = document.getElementById("mainNav");
   if (toggle && nav) {
     toggle.addEventListener("click", () => {
-      const open = nav.classList.toggle("open");
-      Object.assign(nav.style, open ? {
-        display: "flex", position: "absolute", top: "var(--header-h)", left: "0", right: "0",
-        flexDirection: "column", background: "var(--bg-soft)", padding: "1rem 22px",
-        borderBottom: "1px solid var(--border)", gap: "1rem",
-      } : { display: "" });
+      nav.classList.toggle("open");
     });
   }
 
