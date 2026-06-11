@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% if page == "privacidade" %}
+  {% block title %}Política de Privacidade · L3D Labz{% endblock %}
+{% elif page == "termos" %}
+  {% block title %}Termos e Condições · L3D Labz{% endblock %}
+{% else %}
+  {% block title %}L3D Labz{% endblock %}
+{% endif %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div style="max-width:760px;margin-inline:auto">
+
+      {% if page == "privacidade" %}
+        <span class="eyebrow">Institucional</span>
+        <h1>Política de Privacidade</h1>
+        <p class="text-muted">Última atualização: junho de 2026</p>
+
+        <p>A <strong>L3D Labz</strong> se compromete a proteger sua privacidade. Esta política descreve como coletamos, usamos e protegemos seus dados pessoais ao utilizar nosso site e serviços.</p>
+
+        <h3>1. Dados coletados</h3>
+        <p>Coletamos nome, e-mail, endereço de entrega e informações de pagamento necessários para processar seus pedidos. Não vendemos nem compartilhamos seus dados com terceiros sem seu consentimento, exceto para prestadores de serviço envolvidos na entrega dos pedidos.</p>
+
+        <h3>2. Uso dos dados</h3>
+        <p>Seus dados são utilizados exclusivamente para processar pedidos, enviar atualizações de entrega e melhorar a experiência de uso do site. Podemos enviar comunicações de marketing apenas com seu consentimento explícito.</p>
+
+        <h3>3. Cookies</h3>
+        <p>Usamos cookies essenciais para o funcionamento do site (sessão, carrinho) e cookies de análise anônimos para entender o tráfego. Você pode desativar cookies não essenciais nas configurações do seu navegador.</p>
+
+        <h3>4. Seus direitos (LGPD)</h3>
+        <p>Conforme a Lei Geral de Proteção de Dados (LGPD), você tem direito a acessar, corrigir e solicitar a exclusão de seus dados pessoais. Entre em contato conosco para exercer esses direitos.</p>
+
+        <h3>5. Contato</h3>
+        <p>Dúvidas sobre privacidade? <a href="https://wa.me/" style="color:var(--accent-2);font-weight:700">Fale conosco pelo WhatsApp</a> ou envie um e-mail para contato@l3dlabz.com.br.</p>
+
+      {% elif page == "termos" %}
+        <span class="eyebrow">Institucional</span>
+        <h1>Termos e Condições</h1>
+        <p class="text-muted">Última atualização: junho de 2026</p>
+
+        <p>Ao utilizar o site da <strong>L3D Labz</strong>, você concorda com os termos e condições descritos abaixo. Leia com atenção antes de realizar um pedido.</p>
+
+        <h3>1. Produtos e produção</h3>
+        <p>Todos os produtos são impressos sob demanda. O prazo de produção é de aproximadamente 48 horas após a confirmação do pagamento. Variações mínimas de cor e acabamento são inerentes ao processo de impressão 3D.</p>
+
+        <h3>2. Pagamento</h3>
+        <p>Aceitamos PIX (aprovação imediata, desconto de 10%), cartão de crédito e boleto bancário. O pedido é confirmado somente após a confirmação do pagamento.</p>
+
+        <h3>3. Entrega e frete</h3>
+        <p>O frete é calculado individualmente e combinado no atendimento conforme o endereço e o peso/volume do pedido. Enviamos para todo o Brasil com código de rastreio.</p>
+
+        <h3>4. Trocas e devoluções</h3>
+        <p>Aceitamos trocas e devoluções em caso de defeito de fabricação em até 7 dias após o recebimento, conforme o Código de Defesa do Consumidor. Não realizamos trocas por arrependimento de compra de produtos sob demanda personalizados.</p>
+
+        <h3>5. Propriedade intelectual</h3>
+        <p>Os modelos 3D do catálogo são licenciados para uso pessoal. A reprodução comercial sem autorização expressa é proibida.</p>
+
+        <h3>6. Contato</h3>
+        <p>Dúvidas sobre pedidos ou condições de compra? <a href="https://wa.me/" style="color:var(--accent-2);font-weight:700">Fale conosco pelo WhatsApp</a>.</p>
+
+      {% else %}
+        <h1>Página não encontrada</h1>
+        <p>Esta página não existe. <a href="{% url 'core:home' %}" style="color:var(--accent-2)">Voltar ao início.</a></p>
+      {% endif %}
+
+      <div class="mt-3" style="padding-top:1rem;border-top:1px solid var(--border)">
+        <a href="{% url 'core:home' %}" class="btn btn-ghost btn-sm">← Voltar ao início</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

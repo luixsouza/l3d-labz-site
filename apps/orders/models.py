@@ -78,9 +78,9 @@ class Order(TimeStampedModel):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if not self.number:
-            # número estável baseado no PK, ex.: NX-000042
-            type(self).objects.filter(pk=self.pk).update(number=f"NX-{self.pk:06d}")
-            self.number = f"NX-{self.pk:06d}"
+            # número estável baseado no PK, ex.: L3D-000042
+            type(self).objects.filter(pk=self.pk).update(number=f"L3D-{self.pk:06d}")
+            self.number = f"L3D-{self.pk:06d}"
 
     @property
     def item_count(self) -> int:
