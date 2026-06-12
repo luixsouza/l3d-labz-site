@@ -4,6 +4,26 @@
 {% block content %}
 
 <!-- ===================== HERO PROMOCIONAL ===================== -->
+{% if hero_promo %}
+<section class="section" style="padding-top:1.6rem;padding-bottom:0">
+  <div class="container">
+    <div class="geek-hero geek-hero--clean reveal">
+      <div class="gh-inner">
+        <span class="eyebrow">{{ hero_promo.badge }}</span>
+        <h1>{{ hero_promo.title }}</h1>
+        <p class="lead">{{ hero_promo.subtitle }}</p>
+        <div class="hero-cta">
+          <a href="{{ hero_promo.cta_url }}" class="gh-btn primary">{{ hero_promo.cta_label }} <svg class="icon icon-arrow"><use href="#i-arrow-right"></use></svg></a>
+          <a href="{% url 'lithophane:editor' %}" class="gh-btn ghost">Faça meu Lithophane</a>
+        </div>
+      </div>
+      <div class="gh-deco" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+</section>
+{% else %}
 <section class="section" style="padding-top:1.6rem;padding-bottom:0">
   <div class="container">
     <div class="geek-hero geek-hero--clean reveal">
@@ -22,6 +42,7 @@
     </div>
   </div>
 </section>
+{% endif %}
 
 <!-- ===================== SERVIÇOS ===================== -->
 <section class="section" style="padding-top:1.4rem">
