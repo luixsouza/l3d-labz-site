@@ -10,11 +10,13 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         from apps.catalog.services import CatalogService
+        from apps.promotions.services import PromotionService
 
         context = super().get_context_data(**kwargs)
         context["featured"] = CatalogService.list_featured_products(8)
         context["new_arrivals"] = CatalogService.list_new_arrivals(4)
         context["home_categories"] = CatalogService.list_highlighted_categories()
+        context["hero_promo"] = PromotionService.get_hero_promotion()
         return context
 
 
