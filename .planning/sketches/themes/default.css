@@ -1,0 +1,74 @@
+/* =========================================================================
+   L3D Labz — Tema de sketch · Direção "A — Clean & Elegante" (light-first)
+   Só vocabulário visual (custom properties). Inspirado nos tokens reais do
+   site (static/css/theme.css), reequilibrado pra ser claro e arejado.
+   ========================================================================= */
+:root {
+  /* superfícies — off-white quente, cards brancos, sombra em vez de borda dura */
+  --color-bg:        #FAFBF9;
+  --color-bg-soft:   #F2F5F0;
+  --color-surface:   #FFFFFF;
+  --color-elevated:  #FFFFFF;
+  --color-border:    #E7EBE4;
+  --color-border-soft:#F0F3EC;
+
+  /* texto — quase preto esverdeado, hierarquia clara */
+  --color-text:      #16201A;
+  --color-text-muted:#5C6B60;
+  --color-text-dim:  #9AA89E;
+
+  /* verde Luigi — uso contido (CTA, detalhe, foco) */
+  --color-primary:       #2FA84F;
+  --color-primary-2:     #43C266;
+  --color-primary-strong:#1E8C3E;
+  --color-primary-soft:  #E7F6EC;
+  --color-primary-glow:  rgba(47, 168, 79, 0.22);
+
+  /* azul — cor secundária (links, badges, prova social) */
+  --color-blue:      #2BA6E0;
+  --color-blue-soft: #E6F4FB;
+  --color-blue-ink:  #0E5E84;
+
+  /* easter-egg Mario (raro, só promo) */
+  --color-mario:     #E23B3B;
+  --color-coin:      #F4C233;
+
+  --color-success:   #1E8C3E;
+  --color-danger:    #E23B3B;
+
+  /* tipografia */
+  --font-display: "Bricolage Grotesque", "Hanken Grotesk", system-ui, sans-serif;
+  --font-sans:    "Hanken Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono:    "Space Mono", ui-monospace, monospace;
+
+  --text-xs: .75rem; --text-sm: .875rem; --text-base: 1rem;
+  --text-lg: 1.125rem; --text-xl: 1.35rem; --text-2xl: 1.7rem; --text-3xl: 2.4rem;
+
+  /* espaçamento */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-6: 24px; --space-8: 32px; --space-12: 48px; --space-16: 64px; --space-20: 80px;
+
+  /* formas */
+  --radius-sm: 12px; --radius-md: 18px; --radius-lg: 26px; --radius-full: 999px;
+
+  /* sombras difusas (sem borda dura) */
+  --shadow-sm:   0 2px 8px -4px rgba(23, 38, 80, 0.10);
+  --shadow-md:   0 10px 28px -16px rgba(23, 38, 80, 0.18);
+  --shadow-lg:   0 28px 60px -34px rgba(23, 38, 80, 0.28);
+  --shadow-glow: 0 22px 50px -28px var(--color-primary-glow);
+
+  --container: 1180px;
+  --ease: cubic-bezier(.22, 1, .36, 1);
+}
+
+/* ---- referência: paleta do dark ATUAL (usada na variante "Antes") ---- */
+:root {
+  --dark-bg:       #0a0d15;
+  --dark-soft:     #0e121d;
+  --dark-card:     #121826;
+  --dark-elevated: #19202f;
+  --dark-border:   #222a3a;
+  --dark-text:     #e9edf6;
+  --dark-muted:    #98a2b8;
+  --dark-dim:      #5e6a82;
+}
