@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Emitir Orçamento — Calculadora L3D Labz{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+
+    <div class="page-head">
+      <p class="eyebrow">Área restrita — equipe L3D</p>
+      <h1>Emitir Orçamento</h1>
+      <p class="text-muted">Preencha os custos da impressão e os dados do cliente para gerar o PDF de orçamento. O cliente receberá apenas o preço final — os custos internos ficam ocultos.</p>
+    </div>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      <div class="calc-layout">
+
+        {# ---- COLUNA ESQUERDA: custos de produção ---- #}
+        <div class="calc-inputs">
+          <h2 style="font-size:1rem;font-weight:700;color:var(--text-muted);letter-spacing:.05em;text-transform:uppercase;margin:0 0 .5rem">Custos de produção</h2>
+
+          {# --- Filamento --- #}
+          <div class="card">
+            <h3 class="calc-section-title">Filamento</h3>
+            <div class="form-grid">
+              <div class="field">
+                {% include "core/partials/field.html" with field=form.peso_g %}
+              </div>
+              <div class="field">
+                {% include "core/partials/field.html" with field=form.preco_kg %}
+              </div>
+            </div>
+          </div>
+
+          {# --- Energia --- #}
+          <div class="card">
+            <h3 class="calc-section-title">Energia</h3>
+            <div class="form-grid">
+              <div>{% include "core/partials/field.html" with field=form.potencia_w %}</div>
+              <div>{% include "core/partials/field.html" with field=form.tempo_h %}</div>
+              <div class="col-2">{% include "core/partials/field.html" with field=form.tarifa_kwh %}</div>
+            </div>
+          </div>
+
+          {# --- Máquina --- #}
+          <div class="card">
+            <h3 class="calc-section-title">Máquina</h3>
+            <div class="form-grid">
+              <div>{% include "core/partials/field.html" with field=form.valor_maquina %}</div>
+              <div>{% include "core/partials/field.html" with field=form.vida_util_h %}</div>
+            </div>
+          </div>
+
+          {# --- Trabalho --- #}
+          <div class="card">
+            <h3 class="calc-section-title">Trabalho</h3>
+            <div class="form-grid">
+              <div class="col-2">{% include "core/partials/field.html" with field=form.custo_maoobra %}</div>
+            </div>
+          </div>
+
+          {# --- Margem e risco --- #}
+          <div class="card">
+            <h3 class="calc-section-title">Margem e risco</h3>
+            <div class="form-grid">
+              <div>{% include "core/partials/field.html" with field=form.taxa_falha_pct %}</div>
+              <div>{% include "core/partials/field.html" with field=form.margem_pct %}</div>
+            </div>
+          </div>
+        </div>
+
+        {# ---- COLUNA DIREITA: dados do cliente ---- #}
+        <div class="calc-results">
+          <h2 style="font-size:1rem;font-weight:700;color:var(--text-muted);letter-spacing:.05em;text-transform:uppercase;margin:0 0 .5rem">Dados do cliente</h2>
+
+          <div class="card" style="padding:1.5rem">
+            <div class="field">{% include "core/partials/field.html" with field=form.cliente_nome %}</div>
+            <div class="field">{% include "core/partials/field.html" with field=form.peca_descricao %}</div>
+            <div class="form-grid">
+              <div>{% include "core/partials/field.html" with field=form.quantidade %}</div>
+              <div>{% include "core/partials/field.html" with field=form.prazo_entrega %}</div>
+            </div>
+            <div class="field">{% include "core/partials/field.html" with field=form.observacoes %}</div>
+          </div>
+
+          {# ---- Ação: gerar PDF ---- #}
+          <div class="card" style="padding:1.25rem 1.5rem">
+            <p class="text-muted" style="font-size:.9rem;margin:0 0 1rem">
+              O cálculo do preço final é feito no servidor com os custos preenchidos à esquerda.
+              O PDF gerado mostra <strong>apenas o preço ao cliente</strong> — sem expor custos internos.
+            </p>
+            <button type="submit" class="btn btn-primary btn-block">
+              Gerar orçamento (PDF)
+            </button>
+          </div>
+        </div>
+
+      </div>{# /calc-layout #}
+    </form>
+
+  </div>
+</section>
+{% endblock %}

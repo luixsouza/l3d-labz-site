@@ -22,6 +22,9 @@ networkx                      # requerido pelo trimesh p/ ler .3mf (grafo de cen
 lxml                          # requerido pelo trimesh p/ parsear o XML do .3mf
 matplotlib                    # render headless (Agg) da foto padronizada do modelo
 
+# --- Geração de PDF (orçamentos) ---
+reportlab==4.5.1          # geração de PDF pura-python (orçamentos da calculadora, sem deps nativas)
+
 # --- Filtros de catálogo ---
 django-filter==25.1
 
