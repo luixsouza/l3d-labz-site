@@ -34,18 +34,39 @@ class CatalogService(BaseService):
     # ---- hero da home: produto 3D em destaque ----
     @staticmethod
     def get_hero_3d_product() -> dict[str, Any] | None:
-        """Retorna 1 produto-3D para o hero da home ou None se não houver.
+        """Retorna o modelo 3D da vitrine do hero da home ou None.
 
-        Prefere destaques (is_featured=True); cai no primeiro com model_3d
-        se nenhum destaque tiver. Reutiliza ProductQuery.with_3d que já ordena
-        por -sales_count e exclui produtos sem model_3d.
+        Prioridade:
+        (1) settings.HERO_3D_MODEL_URL — modelo-vitrine geek (não-produto),
+            GLB auto-hospedado, mostrado como demo da marca;
+        (2) settings.HERO_3D_PRODUCT_SLUG — produto-3D curado a dedo;
+        (3) um destaque (is_featured) com model_3d;
+        (4) o primeiro com model_3d (maior sales_count).
         """
-        candidates = ProductQuery.with_3d(limit=10)
+        from django.conf import settings
+        from django.templatetags.static import static
+
+        # (1) modelo-vitrine geek (não-produto)
+        showcase_url = (getattr(settings, "HERO_3D_MODEL_URL", "") or "").strip()
+        if showcase_url:
+            src = showcase_url if showcase_url.startswith(("http://", "https://", "/")) else static(showcase_url)
+            return {
+                "name": getattr(settings, "HERO_3D_MODEL_ALT", "Modelo 3D"),
+                "model_3d_url": src,
+                "image_url": "",       # sem poster: o pedestal claro do card cobre o load
+                "has_stl": False,
+                "model_stl_url": "",
+                "is_showcase": True,
+            }
+
+        # (2-4) produto-3D do catálogo
+        candidates = ProductQuery.with_3d(limit=20)
         if not candidates:
             return None
-        # Prefere destaque; caso contrário usa o primeiro (maior sales_count).
+        curated_slug = getattr(settings, "HERO_3D_PRODUCT_SLUG", "") or ""
+        curated = next((p for p in candidates if p.slug == curated_slug), None)
         featured = next((p for p in candidates if p.is_featured), None)
-        produto = featured or candidates[0]
+        produto = curated or featured or candidates[0]
         return ProductMapper.to_dict(produto)
 
     # ---- galeria de modelos 3D ----

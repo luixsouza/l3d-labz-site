@@ -227,3 +227,16 @@ SITE = {
     "tagline": "Impressão 3D com acabamento de laboratório.",
     "accent": "#2FA84F",  # verde Luigi
 }
+
+# --- Vitrine 3D do hero da home ---
+# Modelo-vitrine geek (NÃO é produto): GLB auto-hospedado em static/, mostrado
+# girando no hero como demo da capacidade 3D da marca. Tem prioridade sobre o
+# produto curado. Caminho relativo = resolvido via {% static %}; URL http = usada
+# como está. Vazio = cai no produto curado abaixo.
+# Astronaut.glb — "Poly by Google", CC-BY (Khronos/model-viewer shared-assets).
+HERO_3D_MODEL_URL = env("HERO_3D_MODEL_URL", "models/astronaut.glb")
+HERO_3D_MODEL_ALT = env("HERO_3D_MODEL_ALT", "Action figure impresso em 3D — L3D Labz")
+
+# Fallback: slug do produto-3D que vira a vitrine quando NÃO há modelo-vitrine.
+# Vazio = cai no fallback automático (destaque / mais vendido com model_3d).
+HERO_3D_PRODUCT_SLUG = env("HERO_3D_PRODUCT_SLUG", "usb-motorized-butterfly-figurine")
