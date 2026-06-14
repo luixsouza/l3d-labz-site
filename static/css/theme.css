@@ -23,7 +23,9 @@
   --accent-strong: #1E8C3E;
   --accent-soft:   #13251A;
   --accent-glow:   rgba(47, 168, 79, 0.26);
-  --accent-blue:   #2BA6E0;
+  --accent-blue:      #2BA6E0;
+  --accent-blue-soft: #E6F4FB;
+  --accent-blue-ink:  #0E5E84;
 
   --success:       #46c08a;
   --danger:        #E23B3B;
@@ -224,6 +226,8 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; margin: 0 0 .4e
 .section-head .link { display: inline-flex; align-items: center; gap: .35rem; color: var(--accent-2); font-weight: 700; font-size: .9rem; }
 .section-head .link:hover .icon-arrow { transform: translateX(3px); }
 .section-head .link .icon { transition: transform .25s var(--ease); }
+[data-theme="light"] .section-head .link { color: var(--accent-blue); }
+[data-theme="light"] .section-head .link:hover { color: var(--accent-blue-ink); }
 
 /* ----------------------------------------------------------- categorias */
 .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 1rem; }
@@ -676,23 +680,25 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; margin: 0 0 .4e
    Tema claro + ajustes de carrossel
    ========================================================================= */
 [data-theme="light"] {
-  --bg:            #FFFFFF;
-  --bg-soft:       #F6F8F5;
-  --bg-card:       #FFFFFF;
-  --bg-elevated:   #F1F4EF;
-  --border:        #E3E8E0;
-  --border-soft:   #EEF1EB;
-  --text:          #16201A;
-  --text-muted:    #5C6B60;
-  --text-dim:      #9AA89E;
-  --accent:        #2FA84F;
-  --accent-2:      #1E8C3E;
-  --accent-strong: #1E8C3E;
-  --accent-soft:   #E7F6EC;
-  --accent-glow:   rgba(47, 168, 79, 0.20);
-  --accent-blue:   #2BA6E0;
-  --shadow:        0 16px 40px -26px rgba(23, 38, 80, 0.28);
-  --shadow-soft:   0 6px 20px -16px rgba(23, 38, 80, 0.22);
+  --bg:               #FAFBF9;
+  --bg-soft:          #F2F5F0;
+  --bg-card:          #FFFFFF;
+  --bg-elevated:      #F1F4EF;
+  --border:           #E7EBE4;
+  --border-soft:      #F0F3EC;
+  --text:             #16201A;
+  --text-muted:       #5C6B60;
+  --text-dim:         #9AA89E;
+  --accent:           #2FA84F;
+  --accent-2:         #43C266;
+  --accent-strong:    #1E8C3E;
+  --accent-soft:      #E7F6EC;
+  --accent-glow:      rgba(47, 168, 79, 0.20);
+  --accent-blue:      #2BA6E0;
+  --accent-blue-soft: #E6F4FB;
+  --accent-blue-ink:  #0E5E84;
+  --shadow:           0 16px 40px -26px rgba(23, 38, 80, 0.20);
+  --shadow-soft:      0 6px 20px -16px rgba(23, 38, 80, 0.16);
 }
 [data-theme="light"] body {
   background-image:
@@ -701,7 +707,8 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; margin: 0 0 .4e
 }
 [data-theme="light"] .site-header { background: rgba(255, 255, 255, 0.78); }
 [data-theme="light"] .site-header.scrolled { background: rgba(255, 255, 255, 0.92); }
-[data-theme="light"] .cat-badge, [data-theme="light"] .badge-new { color: #08321f; }
+[data-theme="light"] .badge-new { background: var(--accent-blue-soft); color: var(--accent-blue-ink); }
+[data-theme="light"] .cat-badge { color: #08321f; }
 [data-theme="light"] .cart-badge { border-color: #fff; }
 [data-theme="light"] .thumb-mono { color: color-mix(in srgb, var(--acc, var(--accent)) 80%, #2a3550); }
 [data-theme="light"] .toast { background: #fff; }
@@ -1159,21 +1166,21 @@ select { -webkit-appearance: none; -moz-appearance: none; appearance: none; curs
   --shadow:      0 18px 48px -30px rgba(0,0,0,.58);
   --shadow-soft: 0 10px 30px -24px rgba(0,0,0,.46); }
 [data-theme="light"] {
-  --shadow:      0 18px 44px -30px rgba(20,70,40,.20);
-  --shadow-soft: 0 10px 28px -22px rgba(20,70,40,.14); }
+  --shadow:      0 16px 40px -26px rgba(23,38,80,.20);
+  --shadow-soft: 0 6px 20px -16px rgba(23,38,80,.16); }
 .btn-primary { box-shadow: 0 8px 20px -12px var(--accent-glow); }
 .btn-primary:hover { box-shadow: 0 14px 30px -14px var(--accent-glow); }
 .product-card, .cat-tile, .feature, .benefit, .aside-card, .coupon-card, .svc, .pay-chip { box-shadow: var(--shadow-soft); }
 
 /* =========================================================================
-   Modo claro — verde mais vivo e botões mais legíveis
+   Modo claro — verde da marca consistente e botões mais legíveis
    ========================================================================= */
 [data-theme="light"] {
-  --accent:        #1eb457;
-  --accent-2:      #15914a;
-  --accent-strong: #138a43;
-  --accent-soft:   #e3f7ec;
-  --accent-glow:   rgba(30, 180, 87, 0.28);
+  --accent:        #2FA84F;
+  --accent-2:      #43C266;
+  --accent-strong: #1E8C3E;
+  --accent-soft:   #E7F6EC;
+  --accent-glow:   rgba(47, 168, 79, 0.20);
 }
 /* botão primário: verde vivo com texto branco (mais clean no claro) */
 [data-theme="light"] .btn-primary {
@@ -1949,6 +1956,40 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .geek-hero--clean .gh-deco { display: none; }
 }
 
+/* ---- hero 3D: viewer substituindo o decorativo ---- */
+.gh-viewer {
+  position: relative; z-index: 2; justify-self: center;
+  width: min(380px, 90%); aspect-ratio: 1 / 1.05;
+  display: flex; flex-direction: column; align-items: center; gap: .5rem;
+}
+.gh-viewer model-viewer {
+  width: 100%; height: 100%;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 56px -28px rgba(6,36,15,.55);
+  background: rgba(6,28,15,.12);
+  --progress-bar-color: rgba(255,255,255,.5);
+}
+.gh-viewer-caption {
+  font-size: .75rem; color: rgba(255,255,255,.72);
+  letter-spacing: .04em; text-transform: uppercase;
+  display: flex; align-items: center; gap: .35rem;
+}
+.gh-viewer-caption::before {
+  content: ""; display: inline-block; width: 10px; height: 10px;
+  border-radius: 50%; border: 1.5px solid rgba(255,255,255,.5);
+}
+.gh-viewer-stl {
+  display: inline-flex; align-items: center; gap: .4rem;
+  padding: .42rem .85rem; border-radius: 999px;
+  background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.4);
+  color: #fff; font-size: .8rem; font-weight: 600;
+  transition: background .2s; text-decoration: none;
+}
+.gh-viewer-stl:hover { background: rgba(255,255,255,.3); }
+@media (max-width: 760px) {
+  .gh-viewer { width: min(300px, 92%); }
+}
+
 /* ---- hero verde Luigi (vibrante, texto branco) ---- */
 .geek-hero--clean {
   background:
@@ -1997,6 +2038,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .proof b { display: block; font-family: var(--font-display); font-size: 1.7rem; color: var(--accent-strong); line-height: 1; letter-spacing: -.02em; }
 .proof span { font-size: .8rem; color: var(--text-muted); }
 @media (max-width: 640px) { .proof-strip { grid-template-columns: repeat(2, 1fr); } }
+[data-theme="light"] .proof-strip {
+  background: linear-gradient(110deg, var(--accent-soft), var(--accent-blue-soft));
+  border-color: var(--border-soft);
+}
 
 .cat-chips { display: flex; flex-wrap: wrap; gap: .7rem; }
 .cat-chip {
