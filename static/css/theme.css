@@ -2247,6 +2247,16 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .calc-results { position: static; }
 }
 
+/* ---- v2: título de coluna (orçamento) ---- */
+.calc-col-title {
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 .5rem;
+}
+
 /* ---- v2: breakdown com barras proporcionais ---- */
 
 /* item de custo com barra abaixo */

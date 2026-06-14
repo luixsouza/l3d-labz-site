@@ -3,6 +3,11 @@
 
 {% block title %}Emitir Orçamento — Calculadora L3D Labz{% endblock %}
 
+{% block extra_head %}
+{# Presets para auto-preenchimento JS (mesmo mecanismo da calculadora pública) #}
+{{ presets_json|json_script:"calc-presets" }}
+{% endblock %}
+
 {% block content %}
 <section class="section">
   <div class="container">
@@ -10,7 +15,11 @@
     <div class="page-head">
       <p class="eyebrow">Área restrita — equipe L3D</p>
       <h1>Emitir Orçamento</h1>
-      <p class="text-muted">Preencha os custos da impressão e os dados do cliente para gerar o PDF de orçamento. O cliente receberá apenas o preço final — os custos internos ficam ocultos.</p>
+      <p class="text-muted">
+        Preencha os custos de produção e os dados do cliente para gerar o PDF de orçamento.
+        O cálculo do preço final é feito no servidor — o PDF mostra <strong>apenas o preço ao cliente</strong>
+        sem expor custos internos.
+      </p>
     </div>
 
     <form method="post" novalidate>
@@ -18,39 +27,67 @@
 
       <div class="calc-layout">
 
-        {# ---- COLUNA ESQUERDA: custos de produção ---- #}
+        {# ============================================================
+           COLUNA ESQUERDA — custos de produção (espelha publica.html)
+           ============================================================ #}
         <div class="calc-inputs">
-          <h2 style="font-size:1rem;font-weight:700;color:var(--text-muted);letter-spacing:.05em;text-transform:uppercase;margin:0 0 .5rem">Custos de produção</h2>
+          <h2 class="calc-col-title">Custos de produção</h2>
+
+          {# --- Impressora --- #}
+          <div class="card">
+            <h3 class="calc-section-title">Impressora</h3>
+            <div class="field">
+              <label for="id_impressora">Modelo da impressora</label>
+              <select id="id_impressora" name="impressora" class="calc-select-preset">
+                {% for value, label in form.impressora.field.choices %}
+                  <option value="{{ value }}"{% if value == "manual" %} selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+              <div class="help">Selecione para preencher automaticamente potência, valor e vida útil.</div>
+            </div>
+            <div class="form-grid">
+              <div>{% include "core/partials/field.html" with field=form.potencia_w %}</div>
+              <div>{% include "core/partials/field.html" with field=form.valor_maquina %}</div>
+              <div class="col-2">{% include "core/partials/field.html" with field=form.vida_util_h %}</div>
+            </div>
+          </div>
 
           {# --- Filamento --- #}
           <div class="card">
             <h3 class="calc-section-title">Filamento</h3>
+            <div class="field">
+              <label for="id_filamento">Material</label>
+              <select id="id_filamento" name="filamento" class="calc-select-preset">
+                {% for value, label in form.filamento.field.choices %}
+                  <option value="{{ value }}"{% if value == "manual" %} selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+              <div class="help">Selecione para preencher automaticamente o preço/kg sugerido.</div>
+            </div>
             <div class="form-grid">
-              <div class="field">
-                {% include "core/partials/field.html" with field=form.peso_g %}
-              </div>
-              <div class="field">
-                {% include "core/partials/field.html" with field=form.preco_kg %}
-              </div>
+              <div>{% include "core/partials/field.html" with field=form.peso_g %}</div>
+              <div>{% include "core/partials/field.html" with field=form.preco_kg %}</div>
             </div>
           </div>
 
-          {# --- Energia --- #}
+          {# --- Tempo --- #}
+          <div class="card">
+            <h3 class="calc-section-title">Tempo de impressão</h3>
+            <div class="form-grid">
+              <div class="col-2">{% include "core/partials/field.html" with field=form.tempo_h %}</div>
+            </div>
+          </div>
+
+          {# --- Energia: tarifa_base + bandeira ANEEL --- #}
           <div class="card">
             <h3 class="calc-section-title">Energia</h3>
             <div class="form-grid">
-              <div>{% include "core/partials/field.html" with field=form.potencia_w %}</div>
-              <div>{% include "core/partials/field.html" with field=form.tempo_h %}</div>
-              <div class="col-2">{% include "core/partials/field.html" with field=form.tarifa_kwh %}</div>
+              <div>{% include "core/partials/field.html" with field=form.tarifa_base %}</div>
+              <div>{% include "core/partials/field.html" with field=form.bandeira %}</div>
             </div>
-          </div>
-
-          {# --- Máquina --- #}
-          <div class="card">
-            <h3 class="calc-section-title">Máquina</h3>
-            <div class="form-grid">
-              <div>{% include "core/partials/field.html" with field=form.valor_maquina %}</div>
-              <div>{% include "core/partials/field.html" with field=form.vida_util_h %}</div>
+            {# Exibição da tarifa efetiva (via JS — apenas UX, não afeta o cálculo server-side) #}
+            <div class="calc-tarifa-efetiva" id="res_tarifa_efetiva" aria-live="polite">
+              Tarifa efetiva: calculando…
             </div>
           </div>
 
@@ -70,13 +107,21 @@
               <div>{% include "core/partials/field.html" with field=form.margem_pct %}</div>
             </div>
           </div>
-        </div>
+        </div>{# /calc-inputs #}
 
-        {# ---- COLUNA DIREITA: dados do cliente ---- #}
+        {# ============================================================
+           COLUNA DIREITA — dados do cliente + ação
+           ============================================================ #}
         <div class="calc-results">
-          <h2 style="font-size:1rem;font-weight:700;color:var(--text-muted);letter-spacing:.05em;text-transform:uppercase;margin:0 0 .5rem">Dados do cliente</h2>
+          <h2 class="calc-col-title">Dados do cliente</h2>
 
           <div class="card" style="padding:1.5rem">
+            {% if form.errors %}
+              <div class="errors" style="margin-bottom:1rem;padding:.75rem;border-radius:var(--radius-sm);background:var(--bg-soft);border:1px solid var(--danger);color:var(--danger);font-size:.88rem;">
+                Por favor, corrija os erros abaixo antes de gerar o PDF.
+              </div>
+            {% endif %}
+
             <div class="field">{% include "core/partials/field.html" with field=form.cliente_nome %}</div>
             <div class="field">{% include "core/partials/field.html" with field=form.peca_descricao %}</div>
             <div class="form-grid">
@@ -86,21 +131,29 @@
             <div class="field">{% include "core/partials/field.html" with field=form.observacoes %}</div>
           </div>
 
-          {# ---- Ação: gerar PDF ---- #}
+          {# --- Ação: gerar PDF --- #}
           <div class="card" style="padding:1.25rem 1.5rem">
             <p class="text-muted" style="font-size:.9rem;margin:0 0 1rem">
-              O cálculo do preço final é feito no servidor com os custos preenchidos à esquerda.
-              O PDF gerado mostra <strong>apenas o preço ao cliente</strong> — sem expor custos internos.
+              O cálculo do preço final é feito no servidor com a tarifa efetiva
+              (base + bandeira ANEEL). O PDF mostra <strong>apenas o preço ao cliente</strong>
+              — os custos internos ficam ocultos.
             </p>
             <button type="submit" class="btn btn-primary btn-block">
               Gerar orçamento (PDF)
             </button>
           </div>
-        </div>
+
+        </div>{# /calc-results #}
 
       </div>{# /calc-layout #}
     </form>
 
   </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+{# Reutiliza calculator.js para auto-preenchimento de presets e exibição da tarifa efetiva.
+   O submit continua server-side — o JS é apenas UX (não afeta o cálculo do PDF). #}
+<script src="{% static 'js/calculator.js' %}" defer></script>
 {% endblock %}
