@@ -2440,3 +2440,96 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 @media print {
   .calc-btn-copiar { display: none !important; }
 }
+
+/* =========================================================================
+   Tema claro "Clean & Elegante" — moldura clara (sketch 001 variante B)
+   Header + footer + hero da home passam a ser claros no light. Vence a
+   cascata por vir no fim do arquivo. O tema dark fica intacto.
+   ========================================================================= */
+
+/* ---- header claro translúcido ---- */
+[data-theme="light"] .site-header {
+  background: rgba(255, 255, 255, .82) !important;
+  border-bottom: 1px solid var(--border-soft) !important;
+  backdrop-filter: blur(16px);
+}
+[data-theme="light"] .site-header.scrolled {
+  background: rgba(255, 255, 255, .94) !important;
+  box-shadow: 0 10px 30px -22px rgba(23, 38, 80, .18);
+}
+[data-theme="light"] .site-header .brand-word { color: var(--text); }
+[data-theme="light"] .site-header .brand-labz { color: var(--accent-strong); }
+[data-theme="light"] .site-header .main-nav a { color: var(--text-muted); }
+[data-theme="light"] .site-header .main-nav a:hover,
+[data-theme="light"] .site-header .main-nav a.active { color: var(--text); }
+[data-theme="light"] .site-header .icon-btn {
+  background: #fff; border-color: var(--border); color: var(--text);
+}
+[data-theme="light"] .site-header .icon-btn:hover {
+  border-color: var(--accent); color: var(--accent-strong); background: var(--accent-soft);
+}
+[data-theme="light"] .site-header .btn-ghost {
+  background: #fff !important; border-color: var(--border) !important; color: var(--text) !important;
+}
+[data-theme="light"] .site-header .btn-ghost:hover {
+  border-color: var(--accent) !important; background: var(--accent-soft) !important; color: var(--accent-strong) !important;
+}
+[data-theme="light"] .site-header .btn-primary { color: #fff !important; }
+[data-theme="light"] .site-header .header-actions::before { background: var(--border); }
+[data-theme="light"] .site-header .cart-badge { border-color: #fff; color: #fff; }
+
+/* ---- footer claro ---- */
+[data-theme="light"] .site-footer {
+  background: var(--bg-soft); border-top: 1px solid var(--border); color: var(--text-muted);
+}
+[data-theme="light"] .site-footer .footer-grid h5 { color: var(--text-dim); }
+[data-theme="light"] .site-footer .footer-grid a { color: var(--text-muted); }
+[data-theme="light"] .site-footer .footer-grid a:hover { color: var(--accent-strong); }
+[data-theme="light"] .site-footer .footer-bottom { border-top: 1px solid var(--border-soft); color: var(--text-dim); }
+[data-theme="light"] .site-footer .socials a { border-color: var(--border); color: var(--text-muted); background: #fff; }
+[data-theme="light"] .site-footer .socials a:hover { border-color: var(--accent); color: var(--accent-strong); background: var(--accent-soft); }
+[data-theme="light"] .footer-mascot .mascot-name,
+[data-theme="light"] .footer-brand-block .mascot-name { color: var(--text); }
+[data-theme="light"] .footer-mascot .mascot-name b,
+[data-theme="light"] .footer-brand-block .mascot-name b { color: var(--accent-strong); }
+[data-theme="light"] .footer-mascot .mascot-sub,
+[data-theme="light"] .footer-brand-block .mascot-sub { color: var(--text-muted); }
+
+/* ---- hero da home off-white (variante B) ---- */
+[data-theme="light"] .geek-hero--clean {
+  background:
+    radial-gradient(120% 130% at 80% 8%, var(--accent-soft), transparent 56%),
+    radial-gradient(120% 130% at 0% 100%, var(--accent-blue-soft), transparent 56%),
+    var(--bg-card) !important;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+[data-theme="light"] .geek-hero--clean::before { opacity: .14; }
+[data-theme="light"] .geek-hero--clean .gh-inner,
+[data-theme="light"] .geek-hero--clean .gh-inner h1 { color: var(--text); text-shadow: none; }
+[data-theme="light"] .geek-hero--clean .lead { color: var(--text-muted); }
+[data-theme="light"] .geek-hero--clean .eyebrow { color: var(--accent-strong); }
+[data-theme="light"] .geek-hero--clean .gh-btn.primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong)); color: #fff;
+  box-shadow: 0 12px 28px -12px var(--accent-glow);
+}
+[data-theme="light"] .geek-hero--clean .gh-btn.primary:hover { box-shadow: 0 18px 38px -14px var(--accent-glow); }
+[data-theme="light"] .geek-hero--clean .gh-btn.ghost {
+  background: #fff; border: 1px solid var(--border); color: var(--text);
+}
+[data-theme="light"] .geek-hero--clean .gh-btn.ghost:hover { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-strong); }
+[data-theme="light"] .geek-hero--clean .gh-deco span { background: var(--accent-soft); border-color: var(--border); }
+
+/* viewer 3D do hero no claro */
+[data-theme="light"] .gh-viewer model-viewer {
+  background: var(--bg-soft);
+  box-shadow: 0 26px 56px -30px rgba(23, 38, 80, .30);
+  --progress-bar-color: var(--accent);
+}
+[data-theme="light"] .gh-viewer-caption { color: var(--text-dim); }
+[data-theme="light"] .gh-viewer-caption::before { border-color: var(--text-dim); }
+[data-theme="light"] .gh-viewer-stl {
+  background: #fff; border: 1px solid var(--border); color: var(--text);
+}
+[data-theme="light"] .gh-viewer-stl:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-strong); }
