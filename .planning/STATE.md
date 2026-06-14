@@ -100,9 +100,10 @@ None yet.
 | 260611-mca | Importador MakerWorld (mesh3d.py compartilhado, fotos reais, dimensões do 3MF) + modal 3D no catálogo | 2026-06-11 | 2741089, cf5c837 |
 | 260611-n3w | Catálogo sem 3D na UI + galeria de fotos em carrossel + tradução pt-br dos nomes no import | 2026-06-11 | 9822c50, 0ebcb88 |
 | 260612-gf7 | Hero da home ligado ao PromotionService (promo hero dinâmica com fallback hardcoded) | 2026-06-12 | a31106d, 3dd7fb6 |
+| 260614-lzm | Calculadora de precificação 3D: pública (vanilla JS, detalhamento completo + CTA) e privada is_staff (orçamento em PDF reportlab, sem custos internos) | 2026-06-14 | 253eb86, 436f4b6, 3b94df7 |
 
 ## Session Continuity
 
-Last session: 2026-06-12 (import catálogo MakerWorld + hero promocional)
-Stopped at: Quick task 260612-gf7 completa — deploy + promo Dia dos Namorados em andamento
+Last session: 2026-06-14 (calculadora de precificação 3D — pública + privada com PDF)
+Stopped at: Quick task 260614-lzm completa (app apps/calculator, 3 commits) — não deployado (sem push)
 Resume file: None
