@@ -11,6 +11,7 @@
       <a href="{% url 'catalog:product_list' %}" class="{% if vn == 'catalog:product_list' or vn == 'catalog:product_detail' %}active{% endif %}">Catálogo</a>
       <a href="{% url 'catalog:models_3d' %}" class="{% if vn == 'catalog:models_3d' %}active{% endif %}">Modelos 3D</a>
       <a href="{% url 'lithophane:editor' %}" class="{% if vn == 'lithophane:editor' %}active{% endif %}">Faça meu Lithophane</a>
+      <a href="{% url 'calculator:publica' %}" class="{% if vn == 'calculator:publica' %}active{% endif %}">Calculadora</a>
       <a href="{% url 'promotions:list' %}" class="{% if vn == 'promotions:list' %}active{% endif %}">Promoções</a>
       <a href="{% url 'core:about' %}" class="{% if vn == 'core:about' %}active{% endif %}">Sobre</a>
       {# links de conta — visíveis só no menu mobile (header esconde .btn ≤720px) #}

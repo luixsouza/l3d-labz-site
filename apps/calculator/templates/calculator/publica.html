@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Calculadora de Impressão 3D — L3D Labz{% endblock %}
+
+{% block extra_head %}
+{# Estilos adicionais da calculadora estão em theme.css (bloco .calc-*) #}
+{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+
+    <div class="page-head">
+      <p class="eyebrow">Ferramenta gratuita</p>
+      <h1>Calculadora de Precificação</h1>
+      <p class="text-muted">Descubra o custo real da sua impressão 3D com detalhamento completo de material, energia, máquina e margem. Cálculo em tempo real, sem cadastro.</p>
+    </div>
+
+    <div class="calc-layout">
+
+      {# ---- FORMULÁRIO DE INPUTS ---- #}
+      <div class="calc-inputs">
+        <form id="calcForm" autocomplete="off" novalidate>
+
+          {# --- Filamento --- #}
+          <div class="card">
+            <h3 class="calc-section-title">Filamento</h3>
+            <div class="form-grid">
+              <div class="field">
+                <label for="id_peso_g">Peso do filamento (g)</label>
+                <input type="number" id="id_peso_g" name="peso_g" value="{{ form.peso_g.field.initial }}" min="0.1" step="0.1">
+                <div class="help">Quantidade estimada consumida em gramas.</div>
+              </div>
+              <div class="field">
+                <label for="id_preco_kg">Preço do filamento (R$/kg)</label>
+                <input type="number" id="id_preco_kg" name="preco_kg" value="{{ form.preco_kg.field.initial }}" min="0.01" step="0.01">
+                <div class="help">PLA básico ≈ R$ 120/kg; PETG ≈ R$ 160/kg.</div>
+              </div>
+            </div>
+          </div>
+
+          {# --- Energia --- #}
+          <div class="card">
+            <h3 class="calc-section-title">Energia</h3>
+            <div class="form-grid">
+              <div class="field">
+                <label for="id_potencia_w">Potência da impressora (W)</label>
+                <input type="number" id="id_potencia_w" name="potencia_w" value="{{ form.potencia_w.field.initial }}" min="1" step="1">
+                <div class="help">Ender 3 ≈ 110 W · Prusa i3 MK3S+ ≈ 180 W.</div>
+              </div>
+              <div class="field">
+                <label for="id_tempo_h">Tempo de impressão (h)</label>
+                <input type="number" id="id_tempo_h" name="tempo_h" value="{{ form.tempo_h.field.initial }}" min="0.1" step="0.1">
+                <div class="help">Horas estimadas de impressão contínua.</div>
+              </div>
+              <div class="field col-2">
+                <label for="id_tarifa_kwh">Tarifa de energia (R$/kWh)</label>
+                <input type="number" id="id_tarifa_kwh" name="tarifa_kwh" value="{{ form.tarifa_kwh.field.initial }}" min="0.01" step="0.01">
+                <div class="help">Média residencial BR 2025 ≈ R$ 0,95/kWh.</div>
+              </div>
+            </div>
+          </div>
+
+          {# --- Máquina --- #}
+          <div class="card">
+            <h3 class="calc-section-title">Máquina</h3>
+            <div class="form-grid">
+              <div class="field">
+                <label for="id_valor_maquina">Valor da impressora (R$)</label>
+                <input type="number" id="id_valor_maquina" name="valor_maquina" value="{{ form.valor_maquina.field.initial }}" min="1" step="1">
+                <div class="help">Custo de aquisição para cálculo de depreciação.</div>
+              </div>
+              <div class="field">
+                <label for="id_vida_util_h">Vida útil estimada (h)</label>
+                <input type="number" id="id_vida_util_h" name="vida_util_h" value="{{ form.vida_util_h.field.initial }}" min="1" step="1">
+                <div class="help">Horas de impressão até o fim da vida útil.</div>
+              </div>
+            </div>
+          </div>
+
+          {# --- Trabalho --- #}
+          <div class="card">
+            <h3 class="calc-section-title">Trabalho</h3>
+            <div class="form-grid">
+              <div class="field col-2">
+                <label for="id_custo_maoobra">Mão de obra (R$)</label>
+                <input type="number" id="id_custo_maoobra" name="custo_maoobra" value="{{ form.custo_maoobra.field.initial }}" min="0" step="0.5">
+                <div class="help">Valor fixo para preparação, pós-processamento etc.</div>
+              </div>
+            </div>
+          </div>
+
+          {# --- Margem e risco --- #}
+          <div class="card">
+            <h3 class="calc-section-title">Margem e risco</h3>
+            <div class="form-grid">
+              <div class="field">
+                <label for="id_taxa_falha_pct">Taxa de falha / reimpressão (%)</label>
+                <input type="number" id="id_taxa_falha_pct" name="taxa_falha_pct" value="{{ form.taxa_falha_pct.field.initial }}" min="0" max="100" step="0.5">
+                <div class="help">Percentual para cobrir peças falhas ou reimpressões.</div>
+              </div>
+              <div class="field">
+                <label for="id_margem_pct">Margem de lucro (%)</label>
+                <input type="number" id="id_margem_pct" name="margem_pct" value="{{ form.margem_pct.field.initial }}" min="0" step="1">
+                <div class="help">Percentual sobre o custo total para o preço de venda.</div>
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      {# ---- PAINEL DE RESULTADOS ---- #}
+      <div class="calc-results" id="calcResults">
+        <div class="card calc-result">
+          <h3 class="calc-section-title">Detalhamento de custos</h3>
+
+          <div class="calc-rows">
+            <div class="calc-row">
+              <span class="text-muted">Material (filamento)</span>
+              <span class="calc-value" id="res_custo_material">—</span>
+            </div>
+            <div class="calc-row">
+              <span class="text-muted">Energia elétrica</span>
+              <span class="calc-value" id="res_custo_energia">—</span>
+            </div>
+            <div class="calc-row">
+              <span class="text-muted">Depreciação da máquina</span>
+              <span class="calc-value" id="res_custo_depreciacao">—</span>
+            </div>
+            <div class="calc-row">
+              <span class="text-muted">Mão de obra</span>
+              <span class="calc-value" id="res_custo_maoobra">—</span>
+            </div>
+
+            <div class="calc-row calc-subtotal">
+              <span>Subtotal</span>
+              <span class="calc-value" id="res_subtotal">—</span>
+            </div>
+
+            <div class="calc-row">
+              <span class="text-muted">Ajuste de falha/reimpressão</span>
+              <span class="calc-value" id="res_ajuste_falha">—</span>
+            </div>
+            <div class="calc-row calc-subtotal">
+              <span>Custo total</span>
+              <span class="calc-value" id="res_custo_total">—</span>
+            </div>
+          </div>
+
+          <div class="calc-preco-venda">
+            <span class="calc-label-venda text-muted">Preço de venda</span>
+            <span class="calc-valor-venda" id="res_preco_venda">—</span>
+          </div>
+        </div>
+
+        {# ---- CTA ---- #}
+        {# Placeholder de contato: link WhatsApp da L3D Labz.
+           Substituir pelo número real ou URL de contato quando disponível. #}
+        <div class="card calc-cta">
+          <p>Gostou dos números? Peça um orçamento oficial com a L3D Labz — sem compromisso.</p>
+          <a
+            href="https://wa.me/5511999999999?text=Olá!%20Quero%20um%20orçamento%20de%20impressão%203D."
+            class="btn btn-primary btn-block"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Pedir orçamento com a L3D
+          </a>
+          <p class="text-dim" style="margin-top:.5rem;font-size:.8rem;text-align:center">
+            Esta calculadora é uma estimativa. O orçamento final pode variar conforme o modelo e acabamento.
+          </p>
+        </div>
+
+      </div>{# /calc-results #}
+    </div>{# /calc-layout #}
+
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/calculator.js' %}" defer></script>
+{% endblock %}
