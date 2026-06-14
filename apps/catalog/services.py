@@ -31,6 +31,23 @@ class CatalogService(BaseService):
     def list_on_sale(limit: int = 8) -> list[dict]:
         return ProductMapper.to_list(ProductQuery.on_sale(limit))
 
+    # ---- hero da home: produto 3D em destaque ----
+    @staticmethod
+    def get_hero_3d_product() -> dict[str, Any] | None:
+        """Retorna 1 produto-3D para o hero da home ou None se não houver.
+
+        Prefere destaques (is_featured=True); cai no primeiro com model_3d
+        se nenhum destaque tiver. Reutiliza ProductQuery.with_3d que já ordena
+        por -sales_count e exclui produtos sem model_3d.
+        """
+        candidates = ProductQuery.with_3d(limit=10)
+        if not candidates:
+            return None
+        # Prefere destaque; caso contrário usa o primeiro (maior sales_count).
+        featured = next((p for p in candidates if p.is_featured), None)
+        produto = featured or candidates[0]
+        return ProductMapper.to_dict(produto)
+
     # ---- galeria de modelos 3D ----
     @staticmethod
     def gallery() -> dict[str, Any]:

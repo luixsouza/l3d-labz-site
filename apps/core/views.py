@@ -17,6 +17,7 @@ class HomeView(TemplateView):
         context["new_arrivals"] = CatalogService.list_new_arrivals(4)
         context["home_categories"] = CatalogService.list_highlighted_categories()
         context["hero_promo"] = PromotionService.get_hero_promotion()
+        context["hero_3d"] = CatalogService.get_hero_3d_product()
         return context
 
 

@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}L3D Labz — Impressão 3D sob demanda{% endblock %}
+
+{% block extra_js %}
+{% if hero_3d %}
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js"></script>
+{% endif %}
+{% endblock %}
+
 {% block content %}
 
 <!-- ===================== HERO PROMOCIONAL ===================== -->
@@ -17,9 +24,30 @@
           <a href="{% url 'lithophane:editor' %}" class="gh-btn ghost">Faça meu Lithophane</a>
         </div>
       </div>
+      {% if hero_3d %}
+      <div class="gh-viewer">
+        <model-viewer
+          src="{{ hero_3d.model_3d_url }}"
+          alt="{{ hero_3d.name }}"
+          auto-rotate
+          camera-controls
+          rotation-per-second="22deg"
+          shadow-intensity="1"
+          ar ar-modes="webxr scene-viewer quick-look"
+          style="width:100%;height:100%"
+        ></model-viewer>
+        <span class="gh-viewer-caption">arraste pra girar</span>
+        {% if hero_3d.has_stl %}
+        <a href="{{ hero_3d.model_stl_url }}" download class="gh-viewer-stl">
+          <svg class="icon"><use href="#i-download"></use></svg> Baixar STL
+        </a>
+        {% endif %}
+      </div>
+      {% else %}
       <div class="gh-deco" aria-hidden="true">
         <span></span><span></span><span></span><span></span>
       </div>
+      {% endif %}
     </div>
   </div>
 </section>
@@ -36,9 +64,30 @@
           <a href="{% url 'lithophane:editor' %}" class="gh-btn ghost">Faça meu Lithophane</a>
         </div>
       </div>
+      {% if hero_3d %}
+      <div class="gh-viewer">
+        <model-viewer
+          src="{{ hero_3d.model_3d_url }}"
+          alt="{{ hero_3d.name }}"
+          auto-rotate
+          camera-controls
+          rotation-per-second="22deg"
+          shadow-intensity="1"
+          ar ar-modes="webxr scene-viewer quick-look"
+          style="width:100%;height:100%"
+        ></model-viewer>
+        <span class="gh-viewer-caption">arraste pra girar</span>
+        {% if hero_3d.has_stl %}
+        <a href="{{ hero_3d.model_stl_url }}" download class="gh-viewer-stl">
+          <svg class="icon"><use href="#i-download"></use></svg> Baixar STL
+        </a>
+        {% endif %}
+      </div>
+      {% else %}
       <div class="gh-deco" aria-hidden="true">
         <span></span><span></span><span></span><span></span>
       </div>
+      {% endif %}
     </div>
   </div>
 </section>

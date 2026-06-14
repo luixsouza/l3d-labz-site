@@ -49,6 +49,11 @@ class ProductMapper(BaseMapper[Product]):
             "in_stock": instance.in_stock,
             "rating": float(instance.rating),
             "url": instance.get_absolute_url(),
+            # Campos 3D — usados no hero da home e na galeria de modelos.
+            "has_3d": instance.has_3d_model,
+            "has_stl": instance.has_stl,
+            "model_3d_url": instance.model_3d.url if instance.model_3d else "",
+            "model_stl_url": instance.model_stl.url if instance.model_stl else "",
         }
 
     @classmethod
