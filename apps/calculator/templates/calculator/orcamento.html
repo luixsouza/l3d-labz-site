@@ -27,9 +27,7 @@
 
       <div class="calc-layout">
 
-        {# ============================================================
-           COLUNA ESQUERDA — custos de produção (espelha publica.html)
-           ============================================================ #}
+        {# COLUNA ESQUERDA — custos de producao (espelha publica.html) #}
         <div class="calc-inputs">
           <h2 class="calc-col-title">Custos de produção</h2>
 
@@ -109,9 +107,7 @@
           </div>
         </div>{# /calc-inputs #}
 
-        {# ============================================================
-           COLUNA DIREITA — dados do cliente + ação
-           ============================================================ #}
+        {# COLUNA DIREITA — dados do cliente + acao #}
         <div class="calc-results">
           <h2 class="calc-col-title">Dados do cliente</h2>
 
@@ -153,7 +149,6 @@
 {% endblock %}
 
 {% block extra_js %}
-{# Reutiliza calculator.js para auto-preenchimento de presets e exibição da tarifa efetiva.
-   O submit continua server-side — o JS é apenas UX (não afeta o cálculo do PDF). #}
+{# Reutiliza calculator.js para presets e tarifa efetiva; submit e server-side (JS e so UX). #}
 <script src="{% static 'js/calculator.js' %}" defer></script>
 {% endblock %}
