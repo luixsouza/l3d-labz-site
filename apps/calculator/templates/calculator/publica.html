@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Calculadora de Impressão 3D — L3D Labz{% endblock %}
+{% block title %}Calculadora de Precificação 3D — L3D Labz{% endblock %}
 
 {% block extra_head %}
-{# Estilos adicionais da calculadora estão em theme.css (bloco .calc-*) #}
+{# Presets serializados para o calculator.js — sem números literais no JS #}
+{{ presets_json|json_script:"calc-presets" }}
 {% endblock %}
 
 {% block content %}
@@ -13,29 +14,102 @@
 
     <div class="page-head">
       <p class="eyebrow">Ferramenta gratuita</p>
-      <h1>Calculadora de Precificação</h1>
-      <p class="text-muted">Descubra o custo real da sua impressão 3D com detalhamento completo de material, energia, máquina e margem. Cálculo em tempo real, sem cadastro.</p>
+      <h1>Calculadora de Precificação 3D</h1>
+      <p class="text-muted">
+        Descubra o custo real da sua impressão com detalhamento completo de material, energia,
+        máquina e margem. Selecione a impressora e o filamento para preenchimento automático —
+        cálculo em tempo real, sem cadastro.
+      </p>
     </div>
 
     <div class="calc-layout">
 
-      {# ---- FORMULÁRIO DE INPUTS ---- #}
+      {# ============================================================
+         COLUNA ESQUERDA — formulário de inputs
+         ============================================================ #}
       <div class="calc-inputs">
-        <form id="calcForm" autocomplete="off" novalidate>
+        <form id="calcForm" autocomplete="off" novalidate aria-label="Calculadora de precificação 3D">
+
+          {# --- Impressora --- #}
+          <div class="card">
+            <h3 class="calc-section-title">Impressora</h3>
+            <div class="field">
+              <label for="id_impressora">Modelo da impressora</label>
+              <select id="id_impressora" name="impressora" class="calc-select-preset">
+                {% for value, label in form.impressora.field.choices %}
+                  <option value="{{ value }}"{% if value == "manual" %} selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+              <div class="help">Selecione para preencher automaticamente potência, valor e vida útil.</div>
+            </div>
+            <div class="form-grid" id="impressora-fields">
+              <div class="field">
+                <label for="id_potencia_w">Potência ativa média (W)</label>
+                <input type="number" id="id_potencia_w" name="potencia_w"
+                       value="{{ form.potencia_w.field.initial }}" min="1" step="1"
+                       aria-describedby="help_potencia_w">
+                <div class="help" id="help_potencia_w">
+                  Potência média durante impressão, não a da fonte (que é 2–3× maior).
+                  Use wattímetro para valor exato.
+                </div>
+              </div>
+              <div class="field">
+                <label for="id_valor_maquina">Valor da impressora (R$)</label>
+                <input type="number" id="id_valor_maquina" name="valor_maquina"
+                       value="{{ form.valor_maquina.field.initial }}" min="1" step="1"
+                       aria-describedby="help_valor_maquina">
+                <div class="help" id="help_valor_maquina">Custo de aquisição para cálculo de depreciação.</div>
+              </div>
+              <div class="field col-2">
+                <label for="id_vida_util_h">Vida útil estimada (h)</label>
+                <input type="number" id="id_vida_util_h" name="vida_util_h"
+                       value="{{ form.vida_util_h.field.initial }}" min="1" step="100"
+                       aria-describedby="help_vida_util_h">
+                <div class="help" id="help_vida_util_h">Horas de impressão até o fim da vida útil da máquina.</div>
+              </div>
+            </div>
+          </div>
 
           {# --- Filamento --- #}
           <div class="card">
             <h3 class="calc-section-title">Filamento</h3>
+            <div class="field">
+              <label for="id_filamento">Material</label>
+              <select id="id_filamento" name="filamento" class="calc-select-preset">
+                {% for value, label in form.filamento.field.choices %}
+                  <option value="{{ value }}"{% if value == "manual" %} selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+              <div class="help">Selecione para preencher automaticamente o preço/kg sugerido.</div>
+            </div>
             <div class="form-grid">
               <div class="field">
                 <label for="id_peso_g">Peso do filamento (g)</label>
-                <input type="number" id="id_peso_g" name="peso_g" value="{{ form.peso_g.field.initial }}" min="0.1" step="0.1">
-                <div class="help">Quantidade estimada consumida em gramas.</div>
+                <input type="number" id="id_peso_g" name="peso_g"
+                       value="{{ form.peso_g.field.initial }}" min="0.1" step="0.1"
+                       aria-describedby="help_peso_g">
+                <div class="help" id="help_peso_g">Quantidade estimada consumida em gramas.</div>
               </div>
               <div class="field">
                 <label for="id_preco_kg">Preço do filamento (R$/kg)</label>
-                <input type="number" id="id_preco_kg" name="preco_kg" value="{{ form.preco_kg.field.initial }}" min="0.01" step="0.01">
-                <div class="help">PLA básico ≈ R$ 120/kg; PETG ≈ R$ 160/kg.</div>
+                <input type="number" id="id_preco_kg" name="preco_kg"
+                       value="{{ form.preco_kg.field.initial }}" min="0.01" step="0.01"
+                       aria-describedby="help_preco_kg">
+                <div class="help" id="help_preco_kg">Informe o preço real da sua bobina. O preset é uma sugestão.</div>
+              </div>
+            </div>
+          </div>
+
+          {# --- Tempo de impressão --- #}
+          <div class="card">
+            <h3 class="calc-section-title">Tempo de impressão</h3>
+            <div class="form-grid">
+              <div class="field col-2">
+                <label for="id_tempo_h">Tempo de impressão (h)</label>
+                <input type="number" id="id_tempo_h" name="tempo_h"
+                       value="{{ form.tempo_h.field.initial }}" min="0.1" step="0.1"
+                       aria-describedby="help_tempo_h">
+                <div class="help" id="help_tempo_h">Horas estimadas de impressão contínua.</div>
               </div>
             </div>
           </div>
@@ -45,37 +119,24 @@
             <h3 class="calc-section-title">Energia</h3>
             <div class="form-grid">
               <div class="field">
-                <label for="id_potencia_w">Potência da impressora (W)</label>
-                <input type="number" id="id_potencia_w" name="potencia_w" value="{{ form.potencia_w.field.initial }}" min="1" step="1">
-                <div class="help">Ender 3 ≈ 110 W · Prusa i3 MK3S+ ≈ 180 W.</div>
+                <label for="id_tarifa_base">Tarifa base (R$/kWh)</label>
+                <input type="number" id="id_tarifa_base" name="tarifa_base"
+                       value="{{ form.tarifa_base.field.initial }}" min="0.01" step="0.01"
+                       aria-describedby="help_tarifa_base">
+                <div class="help" id="help_tarifa_base">Tarifa da sua distribuidora (média residencial BR 2025 ≈ R$ 0,95). Consulte sua conta de luz.</div>
               </div>
               <div class="field">
-                <label for="id_tempo_h">Tempo de impressão (h)</label>
-                <input type="number" id="id_tempo_h" name="tempo_h" value="{{ form.tempo_h.field.initial }}" min="0.1" step="0.1">
-                <div class="help">Horas estimadas de impressão contínua.</div>
-              </div>
-              <div class="field col-2">
-                <label for="id_tarifa_kwh">Tarifa de energia (R$/kWh)</label>
-                <input type="number" id="id_tarifa_kwh" name="tarifa_kwh" value="{{ form.tarifa_kwh.field.initial }}" min="0.01" step="0.01">
-                <div class="help">Média residencial BR 2025 ≈ R$ 0,95/kWh.</div>
+                <label for="id_bandeira">Bandeira ANEEL</label>
+                <select id="id_bandeira" name="bandeira" aria-describedby="help_bandeira">
+                  {% for value, label in form.bandeira.field.choices %}
+                    <option value="{{ value }}"{% if value == form.bandeira.field.initial %} selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+                <div class="help" id="help_bandeira">O adicional da bandeira é somado à tarifa base.</div>
               </div>
             </div>
-          </div>
-
-          {# --- Máquina --- #}
-          <div class="card">
-            <h3 class="calc-section-title">Máquina</h3>
-            <div class="form-grid">
-              <div class="field">
-                <label for="id_valor_maquina">Valor da impressora (R$)</label>
-                <input type="number" id="id_valor_maquina" name="valor_maquina" value="{{ form.valor_maquina.field.initial }}" min="1" step="1">
-                <div class="help">Custo de aquisição para cálculo de depreciação.</div>
-              </div>
-              <div class="field">
-                <label for="id_vida_util_h">Vida útil estimada (h)</label>
-                <input type="number" id="id_vida_util_h" name="vida_util_h" value="{{ form.vida_util_h.field.initial }}" min="1" step="1">
-                <div class="help">Horas de impressão até o fim da vida útil.</div>
-              </div>
+            <div class="calc-tarifa-efetiva" id="res_tarifa_efetiva" aria-live="polite">
+              Tarifa efetiva: calculando…
             </div>
           </div>
 
@@ -85,8 +146,10 @@
             <div class="form-grid">
               <div class="field col-2">
                 <label for="id_custo_maoobra">Mão de obra (R$)</label>
-                <input type="number" id="id_custo_maoobra" name="custo_maoobra" value="{{ form.custo_maoobra.field.initial }}" min="0" step="0.5">
-                <div class="help">Valor fixo para preparação, pós-processamento etc.</div>
+                <input type="number" id="id_custo_maoobra" name="custo_maoobra"
+                       value="{{ form.custo_maoobra.field.initial }}" min="0" step="0.5"
+                       aria-describedby="help_maoobra">
+                <div class="help" id="help_maoobra">Valor fixo para preparação, pós-processamento etc.</div>
               </div>
             </div>
           </div>
@@ -97,67 +160,150 @@
             <div class="form-grid">
               <div class="field">
                 <label for="id_taxa_falha_pct">Taxa de falha / reimpressão (%)</label>
-                <input type="number" id="id_taxa_falha_pct" name="taxa_falha_pct" value="{{ form.taxa_falha_pct.field.initial }}" min="0" max="100" step="0.5">
-                <div class="help">Percentual para cobrir peças falhas ou reimpressões.</div>
+                <input type="number" id="id_taxa_falha_pct" name="taxa_falha_pct"
+                       value="{{ form.taxa_falha_pct.field.initial }}" min="0" max="100" step="0.5"
+                       aria-describedby="help_falha">
+                <div class="help" id="help_falha">Percentual para cobrir peças falhas ou reimpressões.</div>
               </div>
               <div class="field">
                 <label for="id_margem_pct">Margem de lucro (%)</label>
-                <input type="number" id="id_margem_pct" name="margem_pct" value="{{ form.margem_pct.field.initial }}" min="0" step="1">
-                <div class="help">Percentual sobre o custo total para o preço de venda.</div>
+                <input type="number" id="id_margem_pct" name="margem_pct"
+                       value="{{ form.margem_pct.field.initial }}" min="0" step="1"
+                       aria-describedby="help_margem">
+                <div class="help" id="help_margem">Percentual sobre o custo total para obter o preço de venda.</div>
+              </div>
+            </div>
+          </div>
+
+          {# --- Quantidade (usada no total, não entra no custo unitário) --- #}
+          <div class="card">
+            <h3 class="calc-section-title">Quantidade</h3>
+            <div class="form-grid">
+              <div class="field col-2">
+                <label for="id_quantidade_pub">Quantidade de peças</label>
+                <input type="number" id="id_quantidade_pub" name="quantidade_pub"
+                       value="1" min="1" step="1"
+                       aria-describedby="help_qtd">
+                <div class="help" id="help_qtd">Número de unidades — o total aparece no resultado quando maior que 1.</div>
               </div>
             </div>
           </div>
 
         </form>
-      </div>
+      </div>{# /calc-inputs #}
 
-      {# ---- PAINEL DE RESULTADOS ---- #}
+      {# ============================================================
+         COLUNA DIREITA — painel de resultados (sticky no desktop)
+         ============================================================ #}
       <div class="calc-results" id="calcResults">
-        <div class="card calc-result">
+
+        {# --- Card de detalhamento --- #}
+        <div class="card calc-result" aria-live="polite" aria-label="Resultado do cálculo">
           <h3 class="calc-section-title">Detalhamento de custos</h3>
 
           <div class="calc-rows">
-            <div class="calc-row">
-              <span class="text-muted">Material (filamento)</span>
-              <span class="calc-value" id="res_custo_material">—</span>
-            </div>
-            <div class="calc-row">
-              <span class="text-muted">Energia elétrica</span>
-              <span class="calc-value" id="res_custo_energia">—</span>
-            </div>
-            <div class="calc-row">
-              <span class="text-muted">Depreciação da máquina</span>
-              <span class="calc-value" id="res_custo_depreciacao">—</span>
-            </div>
-            <div class="calc-row">
-              <span class="text-muted">Mão de obra</span>
-              <span class="calc-value" id="res_custo_maoobra">—</span>
+
+            {# Material #}
+            <div class="calc-row-item">
+              <div class="calc-row-header">
+                <span class="text-muted">Material (filamento)</span>
+                <span class="calc-value" id="res_custo_material">—</span>
+              </div>
+              <div class="calc-bar" aria-hidden="true">
+                <div class="calc-bar-fill" id="bar_custo_material" style="width:0%"></div>
+              </div>
+              <span class="calc-pct text-dim" id="pct_custo_material"></span>
             </div>
 
+            {# Energia #}
+            <div class="calc-row-item">
+              <div class="calc-row-header">
+                <span class="text-muted">Energia elétrica</span>
+                <span class="calc-value" id="res_custo_energia">—</span>
+              </div>
+              <div class="calc-bar" aria-hidden="true">
+                <div class="calc-bar-fill" id="bar_custo_energia" style="width:0%"></div>
+              </div>
+              <span class="calc-pct text-dim" id="pct_custo_energia"></span>
+            </div>
+
+            {# Depreciação #}
+            <div class="calc-row-item">
+              <div class="calc-row-header">
+                <span class="text-muted">Depreciação da máquina</span>
+                <span class="calc-value" id="res_custo_depreciacao">—</span>
+              </div>
+              <div class="calc-bar" aria-hidden="true">
+                <div class="calc-bar-fill" id="bar_custo_depreciacao" style="width:0%"></div>
+              </div>
+              <span class="calc-pct text-dim" id="pct_custo_depreciacao"></span>
+            </div>
+
+            {# Mão de obra #}
+            <div class="calc-row-item">
+              <div class="calc-row-header">
+                <span class="text-muted">Mão de obra</span>
+                <span class="calc-value" id="res_custo_maoobra">—</span>
+              </div>
+              <div class="calc-bar" aria-hidden="true">
+                <div class="calc-bar-fill" id="bar_custo_maoobra" style="width:0%"></div>
+              </div>
+              <span class="calc-pct text-dim" id="pct_custo_maoobra"></span>
+            </div>
+
+            {# Subtotal #}
             <div class="calc-row calc-subtotal">
               <span>Subtotal</span>
               <span class="calc-value" id="res_subtotal">—</span>
             </div>
 
-            <div class="calc-row">
-              <span class="text-muted">Ajuste de falha/reimpressão</span>
-              <span class="calc-value" id="res_ajuste_falha">—</span>
+            {# Ajuste de falha #}
+            <div class="calc-row-item">
+              <div class="calc-row-header">
+                <span class="text-muted">Ajuste de falha / reimpressão</span>
+                <span class="calc-value" id="res_ajuste_falha">—</span>
+              </div>
+              <div class="calc-bar" aria-hidden="true">
+                <div class="calc-bar-fill calc-bar-fill--warn" id="bar_ajuste_falha" style="width:0%"></div>
+              </div>
+              <span class="calc-pct text-dim" id="pct_ajuste_falha"></span>
             </div>
+
+            {# Custo total #}
             <div class="calc-row calc-subtotal">
               <span>Custo total</span>
               <span class="calc-value" id="res_custo_total">—</span>
             </div>
+
+          </div>{# /calc-rows #}
+
+          {# Custo por hora #}
+          <div class="calc-custo-hora" id="res_custo_hora_wrap" style="display:none">
+            <span class="text-dim">Custo/hora:</span>
+            <span class="calc-value" id="res_custo_hora">—</span>
           </div>
 
+          {# Preço de venda em destaque #}
           <div class="calc-preco-venda">
-            <span class="calc-label-venda text-muted">Preço de venda</span>
+            <span class="calc-label-venda text-muted">Preço de venda (unit.)</span>
             <span class="calc-valor-venda" id="res_preco_venda">—</span>
           </div>
-        </div>
 
-        {# ---- CTA ---- #}
-        {# Placeholder de contato: link WhatsApp da L3D Labz.
-           Substituir pelo número real ou URL de contato quando disponível. #}
+          {# Total por quantidade — exibido só quando qtd > 1 #}
+          <div class="calc-total-qtd" id="res_total_qtd_wrap" style="display:none">
+            <span class="text-muted">Total (<span id="res_qtd_label">2</span> unid.)</span>
+            <span class="calc-valor-venda calc-valor-total" id="res_total_qtd">—</span>
+          </div>
+
+        </div>{# /card calc-result #}
+
+        {# --- Botão copiar resultado --- #}
+        <button type="button" class="btn calc-btn-copiar" id="btnCopiar" aria-label="Copiar resumo do resultado">
+          Copiar resultado
+        </button>
+
+        {# --- CTA WhatsApp ---
+             Placeholder de contato: substituir pelo número real da L3D Labz quando disponível. #}
         <div class="card calc-cta">
           <p>Gostou dos números? Peça um orçamento oficial com a L3D Labz — sem compromisso.</p>
           <a

@@ -2246,3 +2246,142 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .calc-layout { grid-template-columns: 1fr; }
   .calc-results { position: static; }
 }
+
+/* ---- v2: breakdown com barras proporcionais ---- */
+
+/* item de custo com barra abaixo */
+.calc-row-item {
+  padding: .5rem 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+.calc-row-item:last-child { border-bottom: none; }
+
+/* linha topo: rótulo + valor */
+.calc-row-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: .9rem;
+  margin-bottom: .25rem;
+}
+
+/* trilho da barra (fundo neutro) */
+.calc-bar {
+  height: 4px;
+  border-radius: var(--radius-sm);
+  background: var(--border-soft);
+  overflow: hidden;
+  margin-bottom: .2rem;
+}
+
+/* preenchimento da barra (accent, com transição suave) */
+.calc-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  width: 0%;
+  transition: width .35s var(--ease);
+}
+
+/* variante de alerta (ajuste de falha) */
+.calc-bar-fill--warn { background: var(--accent-2); }
+
+/* percentual em texto pequeno */
+.calc-pct {
+  font-size: .75rem;
+  display: block;
+}
+
+/* ---- tarifa efetiva ---- */
+.calc-tarifa-efetiva {
+  margin-top: .75rem;
+  padding: .5rem .75rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-soft);
+  border: 1px solid var(--border-soft);
+  font-size: .82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* ---- custo por hora (badge compacto) ---- */
+.calc-custo-hora {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: .82rem;
+  padding: .35rem .5rem;
+  margin: .5rem 0 0;
+  background: var(--bg-soft);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-soft);
+}
+
+/* ---- total por quantidade ---- */
+.calc-total-qtd {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: .6rem 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  margin-top: .5rem;
+  font-size: .9rem;
+}
+.calc-valor-total {
+  font-size: 1.2rem;
+}
+
+/* ---- select de preset ---- */
+.calc-select-preset {
+  width: 100%;
+  padding: .5rem .75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: .9rem;
+  cursor: pointer;
+  transition: border-color .2s var(--ease);
+  appearance: auto;
+}
+.calc-select-preset:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-color: var(--accent);
+}
+
+/* ---- botão copiar resultado ---- */
+.calc-btn-copiar {
+  width: 100%;
+  padding: .6rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: .88rem;
+  cursor: pointer;
+  transition: background .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease);
+}
+.calc-btn-copiar:hover {
+  background: var(--bg-elevated);
+  color: var(--text);
+  border-color: var(--accent-soft);
+}
+.calc-btn-copiar:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.calc-btn-copiar[aria-pressed="true"] {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  border-color: var(--accent);
+}
+
+/* ---- impressão: oculta botão copiar e btn-copiar ---- */
+@media print {
+  .calc-btn-copiar { display: none !important; }
+}
