@@ -102,9 +102,10 @@ None yet.
 | 260612-gf7 | Hero da home ligado ao PromotionService (promo hero dinâmica com fallback hardcoded) | 2026-06-12 | a31106d, 3dd7fb6 |
 | 260614-lzm | Calculadora de precificação 3D: pública (vanilla JS, detalhamento completo + CTA) e privada is_staff (orçamento em PDF reportlab, sem custos internos) | 2026-06-14 | 253eb86, 436f4b6, 3b94df7 |
 | 260614-ndg | Calculadora 3D v2 genérica: presets de 14 impressoras + 10 filamentos, bandeiras tarifárias ANEEL (tarifa efetiva), UI profissional (breakdown/permalink/copiar) e README reescrito. Verificada 8/8 must-haves | 2026-06-14 | f1f70f6, 27b0133, 0cea257, c351d63 |
+| 260614-q6g | Redesign "Clean & Elegante" light-first (sketch 001 variante B): paleta light reconciliada (3 blocos divergentes), azul secundário em links/badges/prova social, sombras difusas, hero 3D na home (service+mapper+view, com fallback) e moldura clara (header/footer/hero off-white). Verificado por screenshot real: home light desktop+mobile, catálogo, carrinho, detalhe, dark intacto | 2026-06-14 | 0a9d35b, 8faed13, d64ff57 |
 
 ## Session Continuity
 
-Last session: 2026-06-14 (calculadora 3D v2 — presets, bandeiras ANEEL, UI profissional + README)
-Stopped at: Quick task 260614-ndg completa (calc v2, 4 commits) — pronta pra deploy
+Last session: 2026-06-14 (redesign Clean & Elegante light-first — sketch 001 variante B aplicado no site real)
+Stopped at: Quick task 260614-q6g completa (3 commits) — verificada por screenshot. NOTA: dev DB precisava da migração catalog.0006_productimage (aplicada localmente; em prod roda no deploy).
 Resume file: None
