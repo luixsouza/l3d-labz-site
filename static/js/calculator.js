@@ -40,7 +40,10 @@
 
   // ---- formatação BRL ----
   function brl(valor) {
-    return Number(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    // guarda anti-NaN: campo vazio ou cálculo com zero produz NaN em alguns paths
+    var n = Number(valor);
+    if (isNaN(n)) n = 0;
+    return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   }
 
   // ---- escreve valor monetário num elemento ----
@@ -66,7 +69,7 @@
 
   // ---- calcula e exibe tarifa efetiva ----
   function atualizarTarifaEfetiva() {
-    var tarifa_base   = num("id_tarifa_base", 0.95);
+    var tarifa_base   = num("id_tarifa_base", 0);
     var bandeiraKey   = selVal("id_bandeira");
     var b             = PRESETS.bandeiras && PRESETS.bandeiras[bandeiraKey];
     var adicional     = b ? b.adicional_kwh : 0;
@@ -104,16 +107,16 @@
   // custo_total       = subtotal + ajuste_falha
   // preco_venda       = custo_total * (1 + margem_pct / 100)
   function calcular() {
-    var peso_g         = num("id_peso_g",        50);
-    var preco_kg       = num("id_preco_kg",       120);
-    var potencia_w     = num("id_potencia_w",     110);
-    var tempo_h        = num("id_tempo_h",        4);
+    var peso_g         = num("id_peso_g",        0);
+    var preco_kg       = num("id_preco_kg",       0);
+    var potencia_w     = num("id_potencia_w",     0);
+    var tempo_h        = num("id_tempo_h",        0);
     var tarifa_efetiva = atualizarTarifaEfetiva(); // tarifa_base + adicional_bandeira
-    var valor_maquina  = num("id_valor_maquina",  2000);
-    var vida_util_h    = num("id_vida_util_h",    2000);
-    var custo_maoobra  = num("id_custo_maoobra",  10);
-    var taxa_falha_pct = num("id_taxa_falha_pct", 10);
-    var margem_pct     = num("id_margem_pct",     150);
+    var valor_maquina  = num("id_valor_maquina",  0);
+    var vida_util_h    = num("id_vida_util_h",    0);
+    var custo_maoobra  = num("id_custo_maoobra",  0);
+    var taxa_falha_pct = num("id_taxa_falha_pct", 0);
+    var margem_pct     = num("id_margem_pct",     0);
     var quantidade     = Math.max(1, Math.round(num("id_quantidade_pub", 1)));
 
     // --- cálculos (espelhando Python com mesma ordem) ---

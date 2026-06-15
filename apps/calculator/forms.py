@@ -18,9 +18,6 @@ from .presets import (
     filamento_choices,
     impressora_choices,
 )
-from .services import CustoDefaults
-
-_DEF = CustoDefaults()
 
 
 class CalcForm(forms.Form):
@@ -52,13 +49,11 @@ class CalcForm(forms.Form):
     )
     peso_g = forms.FloatField(
         label="Peso do filamento (g)",
-        initial=50.0,
         min_value=0.1,
         help_text="Quantidade estimada de filamento consumido em gramas.",
     )
     preco_kg = forms.FloatField(
         label="Preço do filamento (R$/kg)",
-        initial=120.0,
         min_value=0.01,
         help_text="Preço por quilograma do filamento (ex.: PLA básico ≈ R$ 120/kg). O preset sugere um valor; informe o preço real da sua bobina.",
     )
@@ -66,19 +61,16 @@ class CalcForm(forms.Form):
     # --- Máquina (populados pelo preset de impressora, editáveis) ---
     potencia_w = forms.FloatField(
         label="Potência da impressora (W)",
-        initial=_DEF.potencia_w,
         min_value=1.0,
         help_text="Potência ativa média durante impressão — não a potência da fonte (que é 2–3× maior). Use wattímetro para valor exato.",
     )
     valor_maquina = forms.FloatField(
         label="Valor da impressora (R$)",
-        initial=_DEF.valor_maquina,
         min_value=1.0,
         help_text="Custo de aquisição da impressora para cálculo de depreciação.",
     )
     vida_util_h = forms.FloatField(
         label="Vida útil estimada (h)",
-        initial=_DEF.vida_util_h,
         min_value=1.0,
         help_text="Horas de impressão até o fim da vida útil da máquina.",
     )
@@ -86,7 +78,6 @@ class CalcForm(forms.Form):
     # --- Tempo ---
     tempo_h = forms.FloatField(
         label="Tempo de impressão (h)",
-        initial=4.0,
         min_value=0.1,
         help_text="Tempo estimado de impressão em horas.",
     )
@@ -94,7 +85,6 @@ class CalcForm(forms.Form):
     # --- Energia: tarifa base + bandeira ANEEL (substituem o antigo tarifa_kwh) ---
     tarifa_base = forms.FloatField(
         label="Tarifa base da distribuidora (R$/kWh)",
-        initial=0.95,
         min_value=0.01,
         help_text=(
             "Tarifa residencial da sua distribuidora em R$/kWh "
@@ -111,7 +101,6 @@ class CalcForm(forms.Form):
     # --- Trabalho ---
     custo_maoobra = forms.FloatField(
         label="Custo de mão de obra (R$)",
-        initial=10.0,
         min_value=0.0,
         help_text="Valor fixo de mão de obra para a peça (preparação, pós-processamento etc.).",
     )
@@ -119,14 +108,12 @@ class CalcForm(forms.Form):
     # --- Margem e risco ---
     taxa_falha_pct = forms.FloatField(
         label="Taxa de falha / reimpressão (%)",
-        initial=_DEF.taxa_falha_pct,
         min_value=0.0,
         max_value=100.0,
         help_text="Percentual sobre o custo para cobrir peças falhas ou reimpressões.",
     )
     margem_pct = forms.FloatField(
         label="Margem de lucro (%)",
-        initial=_DEF.margem_pct,
         min_value=0.0,
         help_text="Percentual de margem aplicado sobre o custo total para obter o preço de venda.",
     )
