@@ -1,4 +1,4 @@
-"""Geração do PDF de orçamento da L3D Labz usando reportlab.
+"""Geração do PDF de orçamento da L3D Labz usando reportlab (layout premium).
 
 IMPORTANTE — segurança (decisão D-03 / T-calc-02):
 O PDF é o documento do CLIENTE e contém SOMENTE informações públicas:
@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import hashlib
 import io
-from datetime import date
+from datetime import date, timedelta
 
 from django.conf import settings
 from reportlab.lib import colors
@@ -31,18 +31,21 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import cm
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
-# ---- paleta L3D Labz (verde Luigi + neutros) ----
-_VERDE = colors.HexColor("#2FA84F")
-_VERDE_ESC = colors.HexColor("#1E8C3E")
-_VERDE_SOFT = colors.HexColor("#EAF7EE")
-_INK = colors.HexColor("#111827")
-_TEXTO = colors.HexColor("#374151")
-_MUTED = colors.HexColor("#6B7280")
-_FAINT = colors.HexColor("#9CA3AF")
-_HAIR = colors.HexColor("#E5E7EB")
-_CARD = colors.HexColor("#F9FAFB")
+# ---- paleta L3D Labz ----
+_G_LIGHT = colors.HexColor("#34B85A")
+_G = colors.HexColor("#2FA84F")
+_G_DARK = colors.HexColor("#1B7E37")
+_G_SOFT = colors.HexColor("#EAF7EE")
+_INK = colors.HexColor("#0F172A")
+_TEXTO = colors.HexColor("#334155")
+_MUTED = colors.HexColor("#64748B")
+_FAINT = colors.HexColor("#94A3B8")
+_HAIR = colors.HexColor("#E2E8F0")
+_WMARK = colors.HexColor("#F1F6F2")
+_WHITE = colors.white
+_WHITE_DIM = colors.HexColor("#D7F0DE")
 
-# ---- marca / contatos (do settings.SITE quando disponível) ----
+# ---- marca / contatos (de settings.SITE quando disponível) ----
 _SITE = getattr(settings, "SITE", {})
 _NAME = _SITE.get("name", "L3D Labz")
 _TAG = _SITE.get("tagline", "Impressão 3D sob demanda")
@@ -51,9 +54,11 @@ _IG = ("@" + _IG_URL.rstrip("/").split("/")[-1]) if _IG_URL else ""
 _URL = "l3dlabz.com.br"
 _MAIL = "contato@l3dlabz.com.br"
 
-_PAGE_W, _PAGE_H = A4
-_ML = _MR = 2 * cm
-_CONTENT_W = _PAGE_W - _ML - _MR
+_PW, _PH = A4
+_ML = _MR = 1.8 * cm
+_CW = _PW - _ML - _MR
+_BAND = 3.5 * cm
+_FOOT = 1.45 * cm
 
 
 def _format_brl(valor: float) -> str:
@@ -78,62 +83,75 @@ def _ref_orcamento(nome: str, d: date) -> str:
     return f"ORC-{d:%Y%m%d}-{h:04d}"
 
 
-def _monograma(canvas, x, y_top, size):
-    """Marca minimalista: quadrado verde arredondado com 'L3D' branco."""
-    canvas.saveState()
-    canvas.setFillColor(_VERDE)
-    canvas.roundRect(x, y_top - size, size, size, size * 0.22, stroke=0, fill=1)
-    canvas.setFillColor(colors.white)
-    canvas.setFont("Helvetica-Bold", size * 0.34)
-    canvas.drawCentredString(x + size / 2, y_top - size / 2 - size * 0.12, "L3D")
-    canvas.restoreState()
+def _monograma(c, x, ytop, size, sq_color, txt_color):
+    c.saveState()
+    c.setFillColor(sq_color)
+    c.roundRect(x, ytop - size, size, size, size * 0.24, stroke=0, fill=1)
+    c.setFillColor(txt_color)
+    c.setFont("Helvetica-Bold", size * 0.33)
+    c.drawCentredString(x + size / 2, ytop - size / 2 - size * 0.11, "L3D")
+    c.restoreState()
 
 
-def _cabecalho_rodape(canvas, doc):
-    """Letterhead (logo + marca + nº/data) e rodapé (contatos) em cada página."""
-    canvas.saveState()
-    # ---------- CABEÇALHO ----------
-    top = _PAGE_H - 1.7 * cm
-    marca = 1.55 * cm
-    _monograma(canvas, _ML, top, marca)
-    tx = _ML + marca + 0.45 * cm
-    canvas.setFillColor(_INK)
-    canvas.setFont("Helvetica-Bold", 16)
-    canvas.drawString(tx, top - 0.62 * cm, _NAME)
-    canvas.setFillColor(_MUTED)
-    canvas.setFont("Helvetica", 8)
-    canvas.drawString(tx, top - 1.12 * cm, _TAG)
-    # bloco direito: ORÇAMENTO / nº / data
-    rx = _PAGE_W - _MR
-    canvas.setFillColor(_VERDE)
-    canvas.setFont("Helvetica-Bold", 13)
-    canvas.drawRightString(rx, top - 0.55 * cm, "O R Ç A M E N T O")
-    canvas.setFillColor(_MUTED)
-    canvas.setFont("Helvetica", 8.5)
-    canvas.drawRightString(rx, top - 1.08 * cm, doc._ref)
-    canvas.setFillColor(_FAINT)
-    canvas.drawRightString(rx, top - 1.48 * cm, f"Emitido em {doc._hoje}")
-    # hairline verde
-    hy = top - 1.95 * cm
-    canvas.setStrokeColor(_VERDE)
-    canvas.setLineWidth(1.1)
-    canvas.line(_ML, hy, _PAGE_W - _MR, hy)
-
-    # ---------- RODAPÉ ----------
-    fy = 1.6 * cm
-    canvas.setStrokeColor(_HAIR)
-    canvas.setLineWidth(0.8)
-    canvas.line(_ML, fy, _PAGE_W - _MR, fy)
-    canvas.setFillColor(_FAINT)
-    canvas.setFont("Helvetica", 8)
-    canvas.drawString(_ML, fy - 0.42 * cm, f"{_NAME} · Impressão 3D sob demanda")
-    contatos = "   ·   ".join(p for p in (_URL, _IG, _MAIL) if p)
-    canvas.drawRightString(_PAGE_W - _MR, fy - 0.42 * cm, contatos)
-    canvas.restoreState()
+def _decor(c, doc):
+    """Faixas full-bleed (cabeçalho com gradiente + rodapé escuro) e marca d'água."""
+    c.saveState()
+    # marca d'água
+    c.setFillColor(_WMARK)
+    c.setFont("Helvetica-Bold", 170)
+    c.drawCentredString(_PW / 2, 7.5 * cm, "L3D")
+    # faixa de cabeçalho (gradiente verde)
+    c.saveState()
+    p = c.beginPath()
+    p.rect(0, _PH - _BAND, _PW, _BAND)
+    c.clipPath(p, stroke=0, fill=0)
+    c.linearGradient(0, _PH, _PW, _PH - _BAND, (_G_LIGHT, _G_DARK), (0, 1), extend=True)
+    c.restoreState()
+    # monograma branco
+    msz = 1.55 * cm
+    myt = _PH - (_BAND - msz) / 2
+    _monograma(c, _ML, myt, msz, _WHITE, _G_DARK)
+    tx = _ML + msz + 0.5 * cm
+    c.setFillColor(_WHITE)
+    c.setFont("Helvetica-Bold", 18)
+    c.drawString(tx, _PH - _BAND / 2 + 0.08 * cm, _NAME)
+    c.setFillColor(_WHITE_DIM)
+    c.setFont("Helvetica", 8.5)
+    c.drawString(tx, _PH - _BAND / 2 - 0.42 * cm, _TAG)
+    # direita: ORÇAMENTO + pill com nº
+    rx = _PW - _MR
+    c.setFillColor(_WHITE)
+    c.setFont("Helvetica-Bold", 15)
+    c.drawRightString(rx, _PH - _BAND / 2 + 0.45 * cm, "O R Ç A M E N T O")
+    rtxt = doc._ref
+    c.setFont("Helvetica-Bold", 9)
+    tw = c.stringWidth(rtxt, "Helvetica-Bold", 9)
+    pill_w = tw + 0.7 * cm
+    pill_h = 0.52 * cm
+    px = rx - pill_w
+    py = _PH - _BAND / 2 - 0.28 * cm
+    c.setFillColor(_WHITE)
+    c.roundRect(px, py, pill_w, pill_h, pill_h / 2, stroke=0, fill=1)
+    c.setFillColor(_G_DARK)
+    c.drawCentredString(px + pill_w / 2, py + 0.15 * cm, rtxt)
+    # faixa de rodapé
+    c.setFillColor(_INK)
+    c.rect(0, 0, _PW, _FOOT, fill=1, stroke=0)
+    c.setStrokeColor(_G)
+    c.setLineWidth(2)
+    c.line(0, _FOOT, _PW, _FOOT)
+    c.setFillColor(_WHITE)
+    c.setFont("Helvetica-Bold", 8.5)
+    c.drawString(_ML, _FOOT / 2 - 0.08 * cm, "Obrigado pela preferência.")
+    c.setFillColor(_FAINT)
+    c.setFont("Helvetica", 8)
+    contatos = "   ·   ".join(t for t in (_URL, _IG, _MAIL) if t)
+    c.drawRightString(_PW - _MR, _FOOT / 2 - 0.08 * cm, contatos)
+    c.restoreState()
 
 
 def gerar_orcamento_pdf(dados: dict) -> bytes:
-    """Gera e retorna os bytes do PDF de orçamento da L3D Labz.
+    """Gera e retorna os bytes do PDF de orçamento da L3D Labz (layout premium).
 
     `dados` deve conter APENAS (sem custos internos):
       cliente_nome, peca_descricao, quantidade, prazo_entrega,
@@ -141,105 +159,110 @@ def gerar_orcamento_pdf(dados: dict) -> bytes:
     """
     buf = io.BytesIO()
     doc = SimpleDocTemplate(
-        buf, pagesize=A4,
-        leftMargin=_ML, rightMargin=_MR,
-        topMargin=3.1 * cm, bottomMargin=2.2 * cm,
+        buf, pagesize=A4, leftMargin=_ML, rightMargin=_MR,
+        topMargin=_BAND + 0.8 * cm, bottomMargin=_FOOT + 0.6 * cm,
         title="Orçamento L3D Labz", author="L3D Labz",
     )
-    doc._hoje = date.today().strftime("%d/%m/%Y")
     doc._ref = _ref_orcamento(dados.get("cliente_nome", ""), date.today())
+    hoje = date.today()
+    val = hoje + timedelta(days=7)
 
-    lbl = ParagraphStyle("lbl", fontName="Helvetica-Bold", fontSize=9,
-                         textColor=_MUTED, leading=12)
-    th = ParagraphStyle("th", fontName="Helvetica-Bold", fontSize=9,
-                        textColor=colors.white, leading=12)
-    th_r = ParagraphStyle("th_r", parent=th, alignment=TA_RIGHT)
-    td = ParagraphStyle("td", fontName="Helvetica", fontSize=10,
-                        textColor=_TEXTO, leading=14)
-    td_r = ParagraphStyle("td_r", parent=td, alignment=TA_RIGHT)
-    obs_s = ParagraphStyle("obs", fontName="Helvetica", fontSize=10,
-                           textColor=_TEXTO, leading=15)
-
-    def _cell(label, valor):
-        return Paragraph(
-            f'<font name="Helvetica-Bold" size="7.5" color="#6B7280">{label}</font><br/>'
-            f'<font name="Helvetica" size="11.5" color="#111827">{valor}</font>',
-            ParagraphStyle("c", leading=15))
+    s_lblm = ParagraphStyle("lm", fontName="Helvetica-Bold", fontSize=7.5, textColor=_MUTED, leading=11)
+    s_th = ParagraphStyle("th", fontName="Helvetica-Bold", fontSize=8.5, textColor=_WHITE, leading=11)
+    s_thr = ParagraphStyle("thr", parent=s_th, alignment=TA_RIGHT)
+    s_td = ParagraphStyle("td", fontName="Helvetica", fontSize=9.5, textColor=_TEXTO, leading=13)
+    s_tdr = ParagraphStyle("tdr", parent=s_td, alignment=TA_RIGHT)
+    s_obs = ParagraphStyle("o", fontName="Helvetica", fontSize=9.5, textColor=_TEXTO, leading=14)
 
     story = []
 
-    # ---- card de dados (2x2) ----
-    card = Table(
-        [[_cell("CLIENTE", dados.get("cliente_nome", "—")),
-          _cell("PRAZO DE ENTREGA", dados.get("prazo_entrega", "—"))],
-         [_cell("DESCRIÇÃO DA PEÇA", dados.get("peca_descricao", "—")),
-          _cell("VALIDADE", "7 dias corridos")]],
-        colWidths=[_CONTENT_W * 0.62, _CONTENT_W * 0.38],
+    # ---- Faturar para / Detalhes ----
+    detalhes = Table(
+        [[Paragraph("EMISSÃO", s_lblm), Paragraph(hoje.strftime("%d/%m/%Y"), s_tdr)],
+         [Paragraph("VALIDADE", s_lblm), Paragraph(val.strftime("%d/%m/%Y"), s_tdr)],
+         [Paragraph("PRAZO", s_lblm), Paragraph(dados.get("prazo_entrega", "—"), s_tdr)]],
+        colWidths=[_CW * 0.20, _CW * 0.20],
         style=TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), _CARD),
-            ("ROUNDEDCORNERS", [6, 6, 6, 6]),
-            ("VALIGN", (0, 0), (-1, -1), "TOP"),
-            ("LEFTPADDING", (0, 0), (-1, -1), 14),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 14),
-            ("TOPPADDING", (0, 0), (-1, -1), 12),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 12),
+            ("LINEBELOW", (0, 0), (-1, -2), 0.5, _HAIR),
+            ("TOPPADDING", (0, 0), (-1, -1), 5), ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("LEFTPADDING", (0, 0), (-1, -1), 0),
         ]))
-    story.append(card)
-    story.append(Spacer(1, 0.7 * cm))
+    topo = Table(
+        [[Paragraph('<font name="Helvetica-Bold" size="7.5" color="#1B7E37">FATURAR PARA</font><br/>'
+                    f'<font name="Helvetica-Bold" size="14" color="#0F172A">{dados.get("cliente_nome","—")}</font>',
+                    ParagraphStyle("fp", leading=18)),
+          detalhes]],
+        colWidths=[_CW * 0.58, _CW * 0.42],
+        style=TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"),
+                          ("LEFTPADDING", (0, 0), (-1, -1), 0), ("RIGHTPADDING", (0, 0), (-1, -1), 0)]))
+    story.append(topo)
+    story.append(Spacer(1, 0.6 * cm))
 
     # ---- tabela de itens (sem custos internos) ----
     qtd = dados.get("quantidade", 1)
     pu = dados.get("preco_venda", 0.0)
     total = dados.get("total", 0.0)
     itens = Table(
-        [[Paragraph("DESCRIÇÃO", th), Paragraph("QTD", th_r),
-          Paragraph("PREÇO UNIT.", th_r), Paragraph("TOTAL", th_r)],
-         [Paragraph(dados.get("peca_descricao", "—"), td), Paragraph(str(qtd), td_r),
-          Paragraph(_format_brl(pu), td_r), Paragraph(_format_brl(total), td_r)]],
-        colWidths=[_CONTENT_W * 0.48, _CONTENT_W * 0.12, _CONTENT_W * 0.20, _CONTENT_W * 0.20],
+        [[Paragraph("DESCRIÇÃO", s_th), Paragraph("QTD", s_thr),
+          Paragraph("PREÇO UNIT.", s_thr), Paragraph("TOTAL", s_thr)],
+         [Paragraph(dados.get("peca_descricao", "—"), s_td), Paragraph(str(qtd), s_tdr),
+          Paragraph(_format_brl(pu), s_tdr), Paragraph(_format_brl(total), s_tdr)]],
+        colWidths=[_CW * 0.50, _CW * 0.12, _CW * 0.19, _CW * 0.19],
         style=TableStyle([
-            ("BACKGROUND", (0, 0), (-1, 0), _VERDE),
-            ("TOPPADDING", (0, 0), (-1, 0), 9),
-            ("BOTTOMPADDING", (0, 0), (-1, 0), 9),
-            ("TOPPADDING", (0, 1), (-1, -1), 11),
-            ("BOTTOMPADDING", (0, 1), (-1, -1), 11),
-            ("LEFTPADDING", (0, 0), (-1, -1), 10),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 10),
-            ("LINEBELOW", (0, 1), (-1, -1), 0.6, _HAIR),
-            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("BACKGROUND", (0, 0), (-1, 0), _G), ("ROUNDEDCORNERS", [5, 5, 0, 0]),
+            ("TOPPADDING", (0, 0), (-1, 0), 8), ("BOTTOMPADDING", (0, 0), (-1, 0), 8),
+            ("TOPPADDING", (0, 1), (-1, -1), 10), ("BOTTOMPADDING", (0, 1), (-1, -1), 10),
+            ("LEFTPADDING", (0, 0), (-1, -1), 10), ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+            ("LINEBELOW", (0, 1), (-1, -1), 0.6, _HAIR), ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
         ]))
     story.append(itens)
-    story.append(Spacer(1, 0.5 * cm))
+    story.append(Spacer(1, 0.45 * cm))
 
-    # ---- total em destaque (à direita) ----
-    total_str = _format_brl(total).replace(" ", " ")  # nbsp: nao quebra "R$ valor"
-    tot_box = Table(
-        [[Paragraph('<font name="Helvetica-Bold" size="9" color="#1E8C3E">TOTAL</font>', lbl),
-          Paragraph(f'<font name="Helvetica-Bold" size="15" color="#1E8C3E">{total_str}</font>',
+    # ---- resumo: subtotal + total card (à direita) ----
+    sub_row = Table(
+        [[Paragraph("Subtotal", ParagraphStyle("sl", fontName="Helvetica", fontSize=9.5,
+                                               textColor=_MUTED, alignment=TA_RIGHT)),
+          Paragraph(_format_brl(total), ParagraphStyle("sv", fontName="Helvetica", fontSize=9.5,
+                                                       textColor=_TEXTO, alignment=TA_RIGHT))]],
+        colWidths=[4.1 * cm, 4.1 * cm],
+        style=TableStyle([("TOPPADDING", (0, 0), (-1, -1), 2), ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+                          ("RIGHTPADDING", (0, 0), (-1, -1), 0), ("LEFTPADDING", (0, 0), (-1, -1), 0)]))
+    tot_card = Table(
+        [[Paragraph('<font name="Helvetica-Bold" size="9" color="#FFFFFF">TOTAL</font>',
+                    ParagraphStyle("tl", leading=12)),
+          Paragraph(f'<font name="Helvetica-Bold" size="15" color="#FFFFFF">{_format_brl(total)}</font>',
                     ParagraphStyle("tv", alignment=TA_RIGHT, leading=19))]],
-        colWidths=[3.0 * cm, 4.8 * cm],
-        hAlign="RIGHT",
+        colWidths=[2.4 * cm, 5.8 * cm],
         style=TableStyle([
-            ("BACKGROUND", (0, 0), (-1, -1), _VERDE_SOFT),
-            ("ROUNDEDCORNERS", [6, 6, 6, 6]),
+            ("BACKGROUND", (0, 0), (-1, -1), _G_DARK), ("ROUNDEDCORNERS", [6, 6, 6, 6]),
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-            ("ALIGN", (0, 0), (0, 0), "LEFT"),
-            ("ALIGN", (1, 0), (1, 0), "RIGHT"),
-            ("LEFTPADDING", (0, 0), (-1, -1), 14),
-            ("RIGHTPADDING", (0, 0), (-1, -1), 14),
-            ("TOPPADDING", (0, 0), (-1, -1), 12),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 12),
+            ("LEFTPADDING", (0, 0), (-1, -1), 14), ("RIGHTPADDING", (0, 0), (-1, -1), 14),
+            ("TOPPADDING", (0, 0), (-1, -1), 12), ("BOTTOMPADDING", (0, 0), (-1, -1), 12),
         ]))
-    story.append(tot_box)
+    resumo = Table([[sub_row], [tot_card]], colWidths=[8.2 * cm], hAlign="RIGHT",
+                   style=TableStyle([("LEFTPADDING", (0, 0), (-1, -1), 0), ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+                                     ("TOPPADDING", (0, 0), (-1, -1), 0), ("BOTTOMPADDING", (0, 0), (-1, 0), 2)]))
+    story.append(resumo)
 
-    # ---- observações (opcional) ----
+    # ---- condições & observações ----
     obs = (dados.get("observacoes") or "").strip()
+    story.append(Spacer(1, 0.7 * cm))
+    cond = ("Validade de 7 dias corridos a partir da emissão. Valores em reais (BRL). "
+            "Produção iniciada após aprovação do orçamento.")
     if obs:
-        story.append(Spacer(1, 0.7 * cm))
-        story.append(Paragraph(
-            '<font name="Helvetica-Bold" size="7.5" color="#6B7280">OBSERVAÇÕES</font>',
-            ParagraphStyle("obs_lbl", leading=12, spaceAfter=4)))
-        story.append(Paragraph(obs, obs_s))
+        cond = obs + "<br/><br/>" + cond
+    bloco = Table(
+        [[Paragraph('<font name="Helvetica-Bold" size="7.5" color="#1B7E37">CONDIÇÕES &amp; OBSERVAÇÕES</font>',
+                    ParagraphStyle("cl", leading=12, spaceAfter=4))],
+         [Paragraph(cond, s_obs)]],
+        colWidths=[_CW],
+        style=TableStyle([
+            ("BACKGROUND", (0, 0), (-1, -1), _G_SOFT), ("ROUNDEDCORNERS", [6, 6, 6, 6]),
+            ("LEFTPADDING", (0, 0), (-1, -1), 14), ("RIGHTPADDING", (0, 0), (-1, -1), 14),
+            ("TOPPADDING", (0, 0), (0, 0), 12), ("BOTTOMPADDING", (0, 0), (0, 0), 2),
+            ("TOPPADDING", (0, 1), (0, 1), 0), ("BOTTOMPADDING", (0, 1), (0, 1), 12),
+        ]))
+    story.append(bloco)
 
-    doc.build(story, onFirstPage=_cabecalho_rodape, onLaterPages=_cabecalho_rodape)
+    doc.build(story, onFirstPage=_decor, onLaterPages=_decor)
     return buf.getvalue()
