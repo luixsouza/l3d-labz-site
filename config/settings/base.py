@@ -226,6 +226,8 @@ SITE = {
     "name": "L3D Labz",
     "tagline": "Impressão 3D com acabamento de laboratório.",
     "accent": "#2FA84F",  # verde Luigi
+    # Redes sociais (vazio = some do footer). Só Instagram por enquanto.
+    "instagram": "https://instagram.com/l3d_labz",
 }
 
 # --- Vitrine 3D do hero da home ---
