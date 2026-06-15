@@ -42,6 +42,15 @@ from apps.catalog import mesh3d
 from apps.catalog.models import Category, Product, ProductImage
 
 # ---------------------------------------------------------------------------
+# Cap de fotos por produto (catálogo limpo)
+# ---------------------------------------------------------------------------
+# Galerias inchadas (8+ fotos repetidas do mesmo ângulo) poluem o card e o
+# detalhe. Travamos em 3 fotos por produto: 1 principal (Product.image, foto 00)
+# + 2 extras na galeria (ProductImage order=1,2). A foto 03+ é descartada.
+MAX_FOTOS = 3      # total por produto (principal + extras)
+MAX_EXTRAS = 2     # extras de galeria (= MAX_FOTOS - 1 principal)
+
+# ---------------------------------------------------------------------------
 # Mapeamento de keywords → categoria automática
 # ---------------------------------------------------------------------------
 # As keywords são checadas em (titulo_en + ' ' + ' '.join(tags)).lower()
@@ -349,9 +358,12 @@ class Command(BaseCommand):
                 campos.append("model_3d")
             p.save(update_fields=campos)
 
-            # --- galeria (fotos[1:] em ordem, idempotente) ---
+            # ---- galeria limitada a MAX_EXTRAS por produto (catálogo limpo) ----
+            # Mantemos só as 2 primeiras fotos extras; a foto 03+ é descartada
+            # para não inflar a galeria com ângulos repetidos. Idempotente:
+            # reconstrói a galeria do zero a cada import.
             p.gallery.all().delete()
-            for idx, foto_extra in enumerate(fotos[1:], start=1):
+            for idx, foto_extra in enumerate(fotos[1 : 1 + MAX_EXTRAS], start=1):
                 try:
                     extra_bytes = _foto_para_jpeg_quadrado(foto_extra)
                     gi = ProductImage(product=p, order=idx)
