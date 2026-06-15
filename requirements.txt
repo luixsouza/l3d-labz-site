@@ -25,6 +25,9 @@ matplotlib                    # render headless (Agg) da foto padronizada do mod
 # --- Geração de PDF (orçamentos) ---
 reportlab==4.5.1          # geração de PDF pura-python (orçamentos da calculadora, sem deps nativas)
 
+# --- Descrições por IA (Claude Vision) ---
+anthropic==0.109.1        # SDK oficial Anthropic; usado por gerar_descricoes (roda no server)
+
 # --- Filtros de catálogo ---
 django-filter==25.1
 
