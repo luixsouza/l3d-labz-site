@@ -2533,3 +2533,16 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   background: #fff; border: 1px solid var(--border); color: var(--text);
 }
 [data-theme="light"] .gh-viewer-stl:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-strong); }
+
+/* =========================================================================
+   FIX: hero da home SEMPRE lado a lado (texto | 3D) no desktop.
+   O hero do "Sobre" deixou um `.geek-hero { grid-template-columns: 1fr !important }`
+   (linha ~1445) que atropelava o split do hero limpo. Aqui, no fim do arquivo e
+   com !important, o split vence. Empilha só no mobile (<= 820px).
+   ========================================================================= */
+.geek-hero--clean { grid-template-columns: 1.15fr .85fr !important; align-items: center; }
+.geek-hero--clean .gh-viewer { justify-self: end; }
+@media (max-width: 820px) {
+  .geek-hero--clean { grid-template-columns: 1fr !important; }
+  .geek-hero--clean .gh-viewer { justify-self: center; }
+}
