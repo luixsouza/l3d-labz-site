@@ -102,10 +102,11 @@ None yet.
 | 260612-gf7 | Hero da home ligado ao PromotionService (promo hero dinâmica com fallback hardcoded) | 2026-06-12 | a31106d, 3dd7fb6 |
 | 260614-lzm | Calculadora de precificação 3D: pública (vanilla JS, detalhamento completo + CTA) e privada is_staff (orçamento em PDF reportlab, sem custos internos) | 2026-06-14 | 253eb86, 436f4b6, 3b94df7 |
 | 260614-ndg | Calculadora 3D v2 genérica: presets de 14 impressoras + 10 filamentos, bandeiras tarifárias ANEEL (tarifa efetiva), UI profissional (breakdown/permalink/copiar) e README reescrito. Verificada 8/8 must-haves | 2026-06-14 | f1f70f6, 27b0133, 0cea257, c351d63 |
-| 260614-q6g | Redesign "Clean & Elegante" light-first (sketch 001 variante B): paleta light reconciliada (3 blocos divergentes), azul secundário em links/badges/prova social, sombras difusas, hero 3D na home (service+mapper+view, com fallback) e moldura clara (header/footer/hero off-white). Verificado por screenshot real: home light desktop+mobile, catálogo, carrinho, detalhe, dark intacto | 2026-06-14 | 0a9d35b, 8faed13, d64ff57 |
+| 260614-q6g | Redesign "Clean & Elegante" light-first (sketch 001 variante B): paleta light reconciliada (3 blocos divergentes), azul secundário, sombras difusas, moldura clara (header/footer/hero off-white) e hero 3D lado a lado. Hero virou VITRINE geek: modelo-vitrine astronauta auto-hospedado (`static/models/astronaut.glb`) via `HERO_3D_MODEL_URL`, com fallback p/ produto curado (`HERO_3D_PRODUCT_SLUG`); viewer polido (luz neutra, sombra suave, 3/4, poster, sem barra). Fix do split (`1fr !important` herdado do hero do Sobre atropelava). Deployado em prod e confirmado no navegador | 2026-06-14 | 0a9d35b, 8faed13, d64ff57, 289cd36, 4ca96fb |
 
 ## Session Continuity
 
-Last session: 2026-06-14 (redesign Clean & Elegante light-first — sketch 001 variante B aplicado no site real)
-Stopped at: Quick task 260614-q6g completa (3 commits) — verificada por screenshot. NOTA: dev DB precisava da migração catalog.0006_productimage (aplicada localmente; em prod roda no deploy).
+Last session: 2026-06-14 (redesign Clean & Elegante light-first + hero 3D vitrine geek — aplicado e deployado em prod)
+Stopped at: Quick task 260614-q6g completa (5 commits) — EM PROD em l3dlabz.com.br, confirmado no navegador (hero astronauta girando lado a lado).
+NOTAS: (1) headless do Chrome NÃO renderiza WebGL aqui — verificação do 3D depende de olho no navegador real, não de screenshot. (2) modelo-vitrine do hero é trocável por env (`HERO_3D_MODEL_URL` / `HERO_3D_PRODUCT_SLUG`). (3) dev DB precisava da migração catalog.0006_productimage (aplicada local; prod roda no deploy via entrypoint).
 Resume file: None
