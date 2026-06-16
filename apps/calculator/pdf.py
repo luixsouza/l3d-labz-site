@@ -250,19 +250,30 @@ def gerar_orcamento_pdf(dados: dict) -> bytes:
     total = dados.get("total", 0.0)
 
     # Selo gráfico "L3D" antes da descrição (melhoria 4): Drawing como Flowable na célula.
-    # Sub-tabela [selo | descrição] para alinhar verticalmente ao centro sem padding extra.
+    # Sub-tabela [selo+gap | descrição] para alinhar verticalmente ao centro.
+    #
+    # ATENÇÃO: a tabela `itens` aplica LEFTPADDING=10 + RIGHTPADDING=10 na coluna DESCRIÇÃO,
+    # portanto o espaço interno disponível para a sub-tabela é _DESCR_CW − 20pt.
+    # Os colWidths da sub-tabela devem somar ≤ _SUB_CW para evitar overflow silencioso.
+    #
+    # GAP: o respiro entre o Drawing do selo e o texto é incorporado diretamente no colWidth
+    # da coluna do selo (_SELO_LADO + _GAP_BADGE), sem usar RIGHTPADDING, para evitar que
+    # o reportlab comprima o Drawing abaixo de seu tamanho declarado.
+    _ITENS_PAD = 10        # padding lateral de cada célula na tabela itens (pontos)
     _SELO_LADO = 1.0 * cm
     _DESCR_CW = _CW * 0.50   # largura original da coluna DESCRIÇÃO
-    _TEXTO_CW = _DESCR_CW - _SELO_LADO - 0.2 * cm
+    _GAP_BADGE = 8         # pontos de respiro selo → texto (aprovação 260616)
+    _SUB_CW = _DESCR_CW - 2 * _ITENS_PAD   # espaço real disponível após paddings externos
+    _BADGE_COL = _SELO_LADO + _GAP_BADGE    # coluna do badge inclui o gap como espaço extra
+    _TEXTO_CW = _SUB_CW - _BADGE_COL       # coluna texto: espaço restante
     selo = _selo_drawing(_SELO_LADO)
     celula_desc_data = Table(
         [[selo, Paragraph(dados.get("peca_descricao", "—"), s_td)]],
-        colWidths=[_SELO_LADO, _TEXTO_CW],
+        colWidths=[_BADGE_COL, _TEXTO_CW],
         style=TableStyle([
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ("LEFTPADDING", (0, 0), (-1, -1), 0),
-            ("RIGHTPADDING", (0, 0), (0, 0), 6),
-            ("RIGHTPADDING", (1, 0), (1, 0), 0),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 0),
             ("TOPPADDING", (0, 0), (-1, -1), 0),
             ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
         ]))
