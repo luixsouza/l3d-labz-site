@@ -145,7 +145,7 @@ class Command(BaseCommand):
             p.name = nome
             p.description = (
                 f"{nome} impresso em 3D com acabamento premium pela L3D Labz. "
-                f"Produzido sob demanda — orçamento e prazo pelo WhatsApp."
+                f"Produzido sob demanda — orçamento e prazo pelo Instagram @l3d_labz."
             )
             p.price = Decimal("0")
             p.compare_at_price = None
