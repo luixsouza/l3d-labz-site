@@ -104,3 +104,9 @@ None. Nenhuma nova superfície de rede, endpoint, rota de auth ou mudança de sc
 - Commits f299d3f e 13c09fb existem: confirmed (`git log --oneline -5`)
 - 19/19 verificações CSS passaram (Vibrante Maker, --ink, --offset-shadow, .btn-primary, .product-card, thumbs pastel, borda inferior, line-clamp, product-actions, badges, pills, hero gradient, hero pontos, hero border, light override, .ig-cta, ig-cta gradient, split fix, chaves balanceadas)
 - Verificações do plano (Task 1 e Task 2) passaram todas
+
+
+## Follow-up (mockup fidelity)
+- Skin autoritativo (vence [data-theme]/!important) — hero/cards/header/faixas.
+- Barra de categorias da home com pílula "Todas" ativa (igual mockup).
+- **Sistema de botões maker em TODO o site** (btn/btn-ghost/icon-btn/Aplicar, não só primary) — auditado página a página. Commits c82986f, a359736.
