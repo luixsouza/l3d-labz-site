@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="pt-br" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>L3D Labz · Variante A — Clean Premium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FAFBF9; --surface:#ffffff; --ink:#10231A; --muted:#5C6B63; --line:#E8ECE8;
+    --green:#2FA84F; --green-strong:#1E8C3E; --green-soft:#EAF7EE;
+    --blue:#2BA6E0; --blue-soft:#E6F4FB; --blue-ink:#0E5E84;
+    --r:18px; --r-sm:12px; --shadow:0 1px 2px rgba(16,35,26,.04),0 14px 40px -18px rgba(16,35,26,.18);
+    --shadow-hover:0 1px 2px rgba(16,35,26,.05),0 26px 60px -22px rgba(16,35,26,.28);
+    --display:"Bricolage Grotesque",system-ui,sans-serif; --body:"Hanken Grotesk",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:var(--display);line-height:1.05;letter-spacing:-.02em}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  .badge-style{position:fixed;top:14px;left:14px;z-index:99;background:var(--ink);color:#fff;font-size:11px;font-weight:700;letter-spacing:.08em;padding:6px 12px;border-radius:99px;text-transform:uppercase}
+
+  /* header */
+  header{position:sticky;top:0;z-index:50;background:rgba(250,251,249,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;gap:28px;height:68px}
+  .logo{display:flex;align-items:center;gap:9px;font-family:var(--display);font-weight:800;font-size:19px;letter-spacing:-.02em}
+  .logo .mk{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--green),var(--green-strong));display:grid;place-items:center;color:#fff;font-size:13px;font-weight:800}
+  .nav-links{display:flex;gap:22px;font-weight:500;font-size:14.5px;color:var(--muted)}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-cta{margin-left:auto;display:flex;gap:10px;align-items:center}
+  .btn{font-family:var(--body);font-weight:600;font-size:14px;border-radius:99px;padding:10px 18px;border:1px solid transparent;cursor:pointer;transition:.18s;display:inline-flex;align-items:center;gap:8px}
+  .btn-ghost{background:transparent;border-color:var(--line);color:var(--ink)}
+  .btn-ghost:hover{background:#fff;box-shadow:var(--shadow)}
+  .btn-green{background:var(--green);color:#fff}
+  .btn-green:hover{background:var(--green-strong)}
+  .btn-block{width:100%;justify-content:center}
+
+  /* hero */
+  .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;padding:64px 0 40px}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green-strong);background:var(--green-soft);padding:6px 12px;border-radius:99px}
+  .hero h1{font-size:clamp(38px,5vw,62px);font-weight:700;margin:18px 0 16px}
+  .hero p{font-size:18px;color:var(--muted);max-width:46ch;margin-bottom:26px}
+  .hero-cta{display:flex;gap:12px}
+  .hero-art{position:relative;aspect-ratio:1/1;border-radius:28px;background:
+     radial-gradient(120% 120% at 70% 18%,#fff,var(--green-soft) 75%);
+     border:1px solid var(--line);box-shadow:var(--shadow);display:grid;place-items:center;overflow:hidden}
+  .hero-art .obj{font-size:160px;filter:drop-shadow(0 30px 40px rgba(16,35,26,.18))}
+  .hero-art .tag{position:absolute;bottom:18px;left:18px;background:#fff;border:1px solid var(--line);border-radius:99px;padding:8px 14px;font-size:12.5px;font-weight:600;box-shadow:var(--shadow);display:flex;gap:7px;align-items:center}
+  .dot{width:8px;height:8px;border-radius:99px;background:var(--green)}
+
+  /* trust */
+  .trust{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0 8px}
+  .trust div{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:16px 18px}
+  .trust b{font-family:var(--display);font-size:22px;display:block}
+  .trust span{font-size:12.5px;color:var(--muted)}
+
+  /* section head */
+  .sec{padding:56px 0 0}
+  .sec-head{display:flex;align-items:end;justify-content:space-between;margin-bottom:22px}
+  .sec-head h2{font-size:30px;font-weight:700}
+  .sec-head .sub{font-size:14px;color:var(--muted)}
+  .filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+  .chip{font-size:13.5px;font-weight:500;border:1px solid var(--line);background:#fff;color:var(--muted);padding:8px 14px;border-radius:99px;cursor:pointer;transition:.15s}
+  .chip.on,.chip:hover{border-color:var(--green);color:var(--green-strong);background:var(--green-soft)}
+
+  /* GRID — equal-height cards, button pinned bottom (THE FIX) */
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;transition:.2s;box-shadow:var(--shadow)}
+  .card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover)}
+  .thumb{aspect-ratio:1/1;display:grid;place-items:center;position:relative;border-bottom:1px solid var(--line)}
+  .thumb .obj{font-size:78px;filter:drop-shadow(0 16px 18px rgba(16,35,26,.14))}
+  .pill{position:absolute;top:12px;left:12px;font-size:11px;font-weight:700;letter-spacing:.04em;padding:5px 9px;border-radius:99px;background:var(--blue-soft);color:var(--blue-ink)}
+  .pill.new{background:var(--green-soft);color:var(--green-strong)}
+  .body{padding:16px;display:flex;flex-direction:column;flex:1;gap:7px}
+  .cat{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .name{font-family:var(--display);font-weight:600;font-size:15.5px;line-height:1.25;
+        display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.5em}
+  .rate{font-size:12.5px;color:var(--muted)}
+  .price{font-family:var(--display);font-weight:700;font-size:18px;margin-top:2px}
+  .price.sob{font-size:14px;font-weight:600;color:var(--blue-ink)}
+  .body .btn{margin-top:auto}
+
+  /* instagram CTA */
+  .ig{margin:64px 0;background:linear-gradient(120% 120% at 0 0,var(--green-soft),#fff 70%);border:1px solid var(--line);border-radius:26px;padding:44px;display:flex;align-items:center;gap:30px;box-shadow:var(--shadow)}
+  .ig .ic{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#F58529,#DD2A7B 50%,#515BD4);display:grid;place-items:center;color:#fff;font-size:30px;flex:none}
+  .ig h3{font-size:24px;margin-bottom:4px}
+  .ig p{color:var(--muted);font-size:15px}
+  .ig .btn{margin-left:auto}
+
+  footer{border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-size:13.5px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px}
+  @media(max-width:880px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}.trust{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="badge-style">Variante A · Clean Premium</div>
+<header><div class="wrap nav">
+  <div class="logo"><span class="mk">L3D</span> L3D Labz</div>
+  <nav class="nav-links"><a>Catálogo</a><a>Modelos 3D</a><a>Faça meu Lithophane</a><a>Calculadora</a><a>Sobre</a></nav>
+  <div class="nav-cta"><a class="btn btn-ghost">Entrar</a><a class="btn btn-green">Criar conta</a></div>
+</div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <span class="eyebrow"><span class="dot"></span> Impressão 3D sob demanda</span>
+      <h1>Sua ideia, impressa camada por camada.</h1>
+      <p>Action figures, organizadores, luminárias e peças personalizadas — produzidas com acabamento de laboratório pela L3D Labz.</p>
+      <div class="hero-cta"><a class="btn btn-green">Ver catálogo →</a><a class="btn btn-ghost">Faça meu Lithophane</a></div>
+    </div>
+    <div class="hero-art">
+      <div class="obj">🤖</div>
+      <div class="tag"><span class="dot"></span> Modelo 3D · gire e explore</div>
+    </div>
+  </section>
+
+  <div class="trust">
+    <div><b>+2.400</b><span>peças impressas</span></div>
+    <div><b>4,8 ★</b><span>avaliação média</span></div>
+    <div><b>48h</b><span>produção média</span></div>
+    <div><b>Brasil</b><span>envio para todo o país</span></div>
+  </div>
+
+  <section class="sec">
+    <div class="sec-head"><div><h2>Novidades</h2></div><a class="sub">Ver tudo →</a></div>
+    <div class="filters">
+      <span class="chip on">Todas</span><span class="chip">Action Figures</span><span class="chip">Organizadores</span>
+      <span class="chip">Luminárias</span><span class="chip">Chaveiros</span><span class="chip">Geek</span><span class="chip">Decoração</span>
+    </div>
+    <div class="grid">
+      <!-- card -->
+      <article class="card"><div class="thumb"><span class="pill new">Novo</span><div class="obj">🤖</div></div>
+        <div class="body"><span class="cat">Action Figures</span><div class="name">Action Figure Articulada Premium</div>
+        <div class="rate">★ 4,9</div><div class="price">R$ 89,90</div><a class="btn btn-green btn-block">Adicionar</a></div></article>
+      <article class="card"><div class="thumb"><span class="pill">Destaque</span><div class="obj">🪴</div></div>
+        <div class="body"><span class="cat">Decoração</span><div class="name">Vaso Geométrico de Parede</div>
+        <div class="rate">★ 4,7</div><div class="price">R$ 49,90</div><a class="btn btn-green btn-block">Adicionar</a></div></article>
+      <article class="card"><div class="thumb"><div class="obj">💡</div></div>
+        <div class="body"><span class="cat">Luminárias</span><div class="name">Luminária Lua 3D com base de madeira e dimmer</div>
+        <div class="rate">★ 5,0</div><div class="price sob">Sob consulta</div><a class="btn btn-green btn-block">Adicionar</a></div></article>
+      <article class="card"><div class="thumb"><span class="pill new">Novo</span><div class="obj">🔑</div></div>
+        <div class="body"><span class="cat">Chaveiros</span><div class="name">Chaveiro Personalizado</div>
+        <div class="rate">★ 4,8</div><div class="price">R$ 19,90</div><a class="btn btn-green btn-block">Adicionar</a></div></article>
+      <article class="card"><div class="thumb"><div class="obj">🐉</div></div>
+        <div class="body"><span class="cat">Geek</span><div class="name">Miniatura Dragão Articulado</div>
+        <div class="rate">★ 4,9</div><div class="price">R$ 129,90</div><a class="btn btn-green btn-block">Adicionar</a></div></article>
+      <article class="card"><div class="thumb"><div class="obj">🎧</div></div>
+        <div class="body"><span class="cat">Organizadores</span><div class="name">Suporte de Headset de Mesa</div>
+        <div class="rate">★ 4,6</div><div class="price">R$ 59,90</div><a class="btn btn-green btn-block">Adicionar</a></div></article>
+      <article class="card"><div class="thumb"><div class="obj">🧩</div></div>
+        <div class="body"><span class="cat">Organizadores</span><div class="name">Porta-treco Modular Hexagonal</div>
+        <div class="rate">★ 4,7</div><div class="price sob">Sob consulta</div><a class="btn btn-green btn-block">Adicionar</a></div></article>
+      <article class="card"><div class="thumb"><span class="pill">Destaque</span><div class="obj">🦕</div></div>
+        <div class="body"><span class="cat">Brinquedos</span><div class="name">Dino Flexível Anti-stress</div>
+        <div class="rate">★ 5,0</div><div class="price">R$ 39,90</div><a class="btn btn-green btn-block">Adicionar</a></div></article>
+    </div>
+  </section>
+
+  <section class="ig">
+    <div class="ic">📸</div>
+    <div><h3>Acompanhe a gente no Instagram</h3><p>Bastidores das impressões, lançamentos e orçamento rápido por DM.</p></div>
+    <a class="btn btn-green">@l3d_labz</a>
+  </section>
+</main>
+
+<footer><div class="wrap foot">
+  <div><strong>L3D Labz</strong> · Impressão 3D com acabamento de laboratório.</div>
+  <div>© 2026 L3D Labz · l3dlabz.com.br · @l3d_labz</div>
+</div></footer>
+</body>
+</html>

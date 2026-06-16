@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>L3D Labz · Variante B — Vibrante Maker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F4F7F4; --surface:#fff; --ink:#0C1F15; --muted:#566;
+    --green:#2FA84F; --green-d:#1E8C3E; --blue:#2BA6E0; --blue-d:#1B7FB0;
+    --r:20px; --display:"Bricolage Grotesque",system-ui,sans-serif; --body:"Hanken Grotesk",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--body);background:var(--bg);color:var(--ink);line-height:1.45}
+  h1,h2,h3{font-family:var(--display);line-height:1.02;letter-spacing:-.02em}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 22px}
+  .badge-style{position:fixed;top:14px;left:14px;z-index:99;background:#0C1F15;color:#fff;font-size:11px;font-weight:800;letter-spacing:.08em;padding:6px 12px;border-radius:99px}
+
+  header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:3px solid var(--ink)}
+  .nav{display:flex;align-items:center;gap:24px;height:66px}
+  .logo{display:flex;align-items:center;gap:9px;font-family:var(--display);font-weight:800;font-size:20px}
+  .logo .mk{width:32px;height:32px;border-radius:9px;background:var(--ink);color:#7CF29B;display:grid;place-items:center;font-size:12px;font-weight:800;transform:rotate(-4deg)}
+  .nav-links{display:flex;gap:20px;font-weight:600;font-size:14px}
+  .nav-links a:hover{color:var(--green-d)}
+  .nav-cta{margin-left:auto;display:flex;gap:10px}
+  .btn{font-family:var(--body);font-weight:700;font-size:14px;border-radius:12px;padding:11px 18px;border:2.5px solid var(--ink);cursor:pointer;transition:.14s;display:inline-flex;align-items:center;gap:8px}
+  .btn-ghost{background:#fff;color:var(--ink)}
+  .btn-ghost:hover{background:#EAF7EE}
+  .btn-green{background:var(--green);color:#fff;box-shadow:3px 3px 0 var(--ink)}
+  .btn-green:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+  .btn-green:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+  .btn-block{width:100%;justify-content:center}
+
+  .hero{margin:22px 0;border:3px solid var(--ink);border-radius:28px;overflow:hidden;background:
+    linear-gradient(135deg,#2FA84F 0%,#27a07a 45%,#2BA6E0 100%);color:#fff;position:relative}
+  .hero:before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.18) 2px,transparent 2px);background-size:26px 26px;opacity:.5}
+  .hero-in{position:relative;display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center;padding:46px}
+  .hero .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:rgba(255,255,255,.2);padding:7px 13px;border-radius:99px;backdrop-filter:blur(4px)}
+  .hero h1{font-size:clamp(36px,5.2vw,60px);font-weight:800;margin:16px 0 14px}
+  .hero p{font-size:17px;opacity:.95;max-width:42ch;margin-bottom:22px}
+  .hero-cta{display:flex;gap:12px}
+  .btn-white{background:#fff;color:var(--ink);border-color:var(--ink);box-shadow:3px 3px 0 rgba(0,0,0,.25)}
+  .hero-card{background:#fff;border:3px solid var(--ink);border-radius:22px;aspect-ratio:1/1;display:grid;place-items:center;box-shadow:8px 8px 0 rgba(0,0,0,.22);position:relative}
+  .hero-card .obj{font-size:150px}
+  .hero-card .flag{position:absolute;top:-14px;right:18px;background:#FFD23F;color:var(--ink);border:3px solid var(--ink);font-weight:800;font-size:13px;padding:6px 12px;border-radius:10px;transform:rotate(6deg)}
+
+  .strip{display:flex;gap:10px;flex-wrap:wrap;margin:26px 0 6px}
+  .chip{font-size:14px;font-weight:700;border:2.5px solid var(--ink);background:#fff;padding:9px 15px;border-radius:99px;cursor:pointer}
+  .chip.on{background:var(--ink);color:#7CF29B}
+  .chip:hover:not(.on){background:#EAF7EE}
+
+  .sec{padding:42px 0 0}
+  .sec-head{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+  .sec-head h2{font-size:32px;font-weight:800}
+  .sec-head .tagx{background:#FFD23F;border:2.5px solid var(--ink);font-weight:800;font-size:13px;padding:4px 11px;border-radius:9px;transform:rotate(-3deg)}
+
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .card{background:#fff;border:3px solid var(--ink);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;transition:.14s}
+  .card:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+  .thumb{aspect-ratio:1/1;display:grid;place-items:center;position:relative;border-bottom:3px solid var(--ink)}
+  .c0{background:#EAF7EE}.c1{background:#E6F4FB}.c2{background:#FFF4D6}.c3{background:#FCE7F0}.c4{background:#EDE9FE}.c5{background:#E0F7F0}.c6{background:#FFEAD6}.c7{background:#E8F5D6}
+  .thumb .obj{font-size:80px}
+  .pill{position:absolute;top:10px;left:10px;font-size:11px;font-weight:800;letter-spacing:.03em;padding:5px 10px;border-radius:8px;background:var(--ink);color:#7CF29B;border:2px solid var(--ink)}
+  .pill.hot{background:#FF5630;color:#fff}
+  .body{padding:14px;display:flex;flex-direction:column;flex:1;gap:6px}
+  .cat{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--blue-d)}
+  .name{font-family:var(--display);font-weight:700;font-size:15.5px;line-height:1.2;
+        display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.4em}
+  .rate{font-size:12.5px;color:var(--muted);font-weight:600}
+  .price{font-family:var(--display);font-weight:800;font-size:19px}
+  .price.sob{font-size:14px;color:var(--blue-d)}
+  .body .btn{margin-top:auto}
+
+  .ig{margin:56px 0;border:3px solid var(--ink);border-radius:24px;padding:38px;background:linear-gradient(120deg,#F58529,#DD2A7B 55%,#515BD4);color:#fff;display:flex;align-items:center;gap:24px;box-shadow:7px 7px 0 var(--ink)}
+  .ig .ic{font-size:46px}
+  .ig h3{font-size:26px;font-weight:800}
+  .ig p{opacity:.95}
+  .ig .btn{margin-left:auto;background:#fff;color:var(--ink);box-shadow:3px 3px 0 rgba(0,0,0,.3)}
+  footer{border-top:3px solid var(--ink);padding:34px 0;font-size:13.5px;color:var(--muted)}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+  @media(max-width:880px){.hero-in{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="badge-style">Variante B · Vibrante Maker</div>
+<header><div class="wrap nav">
+  <div class="logo"><span class="mk">L3D</span> L3D Labz</div>
+  <nav class="nav-links"><a>Catálogo</a><a>Modelos 3D</a><a>Lithophane</a><a>Calculadora</a><a>Sobre</a></nav>
+  <div class="nav-cta"><a class="btn btn-ghost">Entrar</a><a class="btn btn-green">Criar conta</a></div>
+</div></header>
+
+<main class="wrap">
+  <section class="hero"><div class="hero-in">
+    <div>
+      <span class="eyebrow">🖨️ Fábrica de impressão 3D</span>
+      <h1>Bota pra imprimir.<br>Do print ao pódio.</h1>
+      <p>Action figures, miniaturas, gadgets e peças sob medida — feitas camada por camada com aquele acabamento maker caprichado.</p>
+      <div class="hero-cta"><a class="btn btn-white">Ver catálogo →</a><a class="btn btn-white" style="background:transparent;color:#fff">Faça meu Lithophane</a></div>
+    </div>
+    <div class="hero-card"><span class="flag">NOVO ⚡</span><div class="obj">🤖</div></div>
+  </div></section>
+
+  <div class="strip">
+    <span class="chip on">Tudo</span><span class="chip">Action Figures</span><span class="chip">Miniaturas</span>
+    <span class="chip">Organizadores</span><span class="chip">Luminárias</span><span class="chip">Chaveiros</span><span class="chip">Geek</span>
+  </div>
+
+  <section class="sec">
+    <div class="sec-head"><h2>Novidades</h2><span class="tagx">fresquinho 🔥</span></div>
+    <div class="grid">
+      <article class="card"><div class="thumb c0"><span class="pill">NOVO</span><div class="obj">🤖</div></div>
+        <div class="body"><span class="cat">Action Figures</span><div class="name">Action Figure Articulada Premium</div><div class="rate">★ 4,9 · 132 vendidos</div><div class="price">R$ 89,90</div><a class="btn btn-green btn-block">Adicionar 🛒</a></div></article>
+      <article class="card"><div class="thumb c2"><span class="pill hot">TOP</span><div class="obj">💡</div></div>
+        <div class="body"><span class="cat">Luminárias</span><div class="name">Luminária Lua 3D com base de madeira</div><div class="rate">★ 5,0 · 88 vendidos</div><div class="price sob">Sob consulta</div><a class="btn btn-green btn-block">Adicionar 🛒</a></div></article>
+      <article class="card"><div class="thumb c1"><div class="obj">🪴</div></div>
+        <div class="body"><span class="cat">Decoração</span><div class="name">Vaso Geométrico de Parede</div><div class="rate">★ 4,7 · 54 vendidos</div><div class="price">R$ 49,90</div><a class="btn btn-green btn-block">Adicionar 🛒</a></div></article>
+      <article class="card"><div class="thumb c3"><span class="pill">NOVO</span><div class="obj">🔑</div></div>
+        <div class="body"><span class="cat">Chaveiros</span><div class="name">Chaveiro Personalizado</div><div class="rate">★ 4,8 · 210 vendidos</div><div class="price">R$ 19,90</div><a class="btn btn-green btn-block">Adicionar 🛒</a></div></article>
+      <article class="card"><div class="thumb c4"><span class="pill hot">TOP</span><div class="obj">🐉</div></div>
+        <div class="body"><span class="cat">Geek</span><div class="name">Miniatura Dragão Articulado</div><div class="rate">★ 4,9 · 76 vendidos</div><div class="price">R$ 129,90</div><a class="btn btn-green btn-block">Adicionar 🛒</a></div></article>
+      <article class="card"><div class="thumb c5"><div class="obj">🎧</div></div>
+        <div class="body"><span class="cat">Organizadores</span><div class="name">Suporte de Headset de Mesa</div><div class="rate">★ 4,6 · 41 vendidos</div><div class="price">R$ 59,90</div><a class="btn btn-green btn-block">Adicionar 🛒</a></div></article>
+      <article class="card"><div class="thumb c6"><div class="obj">🧩</div></div>
+        <div class="body"><span class="cat">Organizadores</span><div class="name">Porta-treco Modular Hexagonal</div><div class="rate">★ 4,7 · 33 vendidos</div><div class="price sob">Sob consulta</div><a class="btn btn-green btn-block">Adicionar 🛒</a></div></article>
+      <article class="card"><div class="thumb c7"><span class="pill">NOVO</span><div class="obj">🦕</div></div>
+        <div class="body"><span class="cat">Brinquedos</span><div class="name">Dino Flexível Anti-stress</div><div class="rate">★ 5,0 · 159 vendidos</div><div class="price">R$ 39,90</div><a class="btn btn-green btn-block">Adicionar 🛒</a></div></article>
+    </div>
+  </section>
+
+  <section class="ig">
+    <div class="ic">📸</div>
+    <div><h3>Cola no nosso Instagram!</h3><p>Timelapse das impressões, drops e orçamento na DM. @l3d_labz</p></div>
+    <a class="btn">Seguir @l3d_labz</a>
+  </section>
+</main>
+<footer><div class="wrap foot"><div><strong>L3D Labz</strong> · do print ao pódio.</div><div>© 2026 · l3dlabz.com.br · @l3d_labz</div></div></footer>
+</body>
+</html>
