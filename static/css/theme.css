@@ -2937,3 +2937,118 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
    flex container faz o card preencher 100% da altura da célula. */
 .product-grid > * { display: flex; }
 .product-grid > * > .product-card { flex: 1 1 100%; width: 100%; height: 100%; }
+
+/* =======================================================================
+   SKIN "VIBRANTE MAKER" — autoritativo (vence as regras [data-theme] e
+   !important existentes). Reproduz o sketch 002 variante B.
+   ======================================================================= */
+
+/* ---- HERO: cartão com borda dura + degradê verde→azul + textura de pontos ---- */
+.geek-hero, .geek-hero--clean {
+  border: 3px solid var(--ink) !important;
+  border-radius: 28px !important;
+  background: linear-gradient(135deg, #2FA84F 0%, #27a07a 45%, #2BA6E0 100%) !important;
+  color: #fff !important;
+  position: relative !important;
+  overflow: hidden !important;
+  min-height: auto !important;
+  padding: clamp(1.9rem, 3vw, 3rem) !important;
+  box-shadow: 6px 6px 0 var(--ink) !important;
+}
+.geek-hero::before, .geek-hero--clean::before {
+  content: "" !important; position: absolute !important; inset: 0 !important;
+  background-image: radial-gradient(rgba(255,255,255,.18) 2px, transparent 2px) !important;
+  background-size: 26px 26px !important; opacity: .5 !important; pointer-events: none !important; display: block !important;
+}
+.geek-hero::after { display: none !important; }
+.geek-hero .gh-inner, .geek-hero--clean .gh-inner { position: relative; z-index: 2; color: #fff !important; max-width: 600px; }
+.geek-hero h1, .geek-hero--clean h1 { color: #fff !important; font-weight: 800 !important; }
+.geek-hero .lead, .geek-hero--clean .lead { color: rgba(255,255,255,.95) !important; }
+.geek-hero .eyebrow, .geek-hero--clean .eyebrow {
+  display: inline-flex; align-items: center; gap: .5rem;
+  color: #fff !important; background: rgba(255,255,255,.22); padding: .4rem .85rem;
+  border-radius: 999px; letter-spacing: .08em; backdrop-filter: blur(4px);
+}
+/* botões do hero → brancos com sombra-offset dura */
+.geek-hero .gh-btn.primary, .geek-hero--clean .gh-btn.primary {
+  background: #fff !important; color: var(--ink) !important; border: 2.5px solid var(--ink) !important;
+  border-radius: 12px !important; box-shadow: 3px 3px 0 rgba(0,0,0,.28) !important;
+}
+.geek-hero .gh-btn.primary:hover, .geek-hero--clean .gh-btn.primary:hover {
+  transform: translate(-1px,-1px) !important; box-shadow: 4px 4px 0 rgba(0,0,0,.28) !important;
+}
+.geek-hero .gh-btn.ghost, .geek-hero--clean .gh-btn.ghost {
+  background: transparent !important; color: #fff !important; border: 2.5px solid #fff !important; border-radius: 12px !important;
+}
+/* visualizador 3D → cartão branco com borda dura + sombra-offset + flag "NOVO" */
+.geek-hero .gh-viewer, .geek-hero--clean .gh-viewer {
+  background: #fff !important; border: 3px solid var(--ink) !important; border-radius: 22px !important;
+  box-shadow: 8px 8px 0 rgba(0,0,0,.22) !important; position: relative !important; overflow: visible !important; z-index: 2;
+}
+.geek-hero .gh-viewer::after, .geek-hero--clean .gh-viewer::after {
+  content: "NOVO ⚡"; position: absolute; top: -15px; right: 18px;
+  background: #FFD23F; color: var(--ink); border: 3px solid var(--ink);
+  font-family: var(--font-display); font-weight: 800; font-size: .8rem;
+  padding: .35rem .7rem; border-radius: 10px; transform: rotate(6deg); z-index: 4;
+}
+.geek-hero .gh-viewer model-viewer, .geek-hero--clean .gh-viewer model-viewer { border-radius: 19px !important; }
+
+/* ---- CARDS DE PRODUTO: borda dura + hover com sombra-offset ---- */
+.product-card,
+[data-theme="light"] .product-card,
+[data-theme="dark"] .product-card {
+  border: 2.5px solid var(--ink) !important;
+  border-radius: 16px !important;
+  box-shadow: none !important;
+  transition: transform .14s var(--ease), box-shadow .14s var(--ease) !important;
+}
+.product-card:hover,
+[data-theme="light"] .product-card:hover,
+[data-theme="dark"] .product-card:hover {
+  transform: translate(-3px,-3px) !important;
+  box-shadow: 6px 6px 0 var(--ink) !important;
+  border-color: var(--ink) !important;
+}
+.product-thumb { border-bottom: 2.5px solid var(--ink) !important; }
+
+/* ---- BOTÕES PRIMÁRIOS / Adicionar → sombra-offset dura ---- */
+.btn-primary,
+[data-theme="light"] .btn-primary,
+[data-theme="dark"] .btn-primary {
+  background: var(--accent) !important; color: #fff !important;
+  border: 2.5px solid var(--ink) !important; border-radius: 12px !important;
+  box-shadow: 3px 3px 0 var(--ink) !important;
+}
+.btn-primary:hover,
+[data-theme="light"] .btn-primary:hover,
+[data-theme="dark"] .btn-primary:hover {
+  transform: translate(-1px,-1px) !important; box-shadow: 4px 4px 0 var(--ink) !important;
+}
+.btn-primary:active { transform: translate(2px,2px) !important; box-shadow: 1px 1px 0 var(--ink) !important; }
+
+/* ---- CHIPS DE CATEGORIA / PILLS → borda dura ---- */
+.cat-chip { border: 2.5px solid var(--ink) !important; border-radius: 999px !important; box-shadow: none !important; }
+.cat-chip:hover { transform: translate(-1px,-1px) !important; box-shadow: 3px 3px 0 var(--ink) !important; }
+.pill, .badge-new, .badge-discount, .badge-soft { border: 2px solid var(--ink) !important; }
+
+/* ---- HEADER → borda inferior grossa ---- */
+.site-header, [data-theme="light"] .site-header, [data-theme="dark"] .site-header {
+  border-bottom: 3px solid var(--ink) !important;
+}
+
+/* dark: o hero mantém degradê e texto branco (var(--ink) já é claro p/ bordas) */
+[data-theme="dark"] .geek-hero, [data-theme="dark"] .geek-hero--clean {
+  background: linear-gradient(135deg, #2FA84F 0%, #27a07a 45%, #2BA6E0 100%) !important;
+}
+
+/* ---- faixas de serviço + prova social no idioma maker (borda dura) ---- */
+.svc-cols, .proof-strip,
+[data-theme="light"] .svc-cols, [data-theme="light"] .proof-strip {
+  border: 2.5px solid var(--ink) !important;
+  border-radius: 18px !important;
+  box-shadow: 4px 4px 0 var(--ink) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-card, .btn-primary, .cat-chip { transition: none !important; }
+}
