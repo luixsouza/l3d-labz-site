@@ -37,6 +37,12 @@
 
   {% include "core/partials/footer.html" %}
 
+  {% if SITE.instagram %}
+  <a class="fab-ig" href="{{ SITE.instagram }}" target="_blank" rel="noopener" aria-label="Fale com a L3D Labz no Instagram">
+    <svg class="icon"><use href="#i-instagram"></use></svg>
+  </a>
+  {% endif %}
+
   <script src="{% static 'js/app.js' %}" defer></script>
   {% block extra_js %}{% endblock %}
 </body>

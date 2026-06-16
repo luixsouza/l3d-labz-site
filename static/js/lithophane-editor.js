@@ -219,6 +219,15 @@
       viewer.setAttribute("auto-rotate", "");
       viewer.setAttribute("touch-action", "pan-y");
       viewer.setAttribute("shadow-intensity", "1");
+      // --- AR: espelha o padrão do product_detail.html ---
+      viewer.setAttribute("ar", "");
+      viewer.setAttribute("ar-modes", "webxr scene-viewer quick-look");
+      var btnAr = document.createElement("button");
+      btnAr.setAttribute("slot", "ar-button");
+      btnAr.setAttribute("type", "button");
+      btnAr.className = "detail-ar-btn";
+      btnAr.innerHTML = '<svg class="icon"><use href="#i-cube"></use></svg> Ver no seu espaço';
+      viewer.appendChild(btnAr);
       viewerWrap.appendChild(viewer);
     }
     viewer.setAttribute("src", data.glb_url);
