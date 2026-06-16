@@ -193,17 +193,21 @@
 </section>
 {% endif %}
 
-<!-- ===================== CTA FINAL ===================== -->
+<!-- ===================== CTA FINAL — Instagram ===================== -->
 <section class="section">
   <div class="container">
-    <div class="shop-cta reveal">
-      <span class="eyebrow eyebrow-center">Fale com a gente</span>
-      <h2>Ficou com dúvida? Chama no WhatsApp</h2>
-      <p>Nossa equipe te ajuda a escolher, personalizar e acompanhar seu pedido do início ao fim.</p>
-      <div class="tag-row">
-        <a href="https://wa.me/" class="btn btn-primary"><svg class="icon"><use href="#i-whats"></use></svg> WhatsApp</a>
-        <a href="{% url 'catalog:product_list' %}" class="btn btn-ghost">Ver catálogo</a>
+    <div class="ig-cta reveal">
+      <div class="ig-cta-ico">
+        <svg class="icon"><use href="#i-instagram"></use></svg>
       </div>
+      <div class="ig-cta-body">
+        <h3>Cola no nosso Instagram!</h3>
+        <p>Timelapse das impressões, drops e novidades em primeira mão. <strong>@l3d_labz</strong></p>
+      </div>
+      <a href="{{ SITE.instagram }}" target="_blank" rel="noopener" class="ig-cta-btn">
+        <svg class="icon"><use href="#i-instagram"></use></svg>
+        Seguir @l3d_labz
+      </a>
     </div>
   </div>
 </section>

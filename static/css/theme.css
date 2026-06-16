@@ -2642,3 +2642,290 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .geek-hero--clean { grid-template-columns: 1fr !important; }
   .geek-hero--clean .gh-viewer { justify-self: center; }
 }
+
+/* =========================================================================
+   VIBRANTE MAKER (sketch 002-B) — vence a cascata
+   Apêndice final: tokens, bordas duras, sombra-offset, cards, hero degradê,
+   CTA Instagram. Não altera os layers anteriores (v3/v4/Atelier/Clean).
+   ========================================================================= */
+
+/* --- tokens Vibrante Maker --- */
+:root {
+  /* tinta de borda dura: no dark usamos branco-esverdeado para bordas legíveis */
+  --ink: rgba(233, 237, 246, 0.85);
+  /* sombra-offset padrão (em cima do fundo escuro usa tom claro) */
+  --offset-shadow: 4px 4px 0 var(--ink);
+  --offset-shadow-hover: 6px 6px 0 var(--ink);
+}
+[data-theme="light"] {
+  /* no claro: tinta verde-escura da identidade maker */
+  --ink: #0C1F15;
+  --offset-shadow: 4px 4px 0 var(--ink);
+  --offset-shadow-hover: 6px 6px 0 var(--ink);
+}
+
+/* --- botão primário com borda dura + sombra-offset --- */
+.btn-primary {
+  border: 2.5px solid var(--ink) !important;
+  box-shadow: var(--offset-shadow) !important;
+  transition: transform .14s, box-shadow .14s !important;
+}
+.btn-primary:hover {
+  transform: translate(-1px, -1px) !important;
+  box-shadow: var(--offset-shadow-hover) !important;
+}
+.btn-primary:active {
+  transform: translate(2px, 2px) !important;
+  box-shadow: 1px 1px 0 var(--ink) !important;
+}
+
+/* --- cards de produto: borda dura + sombra-offset no hover --- */
+.product-card {
+  border: 2.5px solid var(--ink) !important;
+  transition: transform .14s, box-shadow .14s !important;
+}
+.product-card:hover {
+  transform: translate(-2px, -2px) !important;
+  box-shadow: var(--offset-shadow-hover) !important;
+  border-color: var(--ink) !important;
+}
+
+/* thumb: bloco de cor pastel derivado de --ph-accent + borda inferior dura */
+.product-thumb {
+  background: color-mix(in srgb, var(--ph-accent, var(--accent)) 16%, #fff) !important;
+  border-bottom: 2.5px solid var(--ink) !important;
+}
+[data-theme="dark"] .product-thumb,
+:root:not([data-theme="light"]) .product-thumb {
+  background: color-mix(in srgb, var(--ph-accent, var(--accent)) 18%, var(--bg-card)) !important;
+}
+
+/* thumb: sem escala excessiva no hover (borda dura é suficiente) */
+.product-card:hover .product-thumb img { transform: scale(1.03); }
+
+/* --- badges com borda dura --- */
+.badge-new,
+.badge-discount {
+  border: 2px solid var(--ink) !important;
+  border-radius: 8px !important;
+}
+.badge-soft {
+  border: 1.5px solid var(--ink) !important;
+  border-radius: 8px !important;
+}
+
+/* --- pills e chips de categoria com borda dura --- */
+.pill,
+.cat-chip {
+  border: 2.5px solid var(--ink) !important;
+}
+.pill.active {
+  background: var(--ink) !important;
+  color: #7CF29B !important;
+  border-color: var(--ink) !important;
+}
+[data-theme="light"] .pill.active {
+  color: #7CF29B !important;
+}
+.pill:hover:not(.active),
+.cat-chip:hover {
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-card)) !important;
+  border-color: var(--ink) !important;
+  transform: none !important;
+}
+[data-theme="light"] .cat-chip:hover {
+  background: #EAF7EE !important;
+}
+
+/* --- altura igual dos cards: clamp no nome + ação na base --- */
+.product-body {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 !important;
+}
+.product-name {
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  min-height: 2.4em !important;
+}
+/* price-row não consome mais o espaço flex sozinho — a ação vai para a base */
+.price-row {
+  margin-top: 0 !important;
+}
+.product-actions {
+  margin-top: auto !important;
+}
+
+/* --- hero degradê verde→azul com textura de pontos (ambos os temas) --- */
+.geek-hero--clean {
+  position: relative !important;
+  background: linear-gradient(135deg, var(--accent) 0%, #27a07a 45%, var(--accent-blue) 100%) !important;
+  border: 3px solid var(--ink) !important;
+  border-radius: var(--radius-lg) !important;
+  overflow: hidden !important;
+  color: #fff !important;
+}
+.geek-hero--clean::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background-image: radial-gradient(rgba(255,255,255,.18) 2px, transparent 2px) !important;
+  background-size: 26px 26px !important;
+  opacity: .5 !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+/* texto em branco sobre o degradê (ambos temas) */
+.geek-hero--clean .gh-inner { position: relative; z-index: 1; }
+.geek-hero--clean h1,
+.geek-hero--clean .lead,
+.geek-hero--clean .eyebrow {
+  color: #fff !important;
+}
+/* sobrescreve o hero light off-white do Clean & Elegante */
+[data-theme="light"] .geek-hero--clean {
+  background: linear-gradient(135deg, var(--accent) 0%, #27a07a 45%, var(--accent-blue) 100%) !important;
+  border: 3px solid var(--ink) !important;
+}
+[data-theme="light"] .geek-hero--clean h1,
+[data-theme="light"] .geek-hero--clean .lead,
+[data-theme="light"] .geek-hero--clean .eyebrow {
+  color: #fff !important;
+}
+
+/* botões do hero: brancos com offset, ghost outline branco */
+.geek-hero--clean .gh-btn.primary {
+  background: #fff !important;
+  color: var(--ink) !important;
+  border: 2.5px solid var(--ink) !important;
+  box-shadow: 3px 3px 0 rgba(0,0,0,.25) !important;
+}
+.geek-hero--clean .gh-btn.primary:hover {
+  transform: translate(-1px, -1px) !important;
+  box-shadow: 4px 4px 0 rgba(0,0,0,.25) !important;
+}
+[data-theme="light"] .geek-hero--clean .gh-btn.primary {
+  background: #fff !important;
+  color: var(--ink) !important;
+  border: 2.5px solid var(--ink) !important;
+  box-shadow: 3px 3px 0 rgba(0,0,0,.25) !important;
+}
+[data-theme="light"] .geek-hero--clean .gh-btn.primary:hover {
+  transform: translate(-1px, -1px) !important;
+  box-shadow: 4px 4px 0 rgba(0,0,0,.25) !important;
+}
+.geek-hero--clean .gh-btn.ghost {
+  background: transparent !important;
+  color: #fff !important;
+  border: 2.5px solid rgba(255,255,255,.7) !important;
+  box-shadow: none !important;
+}
+.geek-hero--clean .gh-btn.ghost:hover {
+  background: rgba(255,255,255,.15) !important;
+  border-color: #fff !important;
+}
+[data-theme="light"] .geek-hero--clean .gh-btn.ghost {
+  background: transparent !important;
+  color: #fff !important;
+  border: 2.5px solid rgba(255,255,255,.7) !important;
+}
+[data-theme="light"] .geek-hero--clean .gh-btn.ghost:hover {
+  background: rgba(255,255,255,.15) !important;
+  border-color: #fff !important;
+}
+
+/* viewer 3D no hero: cartão branco com borda dura (estilo hero-card do mockup) */
+.gh-viewer {
+  position: relative;
+  z-index: 1;
+}
+.gh-viewer model-viewer {
+  background: #fff !important;
+  border: 3px solid var(--ink) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: 8px 8px 0 rgba(0,0,0,.22) !important;
+}
+[data-theme="light"] .gh-viewer model-viewer {
+  background: #fff !important;
+  border: 3px solid var(--ink) !important;
+  box-shadow: 8px 8px 0 rgba(0,0,0,.22) !important;
+}
+.gh-viewer-caption { color: rgba(255,255,255,.85) !important; }
+[data-theme="light"] .gh-viewer-caption { color: rgba(255,255,255,.85) !important; }
+.gh-deco { position: relative; z-index: 1; }
+
+/* --- FIX split hero: reafirmar grid (deve vir depois dos overrides acima) --- */
+.geek-hero--clean { grid-template-columns: 1.15fr .85fr !important; align-items: center !important; }
+.geek-hero--clean .gh-viewer { justify-self: end !important; }
+@media (max-width: 820px) {
+  .geek-hero--clean { grid-template-columns: 1fr !important; }
+  .geek-hero--clean .gh-viewer { justify-self: center !important; }
+}
+
+/* --- CTA Instagram (.ig-cta) --- */
+.ig-cta {
+  background: linear-gradient(120deg, #F58529, #DD2A7B 55%, #515BD4);
+  color: #fff;
+  border: 3px solid var(--ink);
+  box-shadow: 7px 7px 0 var(--ink);
+  border-radius: var(--radius-lg);
+  padding: clamp(1.8rem, 4vw, 2.6rem) clamp(1.4rem, 4vw, 2.2rem);
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+  flex-wrap: wrap;
+}
+.ig-cta .ig-cta-ico {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+}
+.ig-cta .ig-cta-ico .icon { width: 46px; height: 46px; }
+.ig-cta .ig-cta-body { flex: 1; min-width: 180px; }
+.ig-cta .ig-cta-body h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 1rem + 1.2vw, 1.8rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: .45rem;
+}
+.ig-cta .ig-cta-body p {
+  font-size: .95rem;
+  opacity: .95;
+  margin: 0;
+}
+.ig-cta .ig-cta-btn {
+  flex-shrink: 0;
+  background: #fff;
+  color: #0C1F15;
+  border: 2.5px solid rgba(0,0,0,.35);
+  border-radius: 12px;
+  padding: .85rem 1.6rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: .95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  box-shadow: 3px 3px 0 rgba(0,0,0,.3);
+  text-decoration: none;
+  transition: transform .14s, box-shadow .14s;
+  white-space: nowrap;
+}
+.ig-cta .ig-cta-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 rgba(0,0,0,.3);
+}
+.ig-cta .ig-cta-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 rgba(0,0,0,.3);
+}
+.ig-cta .ig-cta-btn .icon { width: 18px; height: 18px; }
+@media (max-width: 600px) {
+  .ig-cta { flex-direction: column; align-items: flex-start; }
+  .ig-cta .ig-cta-btn { width: 100%; justify-content: center; }
+}
