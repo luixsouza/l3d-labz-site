@@ -10,7 +10,7 @@ from apps.core.layers import BaseService
 from .mappers import CategoryMapper, ProductMapper
 from .queries import CategoryQuery, ProductQuery
 
-PAGE_SIZE = 12
+PAGE_SIZE = 24
 
 
 class CatalogService(BaseService):
@@ -69,20 +69,21 @@ class CatalogService(BaseService):
         produto = curated or featured or candidates[0]
         return ProductMapper.to_dict(produto)
 
-    # ---- galeria de modelos 3D ----
-    @staticmethod
-    def gallery() -> dict[str, Any]:
-        return {"products": ProductMapper.to_list(ProductQuery.with_3d())}
-
     # ---- catálogo (listagem com filtros + paginação) ----
     @staticmethod
-    def browse(params, page: int = 1) -> dict[str, Any]:
+    def browse(params, page: int = 1, only_3d: bool = False) -> dict[str, Any]:
+        """Monta o contexto completo do catálogo (paginação + filtros + ordenação).
+
+        only_3d=True restringe aos produtos com model_3d, usado pela página /modelos-3d/.
+        """
         category_slug = params.get("categoria") or None
         query = params.get("q") or None
         sort = params.get("sort") or "relevance"
         material = params.get("material") or None
         min_price = _to_decimal(params.get("min"))
         max_price = _to_decimal(params.get("max"))
+        color = params.get("color") or None
+        filament = params.get("filament") or None
 
         qs = ProductQuery.search(
             category_slug=category_slug,
@@ -91,6 +92,9 @@ class CatalogService(BaseService):
             min_price=min_price,
             max_price=max_price,
             material=material,
+            only_3d=only_3d,
+            color=color,
+            filament=filament,
         )
         paginator = Paginator(qs, PAGE_SIZE)
         page_obj = paginator.get_page(page)
@@ -113,6 +117,9 @@ class CatalogService(BaseService):
             "materials": ProductQuery.materials(),
             "active_material": material or "",
             "query": query or "",
+            "only_3d": only_3d,
+            "active_color": color or "",
+            "active_filament": filament or "",
             "promotions": PromotionService.list_active_promotions(limit=5),
             "flash_sale": ProductMapper.to_list(ProductQuery.on_sale(8)),
             "best_sellers": ProductMapper.to_list(ProductQuery.featured(6)),

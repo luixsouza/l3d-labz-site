@@ -1,13 +1,32 @@
 {% extends "base.html" %}
-{% block title %}Catálogo · {{ SITE.name }}{% endblock %}
+{% block title %}{% if only_3d %}Modelos 3D{% else %}Catálogo{% endif %} · {{ SITE.name }}{% endblock %}
 {% block content %}
 <section class="section" style="padding-top:1.8rem">
   <div class="container">
 
+    {% if only_3d %}
+    {# ---- cabeçalho de Modelos 3D ---- #}
+    <div class="search-hero reveal" style="margin-bottom:1rem">
+      <span class="eyebrow eyebrow-center">Visualização 3D</span>
+      <h1 style="max-width:18ch;margin-inline:auto">Modelos 3D</h1>
+      <p class="text-muted">Explore o modelo antes de comprar — gire, dê zoom e veja cada detalhe.</p>
+    </div>
+    {% endif %}
+
+    {# ---- URL-base para forms/links deste modo ---- #}
+    {% if only_3d %}
+      {% url 'catalog:models_3d' as base_url %}
+    {% else %}
+      {% url 'catalog:product_list' as base_url %}
+    {% endif %}
+
     <!-- ===================== BUSCA ===================== -->
-    <form method="get" action="{% url 'catalog:product_list' %}" class="search-bar reveal">
+    <form method="get" action="{{ base_url }}" class="search-bar reveal">
       {% if active_category %}<input type="hidden" name="categoria" value="{{ active_category.slug }}">{% endif %}
       <input type="hidden" name="sort" value="{{ current_sort }}">
+      {% if active_material %}<input type="hidden" name="material" value="{{ active_material }}">{% endif %}
+      {% if active_color %}<input type="hidden" name="color" value="{{ active_color }}">{% endif %}
+      {% if active_filament %}<input type="hidden" name="filament" value="{{ active_filament }}">{% endif %}
       <input type="search" name="q" value="{{ query }}" placeholder="Buscar action figures, gadgets, réplicas…" aria-label="Buscar no catálogo">
       <button class="btn btn-primary search-go" type="submit" aria-label="Buscar"><svg class="icon"><use href="#i-search"></use></svg></button>
     </form>
@@ -15,16 +34,16 @@
     <!-- ===================== FILTRO POR CATEGORIA ===================== -->
     <div class="filter-bar reveal">
       <div class="cat-pills">
-        <a class="pill {% if not active_category %}active{% endif %}" href="?sort={{ current_sort }}{% if query %}&q={{ query }}{% endif %}">
+        <a class="pill {% if not active_category %}active{% endif %}" href="{{ base_url }}?sort={{ current_sort }}{% if query %}&q={{ query }}{% endif %}{% if active_color %}&color={{ active_color }}{% endif %}{% if active_filament %}&filament={{ active_filament }}{% endif %}">
           <svg class="icon"><use href="#i-layers"></use></svg> Todas
         </a>
         {% for cat in categories %}
-          <a class="pill {% if active_category.slug == cat.slug %}active{% endif %}" href="?categoria={{ cat.slug }}&sort={{ current_sort }}{% if query %}&q={{ query }}{% endif %}">
+          <a class="pill {% if active_category.slug == cat.slug %}active{% endif %}" href="{{ base_url }}?categoria={{ cat.slug }}&sort={{ current_sort }}{% if query %}&q={{ query }}{% endif %}{% if active_color %}&color={{ active_color }}{% endif %}{% if active_filament %}&filament={{ active_filament }}{% endif %}">
             <svg class="icon" style="color:{{ cat.accent }}"><use href="#i-{{ cat.icon }}"></use></svg> {{ cat.name }}
           </a>
         {% endfor %}
       </div>
-      <form method="get" class="tools">
+      <form method="get" action="{{ base_url }}" class="tools">
         {% if active_category %}<input type="hidden" name="categoria" value="{{ active_category.slug }}">{% endif %}
         {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
         <input type="number" name="min" placeholder="mín R$" value="{{ request.GET.min }}" step="0.01">
@@ -37,19 +56,38 @@
           {% endfor %}
         </select>
         {% endif %}
+        {# ---- filtro: nº de cores ---- #}
+        <select name="color" onchange="this.form.submit()">
+          <option value="">Qualquer cor</option>
+          <option value="1" {% if active_color == "1" %}selected{% endif %}>1 cor</option>
+          <option value="2" {% if active_color == "2" %}selected{% endif %}>2 cores</option>
+          <option value="3" {% if active_color == "3" %}selected{% endif %}>3 cores</option>
+          <option value="4" {% if active_color == "4" %}selected{% endif %}>4+ cores</option>
+        </select>
+        {# ---- filtro: faixa de filamento ---- #}
+        <select name="filament" onchange="this.form.submit()">
+          <option value="">Qualquer filamento</option>
+          <option value="0-50" {% if active_filament == "0-50" %}selected{% endif %}>até 50 g</option>
+          <option value="50-150" {% if active_filament == "50-150" %}selected{% endif %}>50–150 g</option>
+          <option value="150+" {% if active_filament == "150+" %}selected{% endif %}>150 g+</option>
+        </select>
+        {# ---- ordenação (inclui sorts de filamento/cores) ---- #}
         <select name="sort" onchange="this.form.submit()">
           <option value="relevance" {% if current_sort == "relevance" %}selected{% endif %}>Relevância</option>
           <option value="new" {% if current_sort == "new" %}selected{% endif %}>Mais novos</option>
           <option value="popular" {% if current_sort == "popular" %}selected{% endif %}>Mais vendidos</option>
           <option value="price_asc" {% if current_sort == "price_asc" %}selected{% endif %}>Menor preço</option>
           <option value="price_desc" {% if current_sort == "price_desc" %}selected{% endif %}>Maior preço</option>
+          <option value="filament_asc" {% if current_sort == "filament_asc" %}selected{% endif %}>Menos filamento</option>
+          <option value="filament_desc" {% if current_sort == "filament_desc" %}selected{% endif %}>Mais filamento</option>
+          <option value="colors_desc" {% if current_sort == "colors_desc" %}selected{% endif %}>Mais cores</option>
         </select>
         <button class="btn btn-ghost btn-sm" type="submit">Aplicar</button>
       </form>
     </div>
 
     <p class="text-dim reveal" style="margin:1.2rem 0 1rem;font-size:.9rem">
-      {{ total }} produto{{ total|pluralize }}{% if active_category %} em {{ active_category.name }}{% endif %}{% if query %} para “{{ query }}”{% endif %}
+      {{ total }} produto{{ total|pluralize }}{% if active_category %} em {{ active_category.name }}{% endif %}{% if query %} para "{{ query }}"{% endif %}
     </p>
 
     <!-- ===================== PRODUTOS (cards) ===================== -->
@@ -60,17 +98,18 @@
         {% endfor %}
       </div>
 
+      {# ---- paginação com {% querystring %} — preserva TODOS os params automaticamente ---- #}
       {% if page_obj.has_other_pages %}
         <nav class="pagination">
           {% if page_obj.has_previous %}
-            <a href="?{% if active_category %}categoria={{ active_category.slug }}&{% endif %}sort={{ current_sort }}&page={{ page_obj.previous_page_number }}"><svg class="icon"><use href="#i-chevron-left"></use></svg></a>
+            <a href="{% querystring page=page_obj.previous_page_number %}"><svg class="icon"><use href="#i-chevron-left"></use></svg></a>
           {% endif %}
           {% for num in page_obj.paginator.page_range %}
             {% if num == page_obj.number %}<span class="current">{{ num }}</span>
-            {% else %}<a href="?{% if active_category %}categoria={{ active_category.slug }}&{% endif %}sort={{ current_sort }}&page={{ num }}">{{ num }}</a>{% endif %}
+            {% else %}<a href="{% querystring page=num %}">{{ num }}</a>{% endif %}
           {% endfor %}
           {% if page_obj.has_next %}
-            <a href="?{% if active_category %}categoria={{ active_category.slug }}&{% endif %}sort={{ current_sort }}&page={{ page_obj.next_page_number }}"><svg class="icon"><use href="#i-chevron-right"></use></svg></a>
+            <a href="{% querystring page=page_obj.next_page_number %}"><svg class="icon"><use href="#i-chevron-right"></use></svg></a>
           {% endif %}
         </nav>
       {% endif %}
@@ -79,7 +118,7 @@
         <div class="ph"><svg class="icon"><use href="#i-search"></use></svg></div>
         <h3>Nada encontrado</h3>
         <p class="text-muted">Tente outro termo ou remova os filtros.</p>
-        <a href="{% url 'catalog:product_list' %}" class="btn btn-ghost mt-2">Limpar filtros</a>
+        <a href="{{ base_url }}" class="btn btn-ghost mt-2">Limpar filtros</a>
       </div>
     {% endif %}
   </div>

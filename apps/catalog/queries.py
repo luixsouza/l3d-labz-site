@@ -5,7 +5,7 @@ lançamentos) são cacheadas; a busca filtrada usa TTL curto.
 """
 from __future__ import annotations
 
-from django.db.models import Count, F, Q
+from django.db.models import Case, Count, F, IntegerField, Q, Value, When
 
 from apps.core import cache as cache_utils
 
@@ -121,9 +121,31 @@ class ProductQuery:
         )
 
     @staticmethod
-    def search(*, category_slug=None, query=None, sort="relevance", min_price=None, max_price=None, material=None):
-        """Busca filtrada — retorna um QuerySet (a view pagina). TTL curto via service."""
+    def search(
+        *,
+        category_slug=None,
+        query=None,
+        sort="relevance",
+        min_price=None,
+        max_price=None,
+        material=None,
+        only_3d=False,
+        color=None,
+        filament=None,
+    ):
+        """Busca filtrada — retorna um QuerySet (a view pagina). TTL curto via service.
+
+        Novos parâmetros:
+        - only_3d: filtra apenas produtos com model_3d preenchido.
+        - color: "1"/"2"/"3"/"4" — nº de cores ("4" = 4+ cores).
+        - filament: faixa de filamento em gramas ("0-50"/"50-150"/"150+");
+          produtos com filament_grams=0 (desconhecido) nunca casam.
+        """
         qs = Product.objects.active().with_relations()
+
+        # --- filtros básicos ---
+        if only_3d:
+            qs = qs.exclude(model_3d="")
         if category_slug:
             qs = qs.filter(category__slug=category_slug)
         if material:
@@ -134,6 +156,46 @@ class ProductQuery:
             qs = qs.filter(price__gte=min_price)
         if max_price is not None:
             qs = qs.filter(price__lte=max_price)
+
+        # --- filtro por nº de cores ---
+        if color is not None:
+            try:
+                n = int(color)
+                if n >= 4:
+                    qs = qs.filter(color_count__gte=4)
+                else:
+                    qs = qs.filter(color_count=n)
+            except (ValueError, TypeError):
+                pass  # valor não-numérico → ignorar
+
+        # --- filtro por faixa de filamento (desconhecido = filament_grams=0 nunca casa) ---
+        if filament == "0-50":
+            qs = qs.filter(filament_grams__gt=0, filament_grams__lte=50)
+        elif filament == "50-150":
+            qs = qs.filter(filament_grams__gt=50, filament_grams__lte=150)
+        elif filament == "150+":
+            qs = qs.filter(filament_grams__gt=150)
+
+        # --- ordenação ---
+        # Para filament_asc/desc: zeros (desconhecido) sempre ao fim via campo anotado.
+        if sort in ("filament_asc", "filament_desc"):
+            # _unknown_fil=1 quando filament_grams=0 (desconhecido), 0 caso contrário.
+            # order_by sempre coloca os zeros por último, independente da direção.
+            qs = qs.annotate(
+                _unknown_fil=Case(
+                    When(filament_grams=0, then=Value(1)),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                )
+            )
+            if sort == "filament_asc":
+                return qs.order_by("_unknown_fil", "filament_grams", "-sales_count")
+            else:  # filament_desc
+                return qs.order_by("_unknown_fil", "-filament_grams", "-sales_count")
+
+        if sort == "colors_desc":
+            # color_count tem default=1 — não há "desconhecido", não precisa do truque.
+            return qs.order_by("-color_count", "-sales_count")
 
         ordering = {
             "new": "-created_at",

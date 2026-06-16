@@ -249,7 +249,7 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; margin: 0 0 .4e
 .cat-card .count { font-size: .8rem; color: var(--text-dim); position: relative; }
 
 /* ----------------------------------------------------------- produtos */
-.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 1.4rem; }
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 1.4rem; }
 .product-card {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
   overflow: hidden; display: flex; flex-direction: column;
@@ -330,6 +330,10 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; margin: 0 0 .4e
 .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.4rem; gap: 1rem; flex-wrap: wrap; }
 .chip { display: inline-flex; align-items: center; gap: .4rem; padding: .42rem .8rem; border-radius: 999px; background: var(--bg-card); border: 1px solid var(--border); font-size: .82rem; }
 .chip .icon { color: var(--accent-2); }
+
+/* chip de specs do produto (filamento/cores) — discreto, só no card de catálogo */
+.spec-chip { display: inline-flex; align-items: center; gap: .35rem; font-size: .72rem; color: var(--text-dim); background: var(--bg-soft); border: 1px solid var(--border-soft); border-radius: 999px; padding: .22rem .6rem; }
+.spec-chip .icon { width: .95em; height: .95em; color: var(--accent-2); }
 
 /* ----------------------------------------------------------- paginação */
 .pagination { display: flex; gap: .4rem; justify-content: center; margin-top: 2.6rem; }
@@ -479,8 +483,9 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; margin: 0 0 .4e
 /* reveal on scroll (ativado por app.js via IntersectionObserver) */
 .reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s var(--ease), transform .7s var(--ease); will-change: opacity, transform; }
 .reveal.is-visible { opacity: 1; transform: none; }
-/* stagger por índice (definido inline via --i) */
-.reveal[style*="--i"] { transition-delay: calc(var(--i) * 70ms); }
+/* stagger por índice (definido inline via --i) — capado em 420ms para evitar
+   "vazão" branca na primeira dobra quando há 24+ cards por página */
+.reveal[style*="--i"] { transition-delay: min(calc(var(--i) * 35ms), 420ms); }
 
 /* skeleton de carregamento */
 .skeleton { background: linear-gradient(100deg, var(--bg-card) 30%, var(--bg-elevated) 50%, var(--bg-card) 70%); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; border-radius: var(--radius-sm); }
@@ -1405,8 +1410,11 @@ select { -webkit-appearance: none; -moz-appearance: none; appearance: none; curs
 .flash-block .block-head { align-items: center; gap: 1.2rem; margin-bottom: 1.5rem; }
 .flash-block .block-title { font-size: 1.45rem; }
 
-/* grids com mais respiro e alinhamento */
-.product-grid { gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(238px, 1fr)); }
+/* grids densos — min 210px cabe mais colunas no desktop */
+.product-grid { gap: 1.3rem; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+/* mobile: 2 colunas até 520px, 1 coluna somente em telas muito estreitas */
+@media (max-width: 520px) { .product-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; } }
+@media (max-width: 340px) { .product-grid { grid-template-columns: 1fr; } }
 .flash-block .product-grid { grid-template-columns: repeat(4, 1fr); }
 @media (max-width: 1100px) { .flash-block .product-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 860px)  { .flash-block .product-grid { grid-template-columns: repeat(2, 1fr); } }
