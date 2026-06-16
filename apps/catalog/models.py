@@ -88,6 +88,14 @@ class Product(TimeStampedModel):
     material = models.CharField("material", max_length=60, default="PLA")
     dimensions = models.CharField("dimensões", max_length=80, blank=True)
     print_time_hours = models.PositiveIntegerField("tempo de impressão (h)", default=4)
+    filament_grams = models.PositiveIntegerField(
+        "gramas de filamento", default=0,
+        help_text="Consumo total de filamento em gramas extraído do 3MF. 0 = desconhecido.",
+    )
+    color_count = models.PositiveSmallIntegerField(
+        "número de cores", default=1,
+        help_text="Quantidade de cores/filamentos distintos no 3MF.",
+    )
 
     is_featured = models.BooleanField("destaque", default=False)
     is_active = models.BooleanField("ativo", default=True)

@@ -54,6 +54,10 @@ class ProductMapper(BaseMapper[Product]):
             "has_stl": instance.has_stl,
             "model_3d_url": instance.model_3d.url if instance.model_3d else "",
             "model_stl_url": instance.model_stl.url if instance.model_stl else "",
+            # Specs de filamento (extraídas do 3MF via extrair_specs_3mf).
+            "filament_grams": instance.filament_grams,
+            "color_count": instance.color_count,
+            "filament_display": f"{instance.filament_grams} g" if instance.filament_grams else "",
         }
 
     @classmethod
