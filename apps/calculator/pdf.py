@@ -29,6 +29,9 @@ from reportlab.lib.enums import TA_RIGHT
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import cm
+from reportlab.graphics import renderPDF
+from reportlab.graphics.barcode import qr
+from reportlab.graphics.shapes import Drawing, Rect, String
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 # ---- paleta L3D Labz ----
@@ -81,6 +84,24 @@ def _ref_orcamento(nome: str, d: date) -> str:
     """Nº de orçamento determinístico a partir do nome do cliente + data."""
     h = int(hashlib.md5((nome or "cliente").encode("utf-8")).hexdigest(), 16) % 10000
     return f"ORC-{d:%Y%m%d}-{h:04d}"
+
+
+def _qr_drawing(url: str, lado: float) -> Drawing | None:
+    """Retorna um Drawing quadrado com QR code apontando para `url`, ou None se url vazio.
+
+    Usa reportlab.graphics.barcode.qr (já incluído no reportlab — zero dep nova).
+    Cor padrão preta sobre fundo branco: legível por qualquer leitor de câmera.
+    """
+    if not url:
+        return None
+    widget = qr.QrCodeWidget(url)
+    b = widget.getBounds()  # (x0, y0, x1, y1) do widget em pontos nativos
+    w, h = b[2] - b[0], b[3] - b[1]
+    if w == 0 or h == 0:
+        return None
+    d = Drawing(lado, lado, transform=[lado / w, 0, 0, lado / h, 0, 0])
+    d.add(widget)
+    return d
 
 
 def _monograma(c, x, ytop, size, sq_color, txt_color):
@@ -243,6 +264,53 @@ def gerar_orcamento_pdf(dados: dict) -> bytes:
                    style=TableStyle([("LEFTPADDING", (0, 0), (-1, -1), 0), ("RIGHTPADDING", (0, 0), (-1, -1), 0),
                                      ("TOPPADDING", (0, 0), (-1, -1), 0), ("BOTTOMPADDING", (0, 0), (-1, 0), 2)]))
     story.append(resumo)
+
+    # ---- CTA "Para aprovar" + QR Instagram ----
+    # Exibido entre o resumo e o bloco de condições.
+    # Degrada para só texto quando _IG_URL estiver vazio.
+    _QR_LADO = 2.4 * cm
+    qr_d = _qr_drawing(_IG_URL, _QR_LADO)
+    s_cta_h = ParagraphStyle("ctah", fontName="Helvetica-Bold", fontSize=7.5,
+                              textColor=_G_DARK, leading=11, spaceAfter=3)
+    s_cta_b = ParagraphStyle("ctab", fontName="Helvetica", fontSize=9.5,
+                              textColor=_TEXTO, leading=14)
+    if _IG:
+        cta_txt = (
+            f'Gostou do orçamento? Fale com a gente no Instagram '
+            f'<font name="Helvetica-Bold" color="#1B7E37">{_IG}</font> '
+            f'ou aponte a câmera no QR ao lado.'
+        )
+    else:
+        cta_txt = "Gostou do orçamento? Entre em contato para aprovar."
+    cta_texto_col = [
+        Paragraph("PARA APROVAR", s_cta_h),
+        Paragraph(cta_txt, s_cta_b),
+    ]
+    if qr_d is not None:
+        # duas colunas: texto | QR
+        cta_bloco = Table(
+            [[cta_texto_col, qr_d]],
+            colWidths=[_CW - _QR_LADO - 0.4 * cm, _QR_LADO],
+            style=TableStyle([
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                ("LEFTPADDING", (0, 0), (-1, -1), 0),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+                ("TOPPADDING", (0, 0), (-1, -1), 0),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+            ]))
+    else:
+        # sem QR — coluna única
+        cta_bloco = Table(
+            [[cta_texto_col]],
+            colWidths=[_CW],
+            style=TableStyle([
+                ("LEFTPADDING", (0, 0), (-1, -1), 0),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+                ("TOPPADDING", (0, 0), (-1, -1), 0),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+            ]))
+    story.append(Spacer(1, 0.55 * cm))
+    story.append(cta_bloco)
 
     # ---- condições & observações ----
     obs = (dados.get("observacoes") or "").strip()
