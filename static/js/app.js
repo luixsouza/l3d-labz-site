@@ -148,6 +148,13 @@
         wrap.querySelectorAll("[data-media-panel]").forEach(function (panel) {
           panel.classList.toggle("active", panel.getAttribute("data-media-panel") === target);
         });
+        // Carrega o GLB sob demanda ao abrir a aba 3D (reveal="manual"):
+        // o IntersectionObserver do model-viewer não dispara para um painel
+        // que nasce display:none, então forçamos o load aqui (idempotente).
+        if (target === "3d") {
+          var mv = wrap.querySelector("model-viewer");
+          if (mv && typeof mv.dismissPoster === "function") mv.dismissPoster();
+        }
       });
     });
   });

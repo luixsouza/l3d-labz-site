@@ -29,7 +29,7 @@
         </div>
         {% endif %}
 
-        <div class="detail-media" data-media-panel="fotos">
+        <div class="detail-media active" data-media-panel="fotos">
           {% if product.gallery|length > 1 %}
             <div class="carousel">
               <div class="carousel-track">
@@ -69,7 +69,8 @@
             auto-rotate
             ar
             ar-modes="webxr scene-viewer quick-look"
-            reveal="interaction"
+            loading="lazy"
+            reveal="manual"
             environment-image="neutral"
             exposure="1.15"
             shadow-intensity="0.9"
