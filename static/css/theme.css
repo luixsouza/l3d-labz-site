@@ -2929,3 +2929,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .ig-cta { flex-direction: column; align-items: flex-start; }
   .ig-cta .ig-cta-btn { width: 100%; justify-content: center; }
 }
+
+/* ---- cards de altura IGUAL na fileira ----
+   Entre .product-grid e .product-card há um wrapper (um <div> na home,
+   .reveal no catálogo) que impedia o card de esticar até a altura da linha
+   do grid, deixando os rodapés/botões desalinhados. Tornar o wrapper um
+   flex container faz o card preencher 100% da altura da célula. */
+.product-grid > * { display: flex; }
+.product-grid > * > .product-card { flex: 1 1 100%; width: 100%; height: 100%; }
