@@ -82,7 +82,7 @@ class Command(BaseCommand):
                     "name": nome,
                     "description": (
                         f"{nome} impresso em 3D com acabamento premium em {material}. "
-                        f"Produzido sob demanda pela L3D Labz — preço e prazo combinados no WhatsApp."
+                        f"Produzido sob demanda pela L3D Labz — preço e prazo combinados no Instagram @l3d_labz."
                     ),
                     "price": Decimal(preco),
                     "compare_at_price": Decimal(compare) if compare else None,

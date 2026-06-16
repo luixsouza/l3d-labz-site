@@ -330,7 +330,7 @@ class Command(BaseCommand):
             # --- descrição pt-br padronizada (não copiar descricao.html) ---
             desc_parts = [
                 f"{nome_produto} ({nome_cat}) impresso sob demanda em PLA pela L3D Labz.",
-                "Orçamento e prazo pelo WhatsApp.",
+                "Orçamento e prazo pelo Instagram @l3d_labz.",
             ]
             if dimensions:
                 desc_parts.append(f"Dimensões: {dimensions}.")
