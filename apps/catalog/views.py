@@ -21,4 +21,7 @@ def product_detail(request, slug):
 
 
 def models_3d(request):
-    return render(request, "catalog/models_3d.html", CatalogService.gallery())
+    """Catálogo 3D completo — reutiliza product_list.html com escopo only_3d=True."""
+    page = request.GET.get("page", 1)
+    context = CatalogService.browse(request.GET, page=page, only_3d=True)
+    return render(request, "catalog/product_list.html", context)

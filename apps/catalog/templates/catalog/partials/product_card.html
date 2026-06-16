@@ -13,6 +13,8 @@
   <div class="product-body">
     <span class="product-cat">{{ product.category_name }}</span>
     <a href="{{ product.url }}" class="product-name">{{ product.name }}</a>
+    {# chip de specs — só exibido quando filament_grams é conhecido (>0) #}
+    {% if product.filament_grams %}<span class="spec-chip"><svg class="icon"><use href="#i-layers"></use></svg> {{ product.filament_display }} · {{ product.color_count }} cor{{ product.color_count|pluralize }}</span>{% endif %}
     <span class="product-rating"><svg class="icon"><use href="#i-star"></use></svg> {{ product.rating }}</span>
     <div class="price-row">
       <span class="price">{{ product.price_display }}</span>
