@@ -214,6 +214,20 @@ class ProductQuery:
             .values_list("material", flat=True).distinct() if m
         )
 
+    @staticmethod
+    def specs_available() -> bool:
+        """True se algum produto ativo já tem gramas de filamento conhecidas.
+
+        Controla a exibição dos filtros de filamento/cores na UI: enquanto
+        `extrair_specs_3mf` não rodou (tudo em filament_grams=0), os filtros
+        ficam escondidos por não terem dado; quando a extração popular os
+        specs, voltam a aparecer automaticamente (sem deploy). TTL curto.
+        """
+        def producer():
+            return Product.objects.active().filter(filament_grams__gt=0).exists()
+
+        return cache_utils.get_or_set("catalog:specs_available", producer, bucket="short")
+
 
 def invalidate_catalog_cache() -> None:
     """Limpa as listagens estáveis. Chamado pelos signals em save/delete."""

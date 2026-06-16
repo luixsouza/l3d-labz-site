@@ -56,6 +56,8 @@
           {% endfor %}
         </select>
         {% endif %}
+        {# ---- filtros de cor/filamento: só quando há specs extraídos (extrair_specs_3mf) ---- #}
+        {% if specs_ready %}
         {# ---- filtro: nº de cores ---- #}
         <select name="color" onchange="this.form.submit()">
           <option value="">Qualquer cor</option>
@@ -71,16 +73,19 @@
           <option value="50-150" {% if active_filament == "50-150" %}selected{% endif %}>50–150 g</option>
           <option value="150+" {% if active_filament == "150+" %}selected{% endif %}>150 g+</option>
         </select>
-        {# ---- ordenação (inclui sorts de filamento/cores) ---- #}
+        {% endif %}
+        {# ---- ordenação (sorts de filamento/cores só com specs prontos) ---- #}
         <select name="sort" onchange="this.form.submit()">
           <option value="relevance" {% if current_sort == "relevance" %}selected{% endif %}>Relevância</option>
           <option value="new" {% if current_sort == "new" %}selected{% endif %}>Mais novos</option>
           <option value="popular" {% if current_sort == "popular" %}selected{% endif %}>Mais vendidos</option>
           <option value="price_asc" {% if current_sort == "price_asc" %}selected{% endif %}>Menor preço</option>
           <option value="price_desc" {% if current_sort == "price_desc" %}selected{% endif %}>Maior preço</option>
+          {% if specs_ready %}
           <option value="filament_asc" {% if current_sort == "filament_asc" %}selected{% endif %}>Menos filamento</option>
           <option value="filament_desc" {% if current_sort == "filament_desc" %}selected{% endif %}>Mais filamento</option>
           <option value="colors_desc" {% if current_sort == "colors_desc" %}selected{% endif %}>Mais cores</option>
+          {% endif %}
         </select>
         <button class="btn btn-ghost btn-sm" type="submit">Aplicar</button>
       </form>

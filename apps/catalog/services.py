@@ -115,6 +115,7 @@ class CatalogService(BaseService):
             "active_category": active_category,
             "current_sort": sort,
             "materials": ProductQuery.materials(),
+            "specs_ready": ProductQuery.specs_available(),
             "active_material": material or "",
             "query": query or "",
             "only_3d": only_3d,
