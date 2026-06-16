@@ -1,0 +1,46 @@
+# Roda um comando manage.py no container web de produção (server caseiro via Tailscale).
+#
+# Disparo MANUAL apenas (workflow_dispatch) — operação pontual de ops, não roda em push.
+# Reusa os mesmos secrets do deploy (TS_OAUTH_*, SSH_KEY) e o mesmo host.
+#
+# Uso:
+#   gh workflow run manage.yml -f command="corrigir_contato_descricoes --dry-run"
+#   gh workflow run manage.yml -f command="extrair_specs_3mf --base /caminho --dry-run"
+#
+# O comando vai via env var (evita injeção de contexto do GitHub Actions); no server
+# ele é expandido para permitir argumentos (word-splitting intencional).
+name: manage
+
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: "manage.py + args (ex.: corrigir_contato_descricoes --dry-run)"
+        required: true
+        default: "corrigir_contato_descricoes --dry-run"
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+jobs:
+  manage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Conectar na Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+
+      - name: Rodar manage.py no container web
+        env:
+          MANAGE_CMD: ${{ github.event.inputs.command }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.SSH_KEY }}" > ~/.ssh/id
+          chmod 600 ~/.ssh/id
+          echo "Rodando no server: manage.py $MANAGE_CMD"
+          ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/id contta@100.113.195.104 \
+            "cd /home/contta/sites/l3dlabz && docker compose --env-file .env.prod exec -T web python manage.py $MANAGE_CMD"
