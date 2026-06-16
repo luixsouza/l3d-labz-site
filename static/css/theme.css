@@ -3051,6 +3051,49 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   box-shadow: 4px 4px 0 var(--ink) !important;
 }
 
+/* =======================================================================
+   SISTEMA DE BOTÕES MAKER — TODOS os botões do site (vence light/dark/!important)
+   ======================================================================= */
+.btn, [data-theme="light"] .btn, [data-theme="dark"] .btn {
+  border: 2.5px solid var(--ink) !important;
+  border-radius: 12px !important;
+  box-shadow: 3px 3px 0 var(--ink) !important;
+  font-weight: 700 !important;
+  transition: transform .14s var(--ease), box-shadow .14s var(--ease) !important;
+}
+.btn:hover, [data-theme="light"] .btn:hover, [data-theme="dark"] .btn:hover {
+  transform: translate(-1px,-1px) !important; box-shadow: 4px 4px 0 var(--ink) !important;
+}
+.btn:active, [data-theme="light"] .btn:active { transform: translate(2px,2px) !important; box-shadow: 1px 1px 0 var(--ink) !important; }
+.btn[disabled], .btn:disabled { box-shadow: none !important; transform: none !important; opacity: .55 !important; }
+
+/* primário (verde cheio) */
+.btn-primary, [data-theme="light"] .btn-primary, [data-theme="dark"] .btn-primary {
+  background: var(--accent) !important; color: #fff !important; border-color: var(--ink) !important;
+}
+.btn-primary::after { display: none !important; } /* mata o shimmer do tema antigo */
+
+/* secundário / ghost — claro com texto tinta */
+.btn-ghost, [data-theme="light"] .btn-ghost {
+  background: #fff !important; color: var(--ink) !important; border-color: var(--ink) !important;
+}
+[data-theme="dark"] .btn-ghost { background: transparent !important; color: var(--text) !important; border-color: var(--ink) !important; }
+.btn-ghost:hover, [data-theme="light"] .btn-ghost:hover { background: var(--accent-soft) !important; color: var(--ink) !important; border-color: var(--ink) !important; }
+[data-theme="dark"] .btn-ghost:hover { background: rgba(255,255,255,.06) !important; color: var(--text) !important; }
+
+/* botões de ícone (header: tema, busca, carrinho) */
+.icon-btn, [data-theme="light"] .icon-btn, [data-theme="dark"] .icon-btn,
+[data-theme="light"] .site-header .icon-btn {
+  border: 2.5px solid var(--ink) !important; border-radius: 10px !important;
+  box-shadow: 2px 2px 0 var(--ink) !important;
+}
+.icon-btn:hover { transform: translate(-1px,-1px) !important; box-shadow: 3px 3px 0 var(--ink) !important; }
+
+/* botão de copiar link (orçamento público) + STL */
+.btn-copiar, .detail-stl-btn {
+  border: 2.5px solid var(--ink) !important; box-shadow: 2px 2px 0 var(--ink) !important; border-radius: 10px !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .product-card, .btn-primary, .cat-chip { transition: none !important; }
+  .product-card, .btn, .btn-primary, .btn-ghost, .icon-btn, .cat-chip { transition: none !important; }
 }
