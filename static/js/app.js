@@ -131,6 +131,27 @@
     });
   });
 
+  /* --- toggle fotos/3d (detalhe) --- */
+  document.querySelectorAll(".detail-media-wrap").forEach(function (wrap) {
+    var tabs = wrap.querySelectorAll("[data-media-tab]");
+    if (!tabs.length) return;
+    tabs.forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        var target = tab.getAttribute("data-media-tab");
+        // Atualiza botões
+        tabs.forEach(function (t) {
+          var isActive = t.getAttribute("data-media-tab") === target;
+          t.classList.toggle("active", isActive);
+          t.setAttribute("aria-selected", isActive ? "true" : "false");
+        });
+        // Atualiza painéis
+        wrap.querySelectorAll("[data-media-panel]").forEach(function (panel) {
+          panel.classList.toggle("active", panel.getAttribute("data-media-panel") === target);
+        });
+      });
+    });
+  });
+
   function updateCartBadge(count) {
     let badge = document.querySelector("[data-cart-count]");
     if (!count) { if (badge) badge.remove(); return; }

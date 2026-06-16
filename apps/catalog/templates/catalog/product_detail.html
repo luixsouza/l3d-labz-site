@@ -1,5 +1,12 @@
 {% extends "base.html" %}
 {% block title %}{{ product.name }} · {{ SITE.name }}{% endblock %}
+
+{% if product.has_3d %}
+{% block extra_js %}
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.3.1/dist/model-viewer.min.js"></script>
+{% endblock %}
+{% endif %}
+
 {% block content %}
 <section class="section">
   <div class="container">
@@ -10,33 +17,78 @@
     </nav>
 
     <div class="product-detail mt-2">
-      <div class="detail-media reveal">
-        {% if product.gallery|length > 1 %}
-          <div class="carousel">
-            <div class="carousel-track">
-              {% for url in product.gallery %}
-                <div class="slide">
-                  <img src="{{ url }}" alt="{{ product.name }}"
-                       onerror="this.onerror=null;this.src='https://picsum.photos/seed/{{ product.slug }}/800/800'">
-                </div>
-              {% endfor %}
+      <div class="detail-media-wrap reveal">
+        {% if product.has_3d %}
+        <div class="detail-media-tabs" role="tablist">
+          <button class="detail-media-tab active" data-media-tab="fotos" type="button" role="tab" aria-selected="true">
+            <svg class="icon"><use href="#i-layers"></use></svg> Fotos
+          </button>
+          <button class="detail-media-tab" data-media-tab="3d" type="button" role="tab" aria-selected="false">
+            <svg class="icon"><use href="#i-cube"></use></svg> 3D
+          </button>
+        </div>
+        {% endif %}
+
+        <div class="detail-media" data-media-panel="fotos">
+          {% if product.gallery|length > 1 %}
+            <div class="carousel">
+              <div class="carousel-track">
+                {% for url in product.gallery %}
+                  <div class="slide">
+                    <img src="{{ url }}" alt="{{ product.name }}"
+                         onerror="this.onerror=null;this.src='https://picsum.photos/seed/{{ product.slug }}/800/800'">
+                  </div>
+                {% endfor %}
+              </div>
+              <div class="carousel-dots" data-carousel-dots></div>
+              <button class="carousel-arrow prev" data-carousel-prev type="button" aria-label="Foto anterior">
+                <svg class="icon"><use href="#i-chevron-left"></use></svg>
+              </button>
+              <button class="carousel-arrow next" data-carousel-next type="button" aria-label="Próxima foto">
+                <svg class="icon"><use href="#i-chevron-right"></use></svg>
+              </button>
             </div>
-            <div class="carousel-dots" data-carousel-dots></div>
-            <button class="carousel-arrow prev" data-carousel-prev type="button" aria-label="Foto anterior">
-              <svg class="icon"><use href="#i-chevron-left"></use></svg>
+          {% else %}
+            <span class="thumb-mono" style="--acc:{{ product.accent }}">{{ product.monogram }}</span>
+            {% with foto=product.gallery.0|default:product.image_url %}
+              {% if foto %}
+                <img src="{{ foto }}" alt="{{ product.name }}"
+                     onerror="this.onerror=null;this.src='https://picsum.photos/seed/{{ product.slug }}/800/800'">
+              {% endif %}
+            {% endwith %}
+          {% endif %}
+        </div>
+
+        {% if product.has_3d %}
+        <div class="detail-3d-panel" data-media-panel="3d">
+          <model-viewer
+            src="{{ product.model_3d_url }}"
+            alt="{{ product.name }}"
+            poster="{{ product.image_url }}"
+            camera-controls
+            auto-rotate
+            ar
+            ar-modes="webxr scene-viewer quick-look"
+            reveal="interaction"
+            environment-image="neutral"
+            exposure="1.15"
+            shadow-intensity="0.9"
+            shadow-softness="1"
+            camera-orbit="-25deg 75deg auto"
+            field-of-view="28deg"
+            style="width:100%;height:100%"
+          >
+            <button slot="ar-button" class="detail-ar-btn" type="button">
+              <svg class="icon"><use href="#i-cube"></use></svg> Ver no seu espaço
             </button>
-            <button class="carousel-arrow next" data-carousel-next type="button" aria-label="Próxima foto">
-              <svg class="icon"><use href="#i-chevron-right"></use></svg>
-            </button>
-          </div>
-        {% else %}
-          <span class="thumb-mono" style="--acc:{{ product.accent }}">{{ product.monogram }}</span>
-          {% with foto=product.gallery.0|default:product.image_url %}
-            {% if foto %}
-              <img src="{{ foto }}" alt="{{ product.name }}"
-                   onerror="this.onerror=null;this.src='https://picsum.photos/seed/{{ product.slug }}/800/800'">
-            {% endif %}
-          {% endwith %}
+          </model-viewer>
+          <span class="detail-3d-caption">arraste pra girar · pinça pra zoom</span>
+          {% if product.has_stl %}
+          <a href="{{ product.model_stl_url }}" download class="detail-stl-btn">
+            <svg class="icon"><use href="#i-download"></use></svg> Baixar STL
+          </a>
+          {% endif %}
+        </div>
         {% endif %}
       </div>
 
@@ -98,4 +150,3 @@
   </div>
 </section>
 {% endblock %}
-
