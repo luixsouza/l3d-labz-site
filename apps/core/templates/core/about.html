@@ -13,7 +13,7 @@
         <p class="lead">A L3D Labz nasceu da paixão por cultura pop e fabricação digital. Cada peça é impressa sob demanda, com atenção artesanal e acabamento de precisão.</p>
         <div class="hero-cta">
           <a href="{% url 'catalog:product_list' %}" class="gh-btn primary">Ver catálogo <svg class="icon icon-arrow"><use href="#i-arrow-right"></use></svg></a>
-          <a href="https://wa.me/" class="gh-btn ghost"><svg class="icon"><use href="#i-whats"></use></svg> Fale conosco</a>
+          <a href="{{ SITE.instagram }}" class="gh-btn ghost" target="_blank" rel="noopener"><svg class="icon"><use href="#i-instagram"></use></svg> Fale conosco</a>
         </div>
       </div>
       <div class="gh-deco" aria-hidden="true">
@@ -37,7 +37,7 @@
       </div>
       <div class="svc">
         <span class="svc-ico"><svg class="icon"><use href="#i-support"></use></svg></span>
-        <div><h4>Precisa de ajuda?</h4><p>Nossa equipe está pronta pra te atender. Chame no chat ou no nosso <strong>WhatsApp</strong>.</p></div>
+        <div><h4>Precisa de ajuda?</h4><p>Nossa equipe está pronta pra te atender. Chame no chat ou no nosso <strong>Instagram</strong>.</p></div>
       </div>
     </div>
   </div>
@@ -122,10 +122,10 @@
   <div class="container">
     <div class="shop-cta reveal">
       <span class="eyebrow eyebrow-center">Fale com a gente</span>
-      <h2>Ficou com dúvida? Chama no WhatsApp</h2>
+      <h2>Ficou com dúvida? Chama no Instagram</h2>
       <p>Nossa equipe te ajuda a escolher, personalizar e acompanhar seu pedido do início ao fim.</p>
       <div class="tag-row">
-        <a href="https://wa.me/" class="btn btn-primary"><svg class="icon"><use href="#i-whats"></use></svg> WhatsApp</a>
+        <a href="{{ SITE.instagram }}" class="btn btn-primary" target="_blank" rel="noopener"><svg class="icon"><use href="#i-instagram"></use></svg> Instagram</a>
         <a href="{% url 'catalog:product_list' %}" class="btn btn-ghost">Ver catálogo</a>
       </div>
     </div>
