@@ -1,13 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% if page == "privacidade" %}
-  {% block title %}Política de Privacidade · L3D Labz{% endblock %}
-{% elif page == "termos" %}
-  {% block title %}Termos e Condições · L3D Labz{% endblock %}
-{% else %}
-  {% block title %}L3D Labz{% endblock %}
-{% endif %}
+{% block title %}{% if page == "privacidade" %}Política de Privacidade{% elif page == "termos" %}Termos e Condições{% else %}Institucional{% endif %} · L3D Labz{% endblock %}
 
 {% block content %}
 <section class="section">
