@@ -3029,6 +3029,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 /* ---- CHIPS DE CATEGORIA / PILLS → borda dura ---- */
 .cat-chip { border: 2.5px solid var(--ink) !important; border-radius: 999px !important; box-shadow: none !important; }
 .cat-chip:hover { transform: translate(-1px,-1px) !important; box-shadow: 3px 3px 0 var(--ink) !important; }
+.cat-chip.active { background: var(--ink) !important; color: #7CF29B !important; border-color: var(--ink) !important; }
+.cat-chip.active .cc-ic { color: #7CF29B !important; }
 .pill, .badge-new, .badge-discount, .badge-soft { border: 2px solid var(--ink) !important; }
 
 /* ---- HEADER → borda inferior grossa ---- */

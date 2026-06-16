@@ -148,6 +148,7 @@
       <a href="{% url 'catalog:product_list' %}" class="link">Ver tudo <svg class="icon icon-arrow"><use href="#i-arrow-right"></use></svg></a>
     </div>
     <div class="cat-chips reveal">
+      <a href="{% url 'catalog:product_list' %}" class="cat-chip active"><span>Todas</span></a>
       {% for cat in home_categories %}
         <a href="{% url 'catalog:product_list' %}?categoria={{ cat.slug }}" class="cat-chip">
           <span class="cc-ic" style="--acc:{{ cat.accent }}"><svg class="icon"><use href="#i-{{ cat.icon }}"></use></svg></span>
