@@ -1,6 +1,6 @@
-"""Serviço de precificação de impressão 3D — fonte única da verdade das fórmulas de custo.
+"""Serviços da calculadora de precificação de impressão 3D.
 
-Modelo de custo COMPLETO (decisão D-01):
+PricingService — fonte única da verdade das fórmulas de custo (decisão D-01):
   - custo_material  = (peso_g / 1000) * preco_kg
   - custo_energia   = (potencia_w / 1000) * tempo_h * tarifa_kwh
   - custo_depreciacao = (valor_maquina / vida_util_h) * tempo_h
@@ -10,14 +10,20 @@ Modelo de custo COMPLETO (decisão D-01):
   - custo_total     = subtotal + ajuste_falha
   - preco_venda     = custo_total * (1 + margem_pct / 100)
 
-App stateless (sem models): todos os cálculos vivem aqui.
+OrcamentoService — persistência dos dados PÚBLICOS do orçamento (T-fma-01):
+  Único ponto de escrita no banco; recebe apenas os 7 campos públicos,
+  NUNCA custos internos.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import ROUND_HALF_UP, Decimal
 
+from django.db import transaction
+
 from apps.core.layers import BaseService
+
+from .models import Orcamento
 
 
 @dataclass(frozen=True)
@@ -105,3 +111,39 @@ class PricingService(BaseService):
             "custo_total":       _arredondar(custo_total),
             "preco_venda":       _arredondar(preco_venda),
         }
+
+
+class OrcamentoService(BaseService):
+    """Persistência dos dados PÚBLICOS do orçamento — única camada que escreve no banco.
+
+    SEGURANÇA (T-fma-01 / T-fma-03): recebe SOMENTE os 7 campos públicos
+    (keyword-only). Jamais aceitar custo_material, custo_energia,
+    custo_depreciacao, custo_maoobra, subtotal, ajuste_falha, custo_total,
+    taxa_falha_pct ou margem_pct — esses dados NÃO entram no banco.
+    """
+
+    @staticmethod
+    @transaction.atomic
+    def criar(
+        *,
+        cliente_nome: str,
+        peca_descricao: str,
+        quantidade: int,
+        prazo_entrega: str,
+        observacoes: str,
+        preco_venda,
+        total,
+    ) -> Orcamento:
+        """Persiste um novo orçamento com os dados públicos e retorna a instância.
+
+        preco_venda e total podem ser float, str ou Decimal — convertidos aqui.
+        """
+        return Orcamento.objects.create(
+            cliente_nome=cliente_nome,
+            peca_descricao=peca_descricao,
+            quantidade=int(quantidade),
+            prazo_entrega=prazo_entrega,
+            observacoes=observacoes or "",
+            preco_venda=Decimal(str(preco_venda)),
+            total=Decimal(str(total)),
+        )
