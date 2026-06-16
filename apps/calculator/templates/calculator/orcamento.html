@@ -12,6 +12,42 @@
 <section class="section">
   <div class="container">
 
+    {# ---- Card de sucesso: exibido após POST bem-sucedido com link copiável ---- #}
+    {% if orcamento_gerado %}
+    <div class="card" style="padding:1.4rem 1.6rem;margin-bottom:1.5rem;border:1px solid var(--accent);background:var(--accent-soft)">
+      <p class="eyebrow" style="margin:0 0 .5rem;color:var(--accent-2)">Orçamento gerado com sucesso</p>
+      <h2 style="margin:0 0 1rem;font-size:1.15rem">{{ orcamento_gerado.cliente_nome }}</h2>
+
+      {# Link copiável #}
+      <p class="text-muted" style="font-size:.83rem;margin:0 0 .35rem">Link público compartilhável (enviar ao cliente):</p>
+      <div style="display:flex;gap:.6rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap">
+        <input
+          id="link-publico"
+          type="text"
+          readonly
+          value="{{ orcamento_gerado.link_publico }}"
+          style="flex:1;min-width:200px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.55rem .85rem;font-size:.88rem;color:var(--text);font-family:var(--font-mono, monospace)"
+        >
+        <button
+          type="button"
+          class="btn btn-ghost btn-sm"
+          onclick="navigator.clipboard.writeText(document.getElementById('link-publico').value).then(function(){var b=this;b.textContent='Copiado!';setTimeout(function(){b.textContent='Copiar link'},2000)}.bind(this))"
+        >Copiar link</button>
+      </div>
+
+      {# Ações: abrir público + PDF #}
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+        <a href="{{ orcamento_gerado.link_publico }}" target="_blank" class="btn btn-primary btn-sm">
+          Abrir página pública
+        </a>
+        <a href="{{ orcamento_gerado.link_pdf }}" target="_blank" class="btn btn-ghost btn-sm">
+          <svg class="icon"><use href="#i-download"></use></svg>
+          Baixar PDF
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
     <div class="page-head">
       <p class="eyebrow">Área restrita — equipe L3D</p>
       <h1>Emitir Orçamento</h1>

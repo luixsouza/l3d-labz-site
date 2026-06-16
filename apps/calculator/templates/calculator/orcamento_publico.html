@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Orçamento {{ orc.cliente_nome }} — {{ SITE.name }}{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width:720px">
+
+    {# ---- Cabeçalho do orçamento ---- #}
+    <div style="
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      border-radius: var(--radius);
+      padding: 2rem 2.2rem 1.6rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    ">
+      {# Monograma L3D #}
+      <div style="
+        width: 56px; height: 56px; flex: none;
+        background: rgba(255,255,255,0.15);
+        border-radius: 14px;
+        display: grid; place-items: center;
+        font-family: var(--font-display);
+        font-weight: 800; font-size: 1.25rem;
+        color: #fff; letter-spacing: -.02em;
+      ">L3D</div>
+      <div>
+        <p style="margin:0;font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.75)">
+          {{ SITE.name }} — Orçamento
+        </p>
+        <h1 style="margin:.18em 0 0;font-size:1.45rem;color:#fff;font-family:var(--font-display);font-weight:700;line-height:1.1">
+          Para {{ orc.cliente_nome }}
+        </h1>
+      </div>
+    </div>
+
+    {# ---- Card de dados ---- #}
+    <div class="card" style="padding:1.6rem 1.8rem;margin-bottom:1rem">
+
+      {# Faturar para / meta #}
+      <div style="display:flex;gap:2rem;flex-wrap:wrap;margin-bottom:1.4rem;padding-bottom:1.2rem;border-bottom:1px solid var(--border)">
+        <div style="flex:1;min-width:160px">
+          <p class="text-muted" style="font-size:.72rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;margin:0 0 .35rem">Faturar para</p>
+          <p style="margin:0;font-size:1.15rem;font-weight:700;color:var(--text)">{{ orc.cliente_nome }}</p>
+        </div>
+        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:flex-start">
+          <div>
+            <p class="text-muted" style="font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin:0 0 .25rem">Emissão</p>
+            <p style="margin:0;font-weight:600">{{ orc.created_at|date:"d/m/Y" }}</p>
+          </div>
+          <div>
+            <p class="text-muted" style="font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin:0 0 .25rem">Prazo</p>
+            <p style="margin:0;font-weight:600">{{ orc.prazo_entrega }}</p>
+          </div>
+        </div>
+      </div>
+
+      {# Tabela de itens #}
+      <p class="text-muted" style="font-size:.72rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;margin:0 0 .75rem">Item</p>
+      <div style="border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border)">
+        <div style="background:var(--accent);padding:.65rem 1rem;display:grid;grid-template-columns:1fr auto auto auto;gap:.75rem;align-items:center">
+          <span style="font-size:.8rem;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.1em">Descrição</span>
+          <span style="font-size:.8rem;font-weight:700;color:rgba(255,255,255,.8);text-align:right">Qtd</span>
+          <span style="font-size:.8rem;font-weight:700;color:rgba(255,255,255,.8);text-align:right;white-space:nowrap">Preço unit.</span>
+          <span style="font-size:.8rem;font-weight:700;color:rgba(255,255,255,.8);text-align:right">Total</span>
+        </div>
+        <div style="padding:.85rem 1rem;display:grid;grid-template-columns:1fr auto auto auto;gap:.75rem;align-items:center;background:var(--bg-card)">
+          <span style="font-weight:600">{{ orc.peca_descricao }}</span>
+          <span style="color:var(--text-muted);text-align:right">{{ orc.quantidade }}</span>
+          <span style="text-align:right;white-space:nowrap">{{ orc.preco_venda_display }}</span>
+          <span style="text-align:right;font-weight:700">{{ orc.total_display }}</span>
+        </div>
+      </div>
+
+      {# Total em destaque #}
+      <div style="
+        margin-top:1rem;
+        background:var(--accent-strong);
+        border-radius:var(--radius-sm);
+        padding:1rem 1.2rem;
+        display:flex;align-items:center;justify-content:space-between;
+      ">
+        <span style="font-weight:700;font-size:.9rem;color:rgba(255,255,255,.85);text-transform:uppercase;letter-spacing:.1em">Total</span>
+        <span style="font-size:1.55rem;font-weight:800;color:#fff;font-family:var(--font-display);letter-spacing:-.02em">{{ orc.total_display }}</span>
+      </div>
+
+    </div>{# /card dados #}
+
+    {# ---- Condições & Observações ---- #}
+    <div class="card" style="padding:1.3rem 1.5rem;margin-bottom:1.2rem;background:var(--accent-soft);border:1px solid var(--accent-strong)">
+      <p style="margin:0 0 .7rem;font-size:.72rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--accent-2)">
+        Condições &amp; Observações
+      </p>
+      {% if orc.observacoes %}
+        <p style="margin:0 0 .65rem;color:var(--text)">{{ orc.observacoes }}</p>
+      {% endif %}
+      <p style="margin:0 0 .35rem;font-weight:700;color:var(--text)">
+        Sinal de 50% para iniciar a produção, saldo na entrega.
+      </p>
+      <p class="text-muted" style="margin:0;font-size:.9rem">
+        Validade de 7 dias corridos a partir da emissão. Valores em reais (BRL).
+      </p>
+    </div>
+
+    {# ---- Ações ---- #}
+    <div style="display:flex;gap:.9rem;flex-wrap:wrap;justify-content:center;margin-bottom:2.5rem">
+      <a href="{% url 'calculator:orcamento_pdf' orc.token %}" target="_blank" class="btn btn-primary">
+        <svg class="icon"><use href="#i-download"></use></svg>
+        Baixar PDF
+      </a>
+      {% if SITE.instagram %}
+      <a href="{{ SITE.instagram }}" target="_blank" rel="noopener" class="btn btn-ghost">
+        <svg class="icon"><use href="#i-instagram"></use></svg>
+        Aprovar via Instagram @l3d_labz
+      </a>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}
