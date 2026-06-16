@@ -104,6 +104,31 @@ def _qr_drawing(url: str, lado: float) -> Drawing | None:
     return d
 
 
+def _selo_drawing(lado: float) -> Drawing:
+    """Retorna um Drawing quadrado com o monograma 'L3D' em verde para uso em células de tabela.
+
+    Equivalente visual a _monograma mas como Flowable Drawing (compatível com platypus/Table).
+    Não depende de nenhum dado externo — é sempre renderizado.
+    """
+    sq_color = _G        # verde L3D
+    txt_color = _WHITE   # texto branco
+    radius = lado * 0.24
+    d = Drawing(lado, lado)
+    rect = Rect(0, 0, lado, lado, rx=radius, ry=radius,
+                fillColor=sq_color, strokeColor=None, strokeWidth=0)
+    d.add(rect)
+    font_size = lado * 0.33
+    # String fica no centro; y ajustado para o meio menos meia altura do glifo
+    txt = String(lado / 2, lado / 2 - font_size * 0.38,
+                 "L3D",
+                 fontName="Helvetica-Bold",
+                 fontSize=font_size,
+                 fillColor=txt_color,
+                 textAnchor="middle")
+    d.add(txt)
+    return d
+
+
 def _monograma(c, x, ytop, size, sq_color, txt_color):
     c.saveState()
     c.setFillColor(sq_color)
@@ -223,12 +248,30 @@ def gerar_orcamento_pdf(dados: dict) -> bytes:
     qtd = dados.get("quantidade", 1)
     pu = dados.get("preco_venda", 0.0)
     total = dados.get("total", 0.0)
+
+    # Selo gráfico "L3D" antes da descrição (melhoria 4): Drawing como Flowable na célula.
+    # Sub-tabela [selo | descrição] para alinhar verticalmente ao centro sem padding extra.
+    _SELO_LADO = 1.0 * cm
+    _DESCR_CW = _CW * 0.50   # largura original da coluna DESCRIÇÃO
+    _TEXTO_CW = _DESCR_CW - _SELO_LADO - 0.2 * cm
+    selo = _selo_drawing(_SELO_LADO)
+    celula_desc_data = Table(
+        [[selo, Paragraph(dados.get("peca_descricao", "—"), s_td)]],
+        colWidths=[_SELO_LADO, _TEXTO_CW],
+        style=TableStyle([
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("LEFTPADDING", (0, 0), (-1, -1), 0),
+            ("RIGHTPADDING", (0, 0), (0, 0), 6),
+            ("RIGHTPADDING", (1, 0), (1, 0), 0),
+            ("TOPPADDING", (0, 0), (-1, -1), 0),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+        ]))
     itens = Table(
         [[Paragraph("DESCRIÇÃO", s_th), Paragraph("QTD", s_thr),
           Paragraph("PREÇO UNIT.", s_thr), Paragraph("TOTAL", s_thr)],
-         [Paragraph(dados.get("peca_descricao", "—"), s_td), Paragraph(str(qtd), s_tdr),
+         [celula_desc_data, Paragraph(str(qtd), s_tdr),
           Paragraph(_format_brl(pu), s_tdr), Paragraph(_format_brl(total), s_tdr)]],
-        colWidths=[_CW * 0.50, _CW * 0.12, _CW * 0.19, _CW * 0.19],
+        colWidths=[_DESCR_CW, _CW * 0.12, _CW * 0.19, _CW * 0.19],
         style=TableStyle([
             ("BACKGROUND", (0, 0), (-1, 0), _G), ("ROUNDEDCORNERS", [5, 5, 0, 0]),
             ("TOPPADDING", (0, 0), (-1, 0), 8), ("BOTTOMPADDING", (0, 0), (-1, 0), 8),
@@ -313,12 +356,20 @@ def gerar_orcamento_pdf(dados: dict) -> bytes:
     story.append(cta_bloco)
 
     # ---- condições & observações ----
+    # Ordem: observações do cliente (se houver) → política de pagamento → validade/condições gerais.
     obs = (dados.get("observacoes") or "").strip()
     story.append(Spacer(1, 0.7 * cm))
-    cond = ("Validade de 7 dias corridos a partir da emissão. Valores em reais (BRL). "
-            "Produção iniciada após aprovação do orçamento.")
+    _PGTO = (
+        '<font name="Helvetica-Bold">Sinal de 50% para iniciar a produção, '
+        'saldo na entrega.</font>'
+    )
+    cond_base = ("Validade de 7 dias corridos a partir da emissão. Valores em reais (BRL). "
+                 "Produção iniciada após aprovação do orçamento.")
+    # monta o parágrafo de condições com pagamento antes da validade
     if obs:
-        cond = obs + "<br/><br/>" + cond
+        cond = obs + "<br/><br/>" + _PGTO + "<br/>" + cond_base
+    else:
+        cond = _PGTO + "<br/>" + cond_base
     bloco = Table(
         [[Paragraph('<font name="Helvetica-Bold" size="7.5" color="#1B7E37">CONDIÇÕES &amp; OBSERVAÇÕES</font>',
                     ParagraphStyle("cl", leading=12, spaceAfter=4))],
