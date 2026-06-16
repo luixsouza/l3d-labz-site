@@ -378,6 +378,66 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; margin: 0 0 .4e
   --progress-bar-color: var(--accent);
   --progress-mask: transparent;
 }
+/* --- toggle fotos/3D (detalhe) --- */
+.detail-media-wrap { display: flex; flex-direction: column; gap: .65rem; }
+.detail-media-tabs { display: flex; gap: .45rem; }
+.detail-media-tab {
+  display: inline-flex; align-items: center; gap: .38rem;
+  padding: .42rem .9rem; border-radius: 999px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  color: var(--text-muted); font-size: .85rem; font-weight: 500; cursor: pointer;
+  transition: background .18s, border-color .18s, color .18s;
+}
+.detail-media-tab .icon { width: 15px; height: 15px; }
+.detail-media-tab.active,
+.detail-media-tab:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-2); }
+.detail-media-tab.active { font-weight: 600; }
+[data-media-panel] { display: none; }
+[data-media-panel].active { display: block; }
+
+/* --- painel 3D do detalhe --- */
+.detail-3d-panel { display: flex; flex-direction: column; align-items: center; gap: .6rem; }
+.detail-3d-panel model-viewer {
+  display: block; width: 100%; aspect-ratio: 1 / 1;
+  border-radius: var(--radius-lg); border: 1px solid var(--border);
+  background: radial-gradient(120% 120% at 70% 20%, rgba(47,168,79,.2), transparent 55%), var(--bg-soft);
+  overflow: hidden;
+  --poster-color: var(--bg-soft);
+  --progress-bar-color: var(--accent);
+  --progress-mask: transparent;
+}
+.detail-3d-caption {
+  font-size: .75rem; color: var(--text-dim);
+  letter-spacing: .04em; text-transform: uppercase;
+}
+.detail-stl-btn {
+  display: inline-flex; align-items: center; gap: .4rem;
+  padding: .42rem .85rem; border-radius: 999px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  color: var(--text-muted); font-size: .82rem; font-weight: 600;
+  text-decoration: none; transition: background .18s, border-color .18s, color .18s;
+}
+.detail-stl-btn:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-2); }
+.detail-stl-btn .icon { width: 15px; height: 15px; }
+.detail-ar-btn {
+  display: inline-flex; align-items: center; gap: .4rem;
+  padding: .5rem 1rem; border-radius: 999px;
+  background: var(--accent); border: none; color: #fff;
+  font-size: .82rem; font-weight: 600; cursor: pointer;
+  transition: background .18s;
+}
+.detail-ar-btn:hover { background: var(--accent-strong); }
+.detail-ar-btn .icon { width: 15px; height: 15px; }
+/* light theme adjustments */
+[data-theme="light"] .detail-media-tab { background: #fff; border-color: var(--border); color: var(--text-muted); }
+[data-theme="light"] .detail-media-tab.active,
+[data-theme="light"] .detail-media-tab:hover { background: var(--accent-soft); }
+[data-theme="light"] .detail-3d-panel model-viewer {
+  background: radial-gradient(120% 120% at 50% 16%, #fff, var(--bg-soft) 82%);
+}
+[data-theme="light"] .detail-stl-btn { background: #fff; }
+[data-theme="light"] .detail-stl-btn:hover { background: var(--accent-soft); }
+
 .detail-price { display: flex; align-items: baseline; gap: .8rem; margin: 1rem 0 1.5rem; }
 .detail-price .price { font-size: 2.3rem; }
 .breadcrumb { display: flex; gap: .4rem; align-items: center; font-size: .85rem; color: var(--text-dim); }
