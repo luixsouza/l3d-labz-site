@@ -3097,3 +3097,132 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 @media (prefers-reduced-motion: reduce) {
   .product-card, .btn, .btn-primary, .btn-ghost, .icon-btn, .cat-chip { transition: none !important; }
 }
+
+/* =========================================================================
+   Calculadora v3 — layout do mockup (3 cards + chips + botões de preço)
+   Vence a cascata por vir no fim do arquivo. Reutiliza tokens existentes.
+   ========================================================================= */
+
+/* --- cabeçalho de card: ícone redondo + título --- */
+.calc-card-header {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: 1.25rem;
+}
+.calc-card-ic {
+  width: 34px; height: 34px; flex: none;
+  border-radius: 999px;
+  display: grid; place-items: center;
+  background: var(--accent-soft);
+  color: var(--accent-2);
+  border: 1.5px solid var(--accent);
+}
+.calc-card-ic .icon { width: 1em; height: 1em; }
+.calc-card-title {
+  font-size: .9rem; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--text);
+}
+
+/* --- grid de 3 colunas dentro de cada card --- */
+.calc-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .85rem 1rem;
+  align-items: start;
+}
+@media (max-width: 680px) {
+  .calc-grid-3 { grid-template-columns: 1fr; }
+}
+
+/* --- input com sufixo de unidade (R$/kg, g, W, R$, %) --- */
+.calc-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.calc-input-wrap input[type="number"] {
+  width: 100%;
+  padding-right: 2.8rem;
+}
+.calc-suffix {
+  position: absolute;
+  right: .7rem;
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* --- chips dentro de campos (consumo, bandeira, margem) --- */
+.calc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin-top: .55rem;
+}
+.calc-chips .pill {
+  font-size: .78rem !important;
+  padding: .3rem .7rem !important;
+  cursor: pointer !important;
+  border: 2px solid var(--ink) !important;
+}
+
+/* --- botões "Puxar / Restaurar preço" abaixo do select de material --- */
+.calc-price-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .55rem;
+  margin-top: 1rem;
+}
+.calc-price-btns .btn {
+  font-size: .82rem !important;
+}
+
+/* --- rodapé do form: Calcular + Limpar --- */
+.calc-form-footer {
+  display: flex;
+  gap: .75rem;
+  align-items: stretch;
+  margin-top: .25rem;
+}
+.calc-form-footer .btn-primary {
+  flex: 1;
+  justify-content: center;
+  padding: .9rem 1.2rem !important;
+  font-size: 1rem !important;
+}
+.calc-form-footer .btn-ghost {
+  white-space: nowrap;
+  padding: .9rem 1.1rem !important;
+}
+
+/* --- rótulo "(opcional)" nos labels --- */
+.calc-label-opt {
+  font-weight: 400;
+  font-size: .78rem;
+  color: var(--accent-2);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* --- campo select dentro dos cards da calculadora --- */
+.calc-card select {
+  width: 100%;
+  padding: .5rem .75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: .9rem;
+  cursor: pointer;
+}
+
+/* tema claro: suffixo e ícone de card legíveis */
+[data-theme="light"] .calc-suffix { color: var(--text-dim); }
+[data-theme="light"] .calc-card-ic { background: var(--accent-soft); border-color: var(--accent); }
+[data-theme="light"] .calc-card select { background: #fff; }
+[data-theme="light"] .calc-input-wrap input[type="number"] { background: #fff; }

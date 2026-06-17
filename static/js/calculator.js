@@ -1,18 +1,23 @@
-// L3D Labz — Calculadora de Precificação 3D v2 (vanilla JS, IIFE, sem framework)
-// Espelha EXATAMENTE as fórmulas de apps/calculator/services.py (PricingService.calcular).
+// L3D Labz — Calculadora de Precificação 3D (vanilla JS, IIFE, sem framework)
+// Espelha EXATAMENTE as fórmulas de apps/calculator/services.py (PricingService.calcular enxuto).
+//
+// Fórmula enxuta (decisão D-01 enxuto — 2026-06-17):
+//   custo_material = (peso_g / 1000) * preco_kg
+//   custo_energia  = (potencia_w / 1000) * tempo_h * valor_kwh
+//   subtotal       = custo_material + custo_energia + custo_maoobra + custos_fixos
+//   preco_venda    = subtotal * (1 + margem_pct / 100)
 //
 // ATENÇÃO: este arquivo é apenas preview client-side.
 // O servidor é a fonte da verdade — diferença de ±R$ 0,01 por floating point é aceitável.
-// O orçamento formal é sempre recalculado server-side via PricingService.
 (function () {
   "use strict";
 
   // ---- leitura dos presets via json_script (sem hardcode de números) ----
   var PRESETS = (function () {
     var el = document.getElementById("calc-presets");
-    if (!el) return { impressoras: {}, filamentos: {}, bandeiras: {} };
+    if (!el) return { filamentos: {}, consumo_chips: [], bandeira_kwh: {} };
     try { return JSON.parse(el.textContent); }
-    catch (e) { return { impressoras: {}, filamentos: {}, bandeiras: {} }; }
+    catch (e) { return { filamentos: {}, consumo_chips: [], bandeira_kwh: {} }; }
   }());
 
   // ---- helpers de leitura de input ----
@@ -40,7 +45,6 @@
 
   // ---- formatação BRL ----
   function brl(valor) {
-    // guarda anti-NaN: campo vazio ou cálculo com zero produz NaN em alguns paths
     var n = Number(valor);
     if (isNaN(n)) n = 0;
     return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -51,15 +55,6 @@
     setText(id, brl(valor));
   }
 
-  // ---- auto-preenchimento por preset de impressora ----
-  function aplicarPresetImpressora(key) {
-    var p = PRESETS.impressoras && PRESETS.impressoras[key];
-    if (!p || key === "manual") return;
-    setVal("id_potencia_w",    p.potencia_w);
-    setVal("id_valor_maquina", p.valor_maquina);
-    setVal("id_vida_util_h",   p.vida_util_h);
-  }
-
   // ---- auto-preenchimento por preset de filamento ----
   function aplicarPresetFilamento(key) {
     var p = PRESETS.filamentos && PRESETS.filamentos[key];
@@ -67,24 +62,12 @@
     setVal("id_preco_kg", p.preco_kg_default);
   }
 
-  // ---- calcula e exibe tarifa efetiva ----
-  function atualizarTarifaEfetiva() {
-    var tarifa_base   = num("id_tarifa_base", 0);
-    var bandeiraKey   = selVal("id_bandeira");
-    var b             = PRESETS.bandeiras && PRESETS.bandeiras[bandeiraKey];
-    var adicional     = b ? b.adicional_kwh : 0;
-    var tarifa_efetiva = tarifa_base + adicional;
-
-    var el = document.getElementById("res_tarifa_efetiva");
-    if (el) {
-      var base_fmt  = brl(tarifa_base);
-      var adic_fmt  = adicional === 0
-        ? "sem adicional"
-        : "Bandeira +" + brl(adicional).replace("R$ ", "R$ ");
-      el.textContent = "Tarifa efetiva: " + brl(tarifa_efetiva) + "/kWh"
-        + " (base " + base_fmt + " + " + adic_fmt + ")";
-    }
-    return tarifa_efetiva;
+  // ---- chips: marca o ativo e limpa os outros ----
+  function marcarChipAtivo(chipAtivo, grupo) {
+    if (!grupo) return;
+    var chips = grupo.querySelectorAll(".pill");
+    chips.forEach(function (c) { c.classList.remove("active"); });
+    if (chipAtivo) chipAtivo.classList.add("active");
   }
 
   // ---- atualiza barra de breakdown ----
@@ -96,73 +79,43 @@
     if (pctEl) pctEl.textContent = pct.toFixed(1) + "%";
   }
 
-  // ---- fórmulas de precificação (espelho exato de PricingService.calcular) ----
+  // ---- fórmulas de precificação (espelho exato de PricingService.calcular enxuto) ----
   //
-  // custo_material    = (peso_g / 1000) * preco_kg
-  // custo_energia     = (potencia_w / 1000) * tempo_h * tarifa_efetiva
-  // custo_depreciacao = (valor_maquina / vida_util_h) * tempo_h
-  // custo_maoobra     = valor fixo informado (passthrough)
-  // subtotal          = custo_material + custo_energia + custo_depreciacao + custo_maoobra
-  // ajuste_falha      = subtotal * (taxa_falha_pct / 100)
-  // custo_total       = subtotal + ajuste_falha
-  // preco_venda       = custo_total * (1 + margem_pct / 100)
+  // custo_material = (peso_g / 1000) * preco_kg
+  // custo_energia  = (potencia_w / 1000) * tempo_h * valor_kwh
+  // custo_maoobra  = valor fixo informado (passthrough)
+  // custos_fixos   = valor fixo informado (passthrough)
+  // subtotal       = custo_material + custo_energia + custo_maoobra + custos_fixos
+  // preco_venda    = subtotal * (1 + margem_pct / 100)
   function calcular() {
-    var peso_g         = num("id_peso_g",        0);
-    var preco_kg       = num("id_preco_kg",       0);
-    var potencia_w     = num("id_potencia_w",     0);
-    var tempo_h        = num("id_tempo_h",        0);
-    var tarifa_efetiva = atualizarTarifaEfetiva(); // tarifa_base + adicional_bandeira
-    var valor_maquina  = num("id_valor_maquina",  0);
-    var vida_util_h    = num("id_vida_util_h",    0);
-    var custo_maoobra  = num("id_custo_maoobra",  0);
-    var taxa_falha_pct = num("id_taxa_falha_pct", 0);
-    var margem_pct     = num("id_margem_pct",     0);
-    var quantidade     = Math.max(1, Math.round(num("id_quantidade_pub", 1)));
+    var peso_g        = num("id_peso_g",          0);
+    var preco_kg      = num("id_preco_kg",         0);
+    var potencia_w    = num("id_potencia_w",       0);
+    var tempo_h       = num("id_tempo_h",          0);
+    var valor_kwh     = num("id_valor_kwh",        0);
+    var custo_maoobra = num("id_custo_maoobra",    0);
+    var custos_fixos  = num("id_custos_fixos",     0);
+    var margem_pct    = num("id_margem_pct",       0);
 
     // --- cálculos (espelhando Python com mesma ordem) ---
-    var custo_material    = (peso_g / 1000) * preco_kg;
-    var custo_energia     = (potencia_w / 1000) * tempo_h * tarifa_efetiva;
-    var custo_depreciacao = vida_util_h > 0 ? (valor_maquina / vida_util_h) * tempo_h : 0;
-    var subtotal          = custo_material + custo_energia + custo_depreciacao + custo_maoobra;
-    var ajuste_falha      = subtotal * (taxa_falha_pct / 100);
-    var custo_total       = subtotal + ajuste_falha;
-    var preco_venda       = custo_total * (1 + margem_pct / 100);
+    var custo_material = (peso_g / 1000) * preco_kg;
+    var custo_energia  = (potencia_w / 1000) * tempo_h * valor_kwh;
+    var subtotal       = custo_material + custo_energia + custo_maoobra + custos_fixos;
+    var preco_venda    = subtotal * (1 + margem_pct / 100);
 
     // --- exibe valores monetários ---
-    escrever("res_custo_material",    custo_material);
-    escrever("res_custo_energia",     custo_energia);
-    escrever("res_custo_depreciacao", custo_depreciacao);
-    escrever("res_custo_maoobra",     custo_maoobra);
-    escrever("res_subtotal",          subtotal);
-    escrever("res_ajuste_falha",      ajuste_falha);
-    escrever("res_custo_total",       custo_total);
-    escrever("res_preco_venda",       preco_venda);
+    escrever("res_custo_material", custo_material);
+    escrever("res_custo_energia",  custo_energia);
+    escrever("res_custo_maoobra",  custo_maoobra);
+    escrever("res_custos_fixos",   custos_fixos);
+    escrever("res_subtotal",       subtotal);
+    escrever("res_preco_venda",    preco_venda);
 
-    // --- breakdown: % de cada componente sobre custo_total ---
-    atualizarBarra("bar_custo_material",    "pct_custo_material",    custo_material,    custo_total);
-    atualizarBarra("bar_custo_energia",     "pct_custo_energia",     custo_energia,     custo_total);
-    atualizarBarra("bar_custo_depreciacao", "pct_custo_depreciacao", custo_depreciacao, custo_total);
-    atualizarBarra("bar_custo_maoobra",     "pct_custo_maoobra",     custo_maoobra,     custo_total);
-    atualizarBarra("bar_ajuste_falha",      "pct_ajuste_falha",      ajuste_falha,      custo_total);
-
-    // --- custo por hora ---
-    var horaWrap = document.getElementById("res_custo_hora_wrap");
-    if (tempo_h > 0 && custo_total > 0) {
-      escrever("res_custo_hora", custo_total / tempo_h);
-      if (horaWrap) horaWrap.style.display = "";
-    } else {
-      if (horaWrap) horaWrap.style.display = "none";
-    }
-
-    // --- total por quantidade (exibe só quando qtd > 1) ---
-    var totalWrap = document.getElementById("res_total_qtd_wrap");
-    if (quantidade > 1) {
-      escrever("res_total_qtd", preco_venda * quantidade);
-      setText("res_qtd_label", String(quantidade));
-      if (totalWrap) totalWrap.style.display = "";
-    } else {
-      if (totalWrap) totalWrap.style.display = "none";
-    }
+    // --- breakdown: % de cada componente sobre subtotal ---
+    atualizarBarra("bar_custo_material", "pct_custo_material", custo_material, subtotal);
+    atualizarBarra("bar_custo_energia",  "pct_custo_energia",  custo_energia,  subtotal);
+    atualizarBarra("bar_custo_maoobra",  "pct_custo_maoobra",  custo_maoobra,  subtotal);
+    atualizarBarra("bar_custos_fixos",   "pct_custos_fixos",   custos_fixos,   subtotal);
 
     // --- permalink: serializa campos na query string ---
     atualizarPermalink();
@@ -171,9 +124,8 @@
   // ---- permalink (query string compartilhável) ----
   var CAMPOS_PERMALINK = [
     "id_peso_g", "id_preco_kg", "id_potencia_w", "id_tempo_h",
-    "id_tarifa_base", "id_bandeira", "id_valor_maquina", "id_vida_util_h",
-    "id_custo_maoobra", "id_taxa_falha_pct", "id_margem_pct",
-    "id_quantidade_pub", "id_impressora", "id_filamento"
+    "id_valor_kwh", "id_custo_maoobra", "id_custos_fixos", "id_margem_pct",
+    "id_filamento"
   ];
 
   function atualizarPermalink() {
@@ -197,9 +149,7 @@
         if (el) el.value = params.get(key);
       }
     });
-    // aplica presets já reidratados (mantém valores se preset != manual foi carregado)
-    var impressoraKey = selVal("id_impressora");
-    if (impressoraKey && impressoraKey !== "manual") aplicarPresetImpressora(impressoraKey);
+    // aplica presets de filamento reidratados
     var filamentoKey = selVal("id_filamento");
     if (filamentoKey && filamentoKey !== "manual") aplicarPresetFilamento(filamentoKey);
   }
@@ -211,19 +161,12 @@
       "==========================",
       "Material (filamento): " + (document.getElementById("res_custo_material") || {}).textContent,
       "Energia elétrica:     " + (document.getElementById("res_custo_energia") || {}).textContent,
-      "Depreciação máquina:  " + (document.getElementById("res_custo_depreciacao") || {}).textContent,
       "Mão de obra:          " + (document.getElementById("res_custo_maoobra") || {}).textContent,
-      "Ajuste de falha:      " + (document.getElementById("res_ajuste_falha") || {}).textContent,
-      "Custo total:          " + (document.getElementById("res_custo_total") || {}).textContent,
+      "Custos fixos:         " + (document.getElementById("res_custos_fixos") || {}).textContent,
+      "Subtotal:             " + (document.getElementById("res_subtotal") || {}).textContent,
       "==========================",
       "PREÇO DE VENDA: " + (document.getElementById("res_preco_venda") || {}).textContent,
     ];
-
-    var qtdWrap = document.getElementById("res_total_qtd_wrap");
-    if (qtdWrap && qtdWrap.style.display !== "none") {
-      linhas.push("Total (" + (document.getElementById("res_qtd_label") || {}).textContent + " unid.): "
-        + (document.getElementById("res_total_qtd") || {}).textContent);
-    }
 
     var texto = linhas.join("\n");
     var btn = document.getElementById("btnCopiar");
@@ -271,16 +214,7 @@
     // reidrata permalink antes do primeiro cálculo
     reidratarPermalink();
 
-    // listeners de preset de impressora
-    var selImpressora = document.getElementById("id_impressora");
-    if (selImpressora) {
-      selImpressora.addEventListener("change", function () {
-        if (this.value !== "manual") aplicarPresetImpressora(this.value);
-        calcular();
-      });
-    }
-
-    // listeners de preset de filamento
+    // listener de preset de filamento
     var selFilamento = document.getElementById("id_filamento");
     if (selFilamento) {
       selFilamento.addEventListener("change", function () {
@@ -289,13 +223,80 @@
       });
     }
 
-    // listener do select de bandeira (separado para atualizar tarifa efetiva imediatamente)
-    var selBandeira = document.getElementById("id_bandeira");
-    if (selBandeira) {
-      selBandeira.addEventListener("change", calcular);
+    // botão "Puxar preço do site" — preenche preco_kg com o default do filamento selecionado
+    var btnPuxar = document.getElementById("btnPuxarPreco");
+    if (btnPuxar) {
+      btnPuxar.addEventListener("click", function () {
+        var key = selVal("id_filamento");
+        aplicarPresetFilamento(key);
+        calcular();
+      });
     }
 
-    // listeners genéricos em todos os inputs do form
+    // botão "Restaurar preço automático" — idem (ambos usam a mesma referência)
+    var btnRestaurar = document.getElementById("btnRestaurarPreco");
+    if (btnRestaurar) {
+      btnRestaurar.addEventListener("click", function () {
+        var key = selVal("id_filamento");
+        aplicarPresetFilamento(key);
+        calcular();
+      });
+    }
+
+    // botão "Calcular Custo" (redundante mas explícito)
+    var btnCalcular = document.getElementById("btnCalcular");
+    if (btnCalcular) {
+      btnCalcular.addEventListener("click", calcular);
+    }
+
+    // botão "Limpar"
+    var btnLimpar = document.getElementById("btnLimpar");
+    if (btnLimpar) {
+      btnLimpar.addEventListener("click", function () {
+        form.reset();
+        // limpa chips ativos
+        document.querySelectorAll(".pill.active").forEach(function (c) { c.classList.remove("active"); });
+        calcular();
+      });
+    }
+
+    // chips de consumo de impressora (data-w)
+    var consumoGrupo = document.getElementById("consumo-chips");
+    if (consumoGrupo) {
+      consumoGrupo.addEventListener("click", function (e) {
+        var btn = e.target.closest(".pill[data-w]");
+        if (!btn) return;
+        setVal("id_potencia_w", btn.dataset.w);
+        marcarChipAtivo(btn, consumoGrupo);
+        calcular();
+      });
+    }
+
+    // chips de bandeira tarifária (data-kwh)
+    var bandeiraGrupo = document.getElementById("bandeira-chips");
+    if (bandeiraGrupo) {
+      bandeiraGrupo.addEventListener("click", function (e) {
+        var btn = e.target.closest(".pill[data-kwh]");
+        if (!btn) return;
+        setVal("id_valor_kwh", btn.dataset.kwh);
+        marcarChipAtivo(btn, bandeiraGrupo);
+        calcular();
+      });
+    }
+
+    // chips de margem (data-margem)
+    var margemGrupo = document.getElementById("margem-chips");
+    if (margemGrupo) {
+      margemGrupo.addEventListener("click", function (e) {
+        var btn = e.target.closest(".pill[data-margem]");
+        if (!btn) return;
+        setVal("id_margem_pct", btn.dataset.margem);
+        marcarChipAtivo(btn, margemGrupo);
+        calcular();
+      });
+    }
+
+    // listeners genéricos em todos os inputs do form (recalcula em tempo real)
     form.addEventListener("input", calcular);
     form.addEventListener("change", calcular);
 
