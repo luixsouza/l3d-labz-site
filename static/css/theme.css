@@ -3260,6 +3260,26 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 }
 .site-header .header-actions form { display: inline-flex; align-items: center; margin: 0; }
 
+/* botões ghost do header (Entrar/Sair) com a MESMA borda ink dos ícones
+   (mata o border-color: var(--border) cinza forçado na regra light do header) */
+.site-header .header-actions .btn-ghost,
+[data-theme="light"] .site-header .header-actions .btn-ghost {
+  border: 2.5px solid var(--ink) !important;
+  border-radius: 12px !important;
+  box-shadow: 3px 3px 0 var(--ink) !important;
+  background: #fff !important;
+  color: var(--ink) !important;
+}
+[data-theme="dark"] .site-header .header-actions .btn-ghost { background: transparent !important; color: var(--text) !important; }
+.site-header .header-actions .btn-ghost:hover,
+[data-theme="light"] .site-header .header-actions .btn-ghost:hover {
+  border-color: var(--ink) !important;
+  background: var(--accent-soft) !important;
+  color: var(--ink) !important;
+  transform: translate(-1px,-1px) !important;
+  box-shadow: 4px 4px 0 var(--ink) !important;
+}
+
 /* --- Navbar: marca no tipo de display do site (Anton), "Labz" em verde --- */
 .site-header .brand-word {
   font-family: "Anton", var(--font-display) !important;
