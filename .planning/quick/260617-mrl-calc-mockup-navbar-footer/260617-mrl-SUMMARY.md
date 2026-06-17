@@ -190,6 +190,30 @@ A revisão do checkpoint apontou 2 desvios; ambos resolvidos:
 
 ---
 
+## Follow-up — Ícones das seções/botões (sprite existente) (2026-06-17)
+
+**Commit:** `fix(quick-260617-mrl): icones das secoes/botoes da calculadora (sprite existente)` (HEAD após este follow-up)
+**Arquivo:** `apps/calculator/templates/calculator/publica.html`
+
+A revisão do checkpoint apontou que os `<use href="#...">` referenciavam ícones inexistentes no sprite (`apps/core/templates/core/partials/icons.html`), deixando os círculos das seções "Energia e Tempo" e "Opcionais" vazios e os botões sem glifo. Trocados pelos ícones que EXISTEM no sprite:
+
+| Onde | Antes (inexistente) | Depois (existe) |
+|------|---------------------|-----------------|
+| Seção "Energia e Tempo" | `#i-zap` | `#i-bolt` |
+| Seção "Opcionais" | `#i-sliders` | `#i-ruler` |
+| Botão "Puxar preço do site" | `#i-refresh` | `#i-download` |
+| Botão "Restaurar preço automático" | `#i-refresh` | `#i-spark` |
+| Botão "Calcular Custo" | `#i-calculator` | `#i-printer3d` |
+| Botão "Limpar" (extra, tb. quebrado) | `#i-refresh` | `#i-trash` |
+
+- Seção "Filamento" já usava `#i-box` (existe) — mantido.
+- Botão "Limpar" também apontava para `#i-refresh` inexistente; trocado para `#i-trash` (semântica de limpar) para zerar o grep.
+- `grep '#i-zap|#i-sliders|#i-refresh|#i-calculator'` em `publica.html`: **sem matches** ✓
+- `manage.py check`: 0 issues ✓
+- Evidência: `shots/calc-light-top.png` (full-page, tema claro) — confirma os 3 ícones de seção preenchidos (box/bolt/ruler) e botões com glifo.
+
+---
+
 ## Checkpoint — Validação Visual (Task 4)
 
 **Status: PENDENTE DE APROVAÇÃO HUMANA**
