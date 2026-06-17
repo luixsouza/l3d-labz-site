@@ -2264,16 +2264,14 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
    Tokens: apenas variáveis existentes — nenhuma cor literal nova.
    ========================================================================= */
 
-/* layout de duas colunas: inputs | resultados */
+/* layout de COLUNA ÚNICA centralizada (igual ao mockup):
+   form (3 cards) + botões + resultado, tudo empilhado e centralizado. */
 .calc-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  align-items: start;
-  margin-top: 2rem;
-}
-@media (max-width: 860px) {
-  .calc-layout { grid-template-columns: 1fr; }
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 920px;
+  margin: 2rem auto 0;
 }
 
 /* titulo de seção dentro de card (Filamento, Energia…) */
@@ -2286,13 +2284,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   margin: 0 0 1rem;
 }
 
-/* coluna de inputs: empilha os cards com gap menor */
+/* inputs: empilha os cards com gap menor (full-width na coluna única) */
 .calc-inputs { display: flex; flex-direction: column; gap: 1rem; }
 
-/* coluna de resultados: sticky no desktop */
-@media (min-width: 861px) {
-  .calc-results { position: sticky; top: calc(var(--header-h) + 1rem); }
-}
+/* resultados: ABAIXO do form, full-width na mesma coluna (sem sticky) */
 .calc-results { display: flex; flex-direction: column; gap: 1rem; }
 
 /* painel de detalhamento dentro do card */
@@ -2357,7 +2352,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 /* impressão: oculta nav, CTAs e mostra só resultado */
 @media print {
   .site-header, .calc-inputs, .calc-cta, footer { display: none !important; }
-  .calc-layout { grid-template-columns: 1fr; }
   .calc-results { position: static; }
 }
 
