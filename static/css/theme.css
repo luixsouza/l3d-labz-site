@@ -1691,8 +1691,8 @@ select { -webkit-appearance: none; -moz-appearance: none; appearance: none; curs
 @media (max-width: 880px) { .site-footer .footer-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 520px) { .site-footer .footer-grid { grid-template-columns: 1fr; } }
 
-/* Footer — nome da marca sem verde (texto uniforme) */
-.footer-brand-block .mascot-name, .footer-brand-block .mascot-name b { color: #eaf5ee !important; }
+/* Footer — cor do nome da marca é resolvida no bloco autoritativo do fim do arquivo
+   (260617-mrl): mascot-name legível nos dois temas, "Labz" em verde. */
 
 /* =========================================================================
    Painel do vendedor — header, rastreio e seletor de papel no cadastro
@@ -3158,11 +3158,29 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   margin-top: .55rem;
 }
 .calc-chips .pill {
-  font-size: .78rem !important;
-  padding: .3rem .7rem !important;
+  font-size: .72rem !important;
+  padding: .26rem .62rem !important;
+  line-height: 1.2 !important;
+  font-weight: 600 !important;
   cursor: pointer !important;
-  border: 2px solid var(--ink) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 999px !important;
+  background: var(--bg-soft) !important;
+  color: var(--text-muted) !important;
+  box-shadow: none !important;
+  transition: border-color .15s var(--ease), background .15s var(--ease), color .15s var(--ease) !important;
 }
+.calc-chips .pill:hover {
+  border-color: var(--accent) !important;
+  color: var(--text) !important;
+  transform: none !important;
+}
+.calc-chips .pill.active {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: #fff !important;
+}
+[data-theme="light"] .calc-chips .pill { background: #fff !important; }
 
 /* --- botões "Puxar / Restaurar preço" abaixo do select de material --- */
 .calc-price-btns {
@@ -3220,3 +3238,85 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 [data-theme="light"] .calc-card-ic { background: var(--accent-soft); border-color: var(--accent); }
 [data-theme="light"] .calc-card select { background: #fff; }
 [data-theme="light"] .calc-input-wrap input[type="number"] { background: #fff; }
+
+/* =========================================================================
+   NAVBAR + FOOTER — refator de consistência (260617-mrl follow-up)
+   Bloco autoritativo no FIM do arquivo: vence as camadas legadas (header v1/v2/v3,
+   footer v1/v2) e os overrides [data-theme]/!important. Consolida:
+   tipografia, botão "Sair" (altura), e o footer (Luigi removido, marca legível).
+   ========================================================================= */
+
+/* --- Navbar: botões de ação com MESMA altura (corrige "Sair" 40px vs 44px) --- */
+.site-header .header-actions .btn,
+.site-header .header-actions .btn-sm,
+.site-header .header-actions form button.btn {
+  height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+.site-header .header-actions form { display: inline-flex; align-items: center; margin: 0; }
+
+/* --- Navbar: marca no tipo de display do site (Anton), "Labz" em verde --- */
+.site-header .brand-word {
+  font-family: "Anton", var(--font-display) !important;
+  letter-spacing: .03em;
+}
+
+/* --- Footer: grid mais compacto (sem o Luigi gigante) --- */
+.site-footer .footer-grid {
+  grid-template-columns: 1.5fr repeat(3, 1fr) !important;
+  gap: 2.2rem !important;
+  padding: 2.6rem 0 1.8rem !important;
+  align-items: start;
+}
+@media (max-width: 880px) { .site-footer .footer-grid { grid-template-columns: 1fr 1fr !important; } }
+@media (max-width: 520px) { .site-footer .footer-grid { grid-template-columns: 1fr !important; } }
+
+/* marca do footer: wordmark legível nos DOIS temas, mesmo padrão do header */
+.site-footer .footer-brand-block { align-self: start; }
+.site-footer .footer-wordmark { display: inline-block; }
+.site-footer .footer-brand-block .mascot-name {
+  font-family: "Anton", var(--font-display) !important;
+  font-size: 1.6rem !important;
+  font-weight: 400 !important;
+  letter-spacing: .04em !important;
+  text-transform: uppercase !important;
+  line-height: 1 !important;
+  color: var(--text) !important;
+}
+.site-footer .footer-brand-block .mascot-name b { color: var(--accent-strong) !important; }
+[data-theme="dark"] .site-footer .footer-brand-block .mascot-name { color: #eaf5ee !important; }
+[data-theme="dark"] .site-footer .footer-brand-block .mascot-name b { color: #3ee37a !important; }
+.site-footer .footer-brand-block .mascot-sub {
+  color: var(--text-muted) !important;
+  font-size: .92rem !important;
+  max-width: 40ch !important;
+  margin: .9rem 0 0 !important;
+  line-height: 1.6 !important;
+}
+[data-theme="dark"] .site-footer .footer-brand-block .mascot-sub { color: #8fae9c !important; }
+
+/* títulos de coluna + links: tipografia do site, contraste correto */
+.site-footer .footer-grid h5 {
+  font-family: var(--font-display) !important;
+  font-size: .76rem !important;
+  font-weight: 700 !important;
+  letter-spacing: .14em !important;
+  text-transform: uppercase !important;
+  color: var(--text) !important;
+  margin-bottom: 1rem !important;
+}
+[data-theme="dark"] .site-footer .footer-grid h5 { color: #cfe6d8 !important; }
+.site-footer .footer-grid a {
+  font-family: var(--font) !important;
+  font-size: .92rem !important;
+  font-weight: 500 !important;
+  color: var(--text-muted) !important;
+}
+.site-footer .footer-grid a:hover { color: var(--accent-strong) !important; }
+[data-theme="dark"] .site-footer .footer-grid a { color: #9bbda8 !important; }
+[data-theme="dark"] .site-footer .footer-grid a:hover { color: #3ee37a !important; }
