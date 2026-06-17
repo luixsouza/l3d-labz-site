@@ -2,8 +2,8 @@
 <header class="site-header">
   <div class="container">
     <a href="{% url 'core:home' %}" class="brand" aria-label="L3D Labz — início">
-      <svg class="brand-logo" viewBox="0 0 64 64" aria-hidden="true"><use href="#i-l3d-mark"></use></svg>
-      <span class="brand-word"><b>L3D</b> Labz</span>
+      <span class="brand-badge"><img src="{% static 'img/logo.png' %}" alt=""></span>
+      <span class="brand-word">L3D <span class="brand-labz">Labz</span></span>
     </a>
 
     {% with vn=request.resolver_match.view_name %}

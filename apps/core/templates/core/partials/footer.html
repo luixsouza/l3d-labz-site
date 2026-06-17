@@ -4,10 +4,13 @@
     <div class="footer-grid">
       <div>
         <a href="{% url 'core:home' %}" class="brand footer-brand">
-          <svg class="brand-logo" viewBox="0 0 64 64" aria-hidden="true"><use href="#i-l3d-mark"></use></svg>
-          <span class="brand-word"><b>L3D</b> Labz</span>
+          <span class="brand-badge"><img src="{% static 'img/logo.png' %}" alt=""></span>
         </a>
-        <p class="text-muted" style="max-width:36ch">Peças impressas em 3D com capricho de maker: action figures, réplicas, utensílios e gadgets — produzidos sob demanda, do seu jeito.</p>
+        {# footer-brand-block: mascot-name uniforme sem verde (linha ~1695 do CSS mantida) #}
+        <div class="footer-brand-block">
+          <span class="mascot-name">L3D <b>Labz</b></span>
+          <p class="mascot-sub">Peças impressas em 3D com capricho de maker: action figures, réplicas, utensílios e gadgets — produzidos sob demanda, do seu jeito.</p>
+        </div>
       </div>
       <div>
         <h5>Loja</h5>
