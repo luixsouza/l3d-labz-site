@@ -1,138 +1,15 @@
-"""Presets genéricos da calculadora de precificação 3D — impressoras, filamentos e bandeiras ANEEL.
+"""Presets da calculadora de precificação 3D — filamentos, chips de consumo e bandeiras de kWh.
 
-Vigência dos dados: 2026-06-14.
-Fonte das bandeiras ANEEL: Jornal de Brasília / ANEEL (junho 2025).
-Nota de potência: os valores de 'potencia_w' são médias de impressão ativas medidas por
-wattímetro — NÃO a potência de pico da fonte (que é 2–3x maior).
-
-Atualizar BANDEIRA_VIGENTE_DEFAULT mensalmente conforme resolução ANEEL.
+Vigência dos dados: 2026-06-17.
+Fonte dos chips de consumo: pesquisa 2026-06 (potências médias de impressão ativas, não pico).
+Fonte do BANDEIRA_KWH: tarifa base residencial BR 2025 ≈ R$0,95/kWh (ANEEL); adicionais
+  Verde: sem adicional (bandeira verde — cenário hídrico favorável).
+  Amarela: +R$0,02 (aproximação do adicional ANEEL vigente, atualizar mensalmente).
+  Vermelha: +R$0,07 (média entre P1 R$0,04463 e P2 R$0,07877 — simplificação para UX).
 """
 from __future__ import annotations
 
 import json
-
-# ---- Impressoras FDM ----------------------------------------------------------------
-# Fonte: pesquisa 2026-06-14 — valores de potência são médias de impressão, NÃO pico da fonte.
-# Marcados como "# estimado" quando não há medição publicada por wattímetro.
-IMPRESSORAS: dict[str, dict] = {
-    "ender3_v3_se": {
-        "label": "Creality Ender 3 V3 SE",
-        "potencia_w": 100,       # estimado
-        "valor_maquina": 1499,
-        "vida_util_h": 2000,
-    },
-    "ender3_v3_ke": {
-        "label": "Creality Ender 3 V3 KE",
-        "potencia_w": 120,       # estimado
-        "valor_maquina": 2199,
-        "vida_util_h": 2000,
-    },
-    "ender3_v3": {
-        "label": "Creality Ender 3 V3",
-        "potencia_w": 130,       # estimado
-        "valor_maquina": 2339,
-        "vida_util_h": 2000,
-    },
-    "k1": {
-        "label": "Creality K1",
-        "potencia_w": 100,
-        "valor_maquina": 4130,
-        "vida_util_h": 3000,
-    },
-    "k1_max": {
-        "label": "Creality K1 Max",
-        "potencia_w": 150,       # estimado
-        "valor_maquina": 9499,
-        "vida_util_h": 3000,
-    },
-    "bambu_a1_mini": {
-        "label": "Bambu Lab A1 Mini",
-        "potencia_w": 90,
-        "valor_maquina": 2319,
-        "vida_util_h": 3000,
-    },
-    "bambu_a1": {
-        "label": "Bambu Lab A1",
-        "potencia_w": 110,       # estimado
-        "valor_maquina": 3529,
-        "vida_util_h": 3000,
-    },
-    "bambu_p1s": {
-        "label": "Bambu Lab P1S",
-        "potencia_w": 120,
-        "valor_maquina": 7789,
-        "vida_util_h": 4000,
-    },
-    "bambu_x1c": {
-        "label": "Bambu Lab X1 Carbon",
-        "potencia_w": 120,
-        "valor_maquina": 15463,
-        "vida_util_h": 4000,
-    },
-    "kobra3_combo": {
-        "label": "Anycubic Kobra 3 Combo",
-        "potencia_w": 140,       # estimado
-        "valor_maquina": 4000,   # estimado
-        "vida_util_h": 3000,
-    },
-    "neptune4": {
-        "label": "Elegoo Neptune 4",
-        "potencia_w": 160,
-        "valor_maquina": 2000,   # estimado (esgotado em lojas)
-        "vida_util_h": 2000,
-    },
-    "neptune4_pro": {
-        "label": "Elegoo Neptune 4 Pro",
-        "potencia_w": 150,       # estimado
-        "valor_maquina": 2800,
-        "vida_util_h": 2000,
-    },
-    "prusa_mk4s": {
-        "label": "Prusa MK4S",
-        "potencia_w": 120,
-        "valor_maquina": 5500,   # estimado (importado ~USD 925)
-        "vida_util_h": 5000,
-    },
-    "prusa_mini_plus": {
-        "label": "Prusa MINI+",
-        "potencia_w": 80,
-        "valor_maquina": 3200,   # estimado (importado)
-        "vida_util_h": 4000,
-    },
-    # Entrada manual — mantida sempre por último na UI
-    "manual": {
-        "label": "Outra / manual",
-        "potencia_w": 0,
-        "valor_maquina": 0,
-        "vida_util_h": 0,
-    },
-}
-
-# ---- Bandeiras ANEEL ----------------------------------------------------------------
-# Fonte: Jornal de Brasília / ANEEL — vigência jun/2025; atualizar mensalmente.
-# O adicional se SOMA à tarifa base: tarifa_efetiva = tarifa_base + adicional_kwh.
-BANDEIRAS_ANEEL: dict[str, dict] = {
-    "verde": {
-        "label": "Verde (sem adicional)",
-        "adicional_kwh": 0.0,
-    },
-    "amarela": {
-        "label": "Amarela (+R$ 0,01885/kWh)",
-        "adicional_kwh": 0.01885,
-    },
-    "vermelha1": {
-        "label": "Vermelha Patamar 1 (+R$ 0,04463/kWh)",
-        "adicional_kwh": 0.04463,
-    },
-    "vermelha2": {
-        "label": "Vermelha Patamar 2 (+R$ 0,07877/kWh)",
-        "adicional_kwh": 0.07877,
-    },
-}
-
-# Bandeira vigente por padrão — atualizar mensalmente conforme ANEEL.
-# Última atualização: 2026-06-14. Vigente: Amarela (mai–jun 2025).
-BANDEIRA_VIGENTE_DEFAULT = "amarela"
 
 # ---- Filamentos FDM -----------------------------------------------------------------
 # Preços são sugestões iniciais (preco_kg_default) — o usuário deve informar o preço real
@@ -218,22 +95,34 @@ FILAMENTOS: dict[str, dict] = {
     },
 }
 
+# ---- Chips de consumo de impressora (UX: preenchem potencia_w no client) -----------
+# Fonte: medições médias de impressão ativa por wattímetro. NÃO é a potência da fonte.
+# Bambu A1 ~200W (mockup): estimativa de uso contínuo com cama aquecida.
+# Bambu X1C ~350W: potência mais alta quando câmara aquecida + multicolor.
+CONSUMO_CHIPS: list[dict] = [
+    {"label": "Ender 3 (~120W)", "w": 120},
+    {"label": "Bambu A1 (~200W)", "w": 200},
+    {"label": "Bambu X1C (~350W)", "w": 350},
+]
+
+# ---- Chips de bandeira tarifária (UX: preenchem valor_kwh no client) ---------------
+# Tarifa base BR 2025 ≈ R$0,95/kWh. Adicionais ANEEL simplificados para UX.
+# Para cálculo preciso, o usuário deve ajustar o campo Valor do kWh manualmente.
+BANDEIRA_KWH: dict[str, float] = {
+    "verde":     0.95,   # sem adicional
+    "amarela":   0.97,   # base + adicional amarela (aprox.)
+    "vermelha":  1.02,   # base + adicional vermelha média (P1+P2)/2 aprox.
+}
+
+# ---- Legados (mantidos para compatibilidade com possíveis referências externas) ----
+# IMPRESSORAS e BANDEIRAS_ANEEL removidos do JSON do JS (calculator.js novo usa
+# filamentos/consumo_chips/bandeira_kwh). Mantidos aqui como fallback de leitura.
+IMPRESSORAS: dict[str, dict] = {}
+BANDEIRAS_ANEEL: dict[str, dict] = {}
+BANDEIRA_VIGENTE_DEFAULT = "verde"
+
 
 # ---- Helpers de choices para os forms -----------------------------------------------
-
-def impressora_choices() -> list[tuple[str, str]]:
-    """Retorna lista de (value, label) para o ChoiceField de impressora.
-
-    A entrada 'manual' (Outra / manual) é sempre a última da lista.
-    """
-    choices = [
-        (key, data["label"])
-        for key, data in IMPRESSORAS.items()
-        if key != "manual"
-    ]
-    choices.append(("manual", IMPRESSORAS["manual"]["label"]))
-    return choices
-
 
 def filamento_choices() -> list[tuple[str, str]]:
     """Retorna lista de (value, label) para o ChoiceField de filamento.
@@ -249,23 +138,14 @@ def filamento_choices() -> list[tuple[str, str]]:
     return choices
 
 
-def bandeira_choices() -> list[tuple[str, str]]:
-    """Retorna lista de (value, label) para o ChoiceField de bandeira ANEEL.
-
-    'verde' (sem adicional) aparece primeiro.
-    """
-    ordem = ["verde", "amarela", "vermelha1", "vermelha2"]
-    return [(key, BANDEIRAS_ANEEL[key]["label"]) for key in ordem if key in BANDEIRAS_ANEEL]
-
-
 def presets_json() -> dict:
-    """Serializa os presets para injeção via json_script no template.
+    """Serializa os presets enxutos para injeção via json_script no template.
 
-    Retorna dict serializável com 'impressoras', 'filamentos' e 'bandeiras' —
-    sem duplicar números literais no JS.
+    Retorna dict serializável com 'filamentos', 'consumo_chips' e 'bandeira_kwh' —
+    sem impressoras/bandeiras antigas (removidas do modelo enxuto).
     """
     return {
-        "impressoras": IMPRESSORAS,
-        "filamentos": FILAMENTOS,
-        "bandeiras": BANDEIRAS_ANEEL,
+        "filamentos":    FILAMENTOS,
+        "consumo_chips": CONSUMO_CHIPS,
+        "bandeira_kwh":  BANDEIRA_KWH,
     }

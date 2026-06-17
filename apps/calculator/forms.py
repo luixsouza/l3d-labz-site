@@ -1,153 +1,117 @@
 """Formulários da calculadora de precificação — inputs de custo e dados do cliente.
 
-CalcForm      — inputs de custo com presets de impressora/filamento e bandeira ANEEL.
+CalcForm      — inputs de custo (modelo enxuto: material, energia, mão de obra, custos fixos, margem).
 OrcamentoForm — estende CalcForm com dados do cliente para o PDF de orçamento.
 
 Padrão `to_calc_data()` espelhado de apps/orders/forms.py (to_order_data).
-A soma tarifa_efetiva = tarifa_base + adicional_bandeira é feita aqui (to_calc_data),
-mantendo a assinatura do PricingService inalterada (recebe um único tarifa_kwh).
+O campo valor_kwh vai direto ao serviço (sem soma de bandeira aqui — o usuário
+escolhe o kWh total via chips de bandeira ou digita manualmente).
 """
 from __future__ import annotations
 
 from django import forms
 
-from .presets import (
-    BANDEIRAS_ANEEL,
-    BANDEIRA_VIGENTE_DEFAULT,
-    bandeira_choices,
-    filamento_choices,
-    impressora_choices,
-)
+from .presets import filamento_choices
 
 
 class CalcForm(forms.Form):
-    """Inputs de custo para a calculadora de precificação de impressão 3D v2.
+    """Inputs de custo para a calculadora de precificação de impressão 3D (modelo enxuto).
 
-    Inclui selects de preset de impressora e filamento (UX de auto-preenchimento),
-    além de tarifa_base + bandeira ANEEL no lugar do antigo campo tarifa_kwh único.
-    Os presets NÃO entram em to_calc_data — são apenas UX; os valores reais usados
-    são os campos numéricos editáveis.
+    Fórmula (decisão D-01 enxuto):
+      custo_material  = (peso_g / 1000) * preco_kg
+      custo_energia   = (potencia_w / 1000) * tempo_h * valor_kwh
+      subtotal        = custo_material + custo_energia + custo_maoobra + custos_fixos
+      preco_venda     = subtotal * (1 + margem_pct / 100)
+
+    Os chips de consumo e de bandeira NÃO entram em to_calc_data — são apenas UX
+    que preenchem potencia_w e valor_kwh no client antes do submit.
     """
 
-    # --- Preset de impressora (UX apenas — não vai a to_calc_data) ---
-    impressora = forms.ChoiceField(
-        label="Impressora",
-        choices=impressora_choices,
+    # --- Preset de filamento (UX apenas — não vai a to_calc_data) ---
+    filamento = forms.ChoiceField(
+        label="Material de referência",
+        choices=filamento_choices,
         required=False,
-        initial="manual",
-        help_text="Selecione para auto-preencher potência, valor e vida útil.",
+        initial="pla",
+        help_text="Selecione para puxar o preço/kg de referência L3D.",
     )
 
     # --- Filamento ---
-    # Preset de filamento (UX apenas)
-    filamento = forms.ChoiceField(
-        label="Material / filamento",
-        choices=filamento_choices,
-        required=False,
-        initial="manual",
-        help_text="Selecione para auto-preencher o preço/kg sugerido.",
-    )
     peso_g = forms.FloatField(
-        label="Peso do filamento (g)",
+        label="Quantidade Utilizada (g)",
         min_value=0.1,
-        help_text="Quantidade estimada de filamento consumido em gramas.",
+        help_text="Consulte o fatiador para saber a gramagem.",
     )
     preco_kg = forms.FloatField(
-        label="Preço do filamento (R$/kg)",
+        label="Preço do Filamento (R$/kg)",
         min_value=0.01,
-        help_text="Preço por quilograma do filamento (ex.: PLA básico ≈ R$ 120/kg). O preset sugere um valor; informe o preço real da sua bobina.",
+        help_text="Preço por quilograma do filamento. Use 'Puxar preço do site' para o valor L3D.",
     )
 
-    # --- Máquina (populados pelo preset de impressora, editáveis) ---
+    # --- Energia ---
     potencia_w = forms.FloatField(
-        label="Potência da impressora (W)",
+        label="Consumo da Impressora (W)",
         min_value=1.0,
-        help_text="Potência ativa média durante impressão — não a potência da fonte (que é 2–3× maior). Use wattímetro para valor exato.",
+        help_text="Potência média durante impressão (não a da fonte). Use os chips abaixo.",
     )
-    valor_maquina = forms.FloatField(
-        label="Valor da impressora (R$)",
-        min_value=1.0,
-        help_text="Custo de aquisição da impressora para cálculo de depreciação.",
-    )
-    vida_util_h = forms.FloatField(
-        label="Vida útil estimada (h)",
-        min_value=1.0,
-        help_text="Horas de impressão até o fim da vida útil da máquina.",
-    )
-
-    # --- Tempo ---
     tempo_h = forms.FloatField(
-        label="Tempo de impressão (h)",
+        label="Tempo de Impressão (horas)",
         min_value=0.1,
         help_text="Tempo estimado de impressão em horas.",
     )
-
-    # --- Energia: tarifa base + bandeira ANEEL (substituem o antigo tarifa_kwh) ---
-    tarifa_base = forms.FloatField(
-        label="Tarifa base da distribuidora (R$/kWh)",
+    valor_kwh = forms.FloatField(
+        label="Valor do kWh (R$)",
         min_value=0.01,
-        help_text=(
-            "Tarifa residencial da sua distribuidora em R$/kWh "
-            "(média BR 2025 ≈ R$ 0,95). Veja na sua conta de luz."
-        ),
-    )
-    bandeira = forms.ChoiceField(
-        label="Bandeira tarifária ANEEL",
-        choices=bandeira_choices,
-        initial=BANDEIRA_VIGENTE_DEFAULT,
-        help_text="O adicional da bandeira é somado à tarifa base para obter a tarifa efetiva.",
+        initial=0.95,
+        help_text="Tarifa do kWh da sua distribuidora com bandeira inclusa. Use os chips de bandeira.",
     )
 
-    # --- Trabalho ---
+    # --- Opcionais ---
     custo_maoobra = forms.FloatField(
-        label="Custo de mão de obra (R$)",
+        label="Mão de Obra (R$)",
         min_value=0.0,
-        help_text="Valor fixo de mão de obra para a peça (preparação, pós-processamento etc.).",
+        initial=0.0,
+        required=False,
+        help_text="Valor fixo por peça (preparação, acabamento, etc.).",
     )
-
-    # --- Margem e risco ---
-    taxa_falha_pct = forms.FloatField(
-        label="Taxa de falha / reimpressão (%)",
+    custos_fixos = forms.FloatField(
+        label="Custos Fixos (R$)",
         min_value=0.0,
-        max_value=100.0,
-        help_text="Percentual sobre o custo para cobrir peças falhas ou reimpressões.",
+        initial=0.0,
+        required=False,
+        help_text="Desgaste da impressora, acabamento, etc.",
     )
     margem_pct = forms.FloatField(
-        label="Margem de lucro (%)",
+        label="Margem de Lucro (%)",
         min_value=0.0,
-        help_text="Percentual de margem aplicado sobre o custo total para obter o preço de venda.",
+        initial=100.0,
+        help_text="Percentual de margem sobre o subtotal para obter o preço de venda.",
     )
 
     def to_calc_data(self) -> dict:
         """Converte o form validado no dict que PricingService.calcular espera.
 
-        Calcula a tarifa efetiva somando o adicional da bandeira ANEEL à tarifa base
-        ANTES de chamar o serviço — a assinatura do PricingService permanece inalterada
-        (recebe um único 'tarifa_kwh').
-        Os campos de preset (impressora/filamento) NÃO entram aqui — são apenas UX.
+        Campos retornados: peso_g, preco_kg, potencia_w, tempo_h, valor_kwh,
+        custo_maoobra, custos_fixos, margem_pct.
+        O campo filamento NÃO entra — é apenas UX.
         """
         c = self.cleaned_data
-        # --- soma da bandeira (decisão arquitetural: feita no form, não no serviço) ---
-        adicional = BANDEIRAS_ANEEL[c["bandeira"]]["adicional_kwh"]
-        tarifa_kwh = c["tarifa_base"] + adicional
         return {
-            "peso_g":         c["peso_g"],
-            "preco_kg":       c["preco_kg"],
-            "potencia_w":     c["potencia_w"],
-            "tempo_h":        c["tempo_h"],
-            "tarifa_kwh":     tarifa_kwh,       # tarifa efetiva = base + adicional_bandeira
-            "valor_maquina":  c["valor_maquina"],
-            "vida_util_h":    c["vida_util_h"],
-            "custo_maoobra":  c["custo_maoobra"],
-            "taxa_falha_pct": c["taxa_falha_pct"],
-            "margem_pct":     c["margem_pct"],
+            "peso_g":        c["peso_g"],
+            "preco_kg":      c["preco_kg"],
+            "potencia_w":    c["potencia_w"],
+            "tempo_h":       c["tempo_h"],
+            "valor_kwh":     c["valor_kwh"],
+            "custo_maoobra": c.get("custo_maoobra") or 0.0,
+            "custos_fixos":  c.get("custos_fixos") or 0.0,
+            "margem_pct":    c["margem_pct"],
         }
 
 
 class OrcamentoForm(CalcForm):
     """Estende CalcForm com os dados do cliente para emissão do PDF de orçamento.
 
-    Campos adicionais (decisão D-03): cliente, peça, quantidade, prazo, observações.
+    Campos adicionais: cliente, peça, quantidade, prazo, observações.
     """
 
     # --- Dados do cliente ---

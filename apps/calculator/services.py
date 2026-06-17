@@ -1,18 +1,19 @@
 """Serviços da calculadora de precificação de impressão 3D.
 
-PricingService — fonte única da verdade das fórmulas de custo (decisão D-01):
+PricingService — fonte única da verdade das fórmulas de custo (decisão D-01 enxuto):
   - custo_material  = (peso_g / 1000) * preco_kg
-  - custo_energia   = (potencia_w / 1000) * tempo_h * tarifa_kwh
-  - custo_depreciacao = (valor_maquina / vida_util_h) * tempo_h
+  - custo_energia   = (potencia_w / 1000) * tempo_h * valor_kwh
   - custo_maoobra   = valor fixo informado (passthrough)
-  - subtotal        = soma dos quatro acima
-  - ajuste_falha    = subtotal * (taxa_falha_pct / 100)
-  - custo_total     = subtotal + ajuste_falha
-  - preco_venda     = custo_total * (1 + margem_pct / 100)
+  - custos_fixos    = valor fixo informado (passthrough)
+  - subtotal        = custo_material + custo_energia + custo_maoobra + custos_fixos
+  - preco_venda     = subtotal * (1 + margem_pct / 100)
 
-OrcamentoService — persistência dos dados PÚBLICOS do orçamento (T-fma-01):
+  REMOVIDOS: custo_depreciacao (valor_maquina/vida_util_h), ajuste_falha (taxa_falha_pct),
+  custo_total. Simplificação aprovada pelo usuário (mockup 2026-06-17).
+
+OrcamentoService — persistência dos dados PÚBLICOS do orçamento (T-mrl-01):
   Único ponto de escrita no banco; recebe apenas os 7 campos públicos,
-  NUNCA custos internos.
+  NUNCA custos internos (custo_maoobra, custos_fixos, margem_pct não entram no banco).
 """
 from __future__ import annotations
 
@@ -28,19 +29,14 @@ from .models import Orcamento
 
 @dataclass(frozen=True)
 class CustoDefaults:
-    """Valores padrão de custo — editáveis num único lugar (decisão D-05).
+    """Valores padrão de custo — editáveis num único lugar (decisão D-05 enxuto).
 
-    Impressoras de referência:
-      - Creality Ender 3: ~110 W de potência ativa
-      - Prusa i3 MK3S+: ~180 W de potência ativa
+    Modelo enxuto: sem valor_maquina, vida_util_h, taxa_falha_pct.
     """
 
-    tarifa_kwh: float = 0.95       # R$/kWh (tarifa residencial típica BR 2025)
-    margem_pct: float = 150.0      # margem sobre o custo total (%)
-    taxa_falha_pct: float = 10.0   # ajuste para taxa de falha/reimpressão (%)
-    potencia_w: float = 110.0      # watts (Ender 3; Prusa i3 MK3S+ ≈ 180 W)
-    valor_maquina: float = 2000.0  # custo da impressora (R$)
-    vida_util_h: float = 2000.0    # horas úteis estimadas até o fim da vida
+    valor_kwh: float = 0.95       # R$/kWh (tarifa residencial típica BR 2025, bandeira verde)
+    margem_pct: float = 100.0     # margem sobre o subtotal (%)
+    potencia_w: float = 200.0     # watts (Bambu A1 — impressora de referência do mockup)
 
 
 _DEFAULTS = CustoDefaults()
@@ -54,7 +50,7 @@ def _d(value: float | int) -> Decimal:
 
 
 class PricingService(BaseService):
-    """Cálculo de preço de impressão 3D — stateless."""
+    """Cálculo de preço de impressão 3D — stateless (modelo enxuto)."""
 
     @staticmethod
     def calcular(
@@ -63,63 +59,53 @@ class PricingService(BaseService):
         preco_kg: float,
         potencia_w: float = _DEFAULTS.potencia_w,
         tempo_h: float,
-        tarifa_kwh: float = _DEFAULTS.tarifa_kwh,
-        valor_maquina: float = _DEFAULTS.valor_maquina,
-        vida_util_h: float = _DEFAULTS.vida_util_h,
+        valor_kwh: float = _DEFAULTS.valor_kwh,
         custo_maoobra: float,
-        taxa_falha_pct: float = _DEFAULTS.taxa_falha_pct,
+        custos_fixos: float = 0.0,
         margem_pct: float = _DEFAULTS.margem_pct,
     ) -> dict[str, float]:
-        """Calcula o preço de venda e o detalhamento completo de custos.
+        """Calcula o preço de venda e o detalhamento enxuto de custos.
 
-        Devolve um dict com 8 chaves (valores float arredondados a 2 casas):
-          custo_material, custo_energia, custo_depreciacao, custo_maoobra,
-          subtotal, ajuste_falha, custo_total, preco_venda.
+        Devolve um dict com EXATAMENTE 6 chaves (valores float arredondados a 2 casas):
+          custo_material, custo_energia, custo_maoobra, custos_fixos, subtotal, preco_venda.
         """
         # --- material ---
         custo_material = (_d(peso_g) / _d(1000)) * _d(preco_kg)
 
         # --- energia elétrica ---
-        custo_energia = (_d(potencia_w) / _d(1000)) * _d(tempo_h) * _d(tarifa_kwh)
-
-        # --- depreciação da máquina ---
-        custo_depreciacao = (_d(valor_maquina) / _d(vida_util_h)) * _d(tempo_h)
+        custo_energia = (_d(potencia_w) / _d(1000)) * _d(tempo_h) * _d(valor_kwh)
 
         # --- mão de obra (passthrough do valor informado) ---
         custo_maoobra_d = _d(custo_maoobra)
 
-        # --- subtotal ---
-        subtotal = custo_material + custo_energia + custo_depreciacao + custo_maoobra_d
+        # --- custos fixos (passthrough do valor informado) ---
+        custos_fixos_d = _d(custos_fixos)
 
-        # --- ajuste de falha/reimpressão ---
-        ajuste_falha = subtotal * (_d(taxa_falha_pct) / _d(100))
-        custo_total = subtotal + ajuste_falha
+        # --- subtotal ---
+        subtotal = custo_material + custo_energia + custo_maoobra_d + custos_fixos_d
 
         # --- preço de venda com margem ---
-        preco_venda = custo_total * (_d(1) + _d(margem_pct) / _d(100))
+        preco_venda = subtotal * (_d(1) + _d(margem_pct) / _d(100))
 
         def _arredondar(v: Decimal) -> float:
             return float(v.quantize(_DOIS, rounding=ROUND_HALF_UP))
 
         return {
-            "custo_material":    _arredondar(custo_material),
-            "custo_energia":     _arredondar(custo_energia),
-            "custo_depreciacao": _arredondar(custo_depreciacao),
-            "custo_maoobra":     _arredondar(custo_maoobra_d),
-            "subtotal":          _arredondar(subtotal),
-            "ajuste_falha":      _arredondar(ajuste_falha),
-            "custo_total":       _arredondar(custo_total),
-            "preco_venda":       _arredondar(preco_venda),
+            "custo_material": _arredondar(custo_material),
+            "custo_energia":  _arredondar(custo_energia),
+            "custo_maoobra":  _arredondar(custo_maoobra_d),
+            "custos_fixos":   _arredondar(custos_fixos_d),
+            "subtotal":       _arredondar(subtotal),
+            "preco_venda":    _arredondar(preco_venda),
         }
 
 
 class OrcamentoService(BaseService):
     """Persistência dos dados PÚBLICOS do orçamento — única camada que escreve no banco.
 
-    SEGURANÇA (T-fma-01 / T-fma-03): recebe SOMENTE os 7 campos públicos
-    (keyword-only). Jamais aceitar custo_material, custo_energia,
-    custo_depreciacao, custo_maoobra, subtotal, ajuste_falha, custo_total,
-    taxa_falha_pct ou margem_pct — esses dados NÃO entram no banco.
+    SEGURANÇA (T-mrl-01): recebe SOMENTE os 7 campos públicos (keyword-only).
+    Jamais aceitar custo_material, custo_energia, custo_maoobra, custos_fixos,
+    subtotal, margem_pct — esses dados NÃO entram no banco.
     """
 
     @staticmethod
