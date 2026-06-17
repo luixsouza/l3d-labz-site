@@ -126,7 +126,7 @@
                 {# Chips de bandeira tarifária #}
                 <div class="calc-chips" id="bandeira-chips">
                   {% for bandeira, kwh in presets_json.bandeira_kwh.items %}
-                    <button type="button" class="pill" data-kwh="{{ kwh }}">Bandeira {{ bandeira }}</button>
+                    <button type="button" class="pill" data-kwh="{{ kwh|unlocalize }}">Bandeira {{ bandeira }}</button>
                   {% endfor %}
                 </div>
               </div>
