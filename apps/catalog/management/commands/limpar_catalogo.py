@@ -23,6 +23,7 @@ Uso:
 """
 from __future__ import annotations
 
+import io
 from pathlib import Path
 
 from django.conf import settings
@@ -90,13 +91,18 @@ class Command(BaseCommand):
         backup_path = BACKUP_DIR / f"catalogo-{timestamp}.json"
 
         self.stdout.write(f"Gerando backup em: {backup_path}")
+        # Captura o output do dumpdata em memória e escreve com UTF-8 explícito.
+        # Usar --output do dumpdata no Windows pode gerar arquivos em CP1252 (encoding
+        # do sistema), o que impede o loaddata de restaurar corretamente.
+        buf = io.StringIO()
         call_command(
             "dumpdata",
             "catalog.Product",
             "catalog.ProductImage",
             indent=2,
-            output=str(backup_path),
+            stdout=buf,
         )
+        backup_path.write_text(buf.getvalue(), encoding="utf-8")
 
         tamanho_kb = backup_path.stat().st_size / 1024
         self.stdout.write(
