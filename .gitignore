@@ -42,3 +42,6 @@ Thumbs.db
 # UAT screenshots / fixtures (nao versionar)
 .shots/
 .uat/
+
+# Backups gerados pelo limpar_catalogo (nao versionar — podem conter dados sensíveis)
+/backups/
